@@ -1,0 +1,6 @@
+type {{.Name}} {{.Type}}
+
+const (
+	{{range .Values}}{{.ConstName}} {{$.Name}} = {{printf "%#v" .Value}}
+	{{end}}
+)

@@ -1,0 +1,10 @@
+type {{.Name}} struct {
+	// Mandatory fields
+	{{range .Fields}}{{if .Required}}{{.Name}} {{.Type}} `json:"{{.JSONField}}"`
+	{{end}}{{end}}
+
+	// Optional fields
+	{{range .Fields}}{{if not .Required}}{{.Name}} {{.Type}} `json:"{{.JSONField}},omitempty"`
+	{{end}}{{end}}
+}
+

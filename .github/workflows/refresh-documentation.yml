@@ -1,0 +1,20 @@
+# Makes sure that new releases are pulled into https://proxy.golang.org
+# and that the documentation on https://pkg.go.dev/ is updated.
+# See https://github.com/andrewslotin/go-proxy-pull-action for details.
+
+name: Refresh documentation
+
+on:
+  release:
+    types:
+      - created
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  build:
+    name: Refresh documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull new module version
+        uses: andrewslotin/go-proxy-pull-action@master
