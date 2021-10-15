@@ -25,6 +25,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+//go:generate go run ./internal/cmd/roundtriptestgen protocol/examples/events events_test_roundtripdata.go
+
 // TestRoundtrip reads example events from the Eiffel protocol repository,
 // deserializes them into Go structs, verifies that we get the expected struct,
 // and finally serializes back to JSON and verifies that the result is
