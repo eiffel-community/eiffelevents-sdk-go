@@ -75,7 +75,7 @@ func main() {
 	}
 
 	switch event := anyEvent.(type) {
-		case *eiffelevents.CompositionDefinedV3:
+	case *eiffelevents.CompositionDefinedV3:
 		fmt.Printf("Received %s composition\n", event.Data.Name)
 	default:
 		fmt.Printf("This event I don't know much about: %s\n", event)
