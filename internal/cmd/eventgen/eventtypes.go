@@ -114,9 +114,8 @@ func goTypeFromSchema(parent *goStruct, name string, schema *jsschema.Schema) (g
 		typ = &goPrimitiveType{name: "bool"}
 	case jsschema.ObjectType:
 		// The data.batches.recipes.constraints member of TERCC 1.0.0 has
-		// the type "object" but no properties defined. I'm not sure that's
-		// a correct way to describe an object that can have any properties,
-		// but we can add an exception for it.
+		// the type "object" but no properties defined. We can't generate
+		// a struct type for that so use an interface pointer instead.
 		if len(schema.Properties) == 0 {
 			typ = &goInterface{}
 		} else {
