@@ -27,8 +27,7 @@ var eventRoundTripTestTable = []struct {
 	{"protocol/examples/events/EiffelActivityTriggeredEvent/simple-customdata.json", &ActivityTriggeredV3{}},
 	{"protocol/examples/events/EiffelActivityTriggeredEvent/simple.json", &ActivityTriggeredV3{}},
 	{"protocol/examples/events/EiffelAnnouncementPublishedEvent/simple.json", &AnnouncementPublishedV3{}},
-	// Commenting out the following example until https://github.com/eiffel-community/eiffel/pull/284 has been merged.
-	// {"protocol/examples/events/EiffelArtifactCreatedEvent/backend.json", &ArtifactCreatedV3{}},
+	{"protocol/examples/events/EiffelArtifactCreatedEvent/backend.json", &ArtifactCreatedV3{}},
 	{"protocol/examples/events/EiffelArtifactCreatedEvent/dependent.json", &ArtifactCreatedV3{}},
 	{"protocol/examples/events/EiffelArtifactCreatedEvent/interface.json", &ArtifactCreatedV3{}},
 	{"protocol/examples/events/EiffelArtifactCreatedEvent/simple.json", &ArtifactCreatedV3{}},
