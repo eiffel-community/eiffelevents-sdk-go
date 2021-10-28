@@ -1,4 +1,4 @@
-module github.com/magnusbaeck/eiffelevents-sdk-go
+module github.com/eiffel-community/eiffelevents-sdk-go
 
 go 1.17
 

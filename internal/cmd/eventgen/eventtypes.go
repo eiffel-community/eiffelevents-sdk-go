@@ -26,8 +26,8 @@ import (
 	"github.com/Masterminds/semver"
 	jsschema "github.com/lestrrat-go/jsschema"
 
-	"github.com/magnusbaeck/eiffelevents-sdk-go"
-	"github.com/magnusbaeck/eiffelevents-sdk-go/internal/codetemplate"
+	"github.com/eiffel-community/eiffelevents-sdk-go"
+	"github.com/eiffel-community/eiffelevents-sdk-go/internal/codetemplate"
 )
 
 // goType represents a Go type that's capable of formatting itself

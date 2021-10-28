@@ -22,7 +22,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/magnusbaeck/eiffelevents-sdk-go/internal/codetemplate"
+	"github.com/eiffel-community/eiffelevents-sdk-go/internal/codetemplate"
 )
 
 // goEnum represents a Go type that acts as an enumeration. This type has the following form:

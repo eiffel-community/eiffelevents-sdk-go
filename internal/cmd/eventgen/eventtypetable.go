@@ -19,8 +19,8 @@ package main
 import (
 	_ "embed"
 
-	"github.com/magnusbaeck/eiffelevents-sdk-go"
-	"github.com/magnusbaeck/eiffelevents-sdk-go/internal/codetemplate"
+	"github.com/eiffel-community/eiffelevents-sdk-go"
+	"github.com/eiffel-community/eiffelevents-sdk-go/internal/codetemplate"
 )
 
 //go:embed templates/eventtypetable.tmpl

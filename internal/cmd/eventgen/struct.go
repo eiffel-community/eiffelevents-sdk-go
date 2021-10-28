@@ -22,7 +22,8 @@ import (
 	"strings"
 
 	jsschema "github.com/lestrrat-go/jsschema"
-	"github.com/magnusbaeck/eiffelevents-sdk-go/internal/codetemplate"
+
+	"github.com/eiffel-community/eiffelevents-sdk-go/internal/codetemplate"
 )
 
 // goStruct represents a struct Go type, including its fields.
