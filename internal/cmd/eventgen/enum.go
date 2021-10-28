@@ -34,7 +34,7 @@ import (
 //	       EnumName_Value2 EnumName = "VALUE2"
 //	   )
 //
-// It currently assumes that the underlying type is a string and that that
+// It currently assumes that the underlying type is a string and that the
 // string (with limited mangling) can be appended to the name of the enum type
 // to form a valid constant name.
 type goEnum struct {

@@ -48,15 +48,15 @@ func UnmarshalAny(input []byte) (interface{}, error) {
 	schemaSelectors := gjson.GetManyBytes(input, "meta.type", "meta.version")
 	metaType := schemaSelectors[0].String()
 	if metaType == "" {
-		return nil, fmt.Errorf("%w: unable to extract meta.type from input", ErrMalformedInput)
+		return nil, fmt.Errorf("%w: unable to extract meta.type", ErrMalformedInput)
 	}
 	metaVersion := schemaSelectors[1].String()
 	if metaVersion == "" {
-		return nil, fmt.Errorf("%w: unable to extract meta.version from input", ErrMalformedInput)
+		return nil, fmt.Errorf("%w: unable to extract meta.version", ErrMalformedInput)
 	}
 	version, err := semver.NewVersion(metaVersion)
 	if err != nil {
-		return nil, fmt.Errorf("%w: unalbe to parse meta.version: %s", ErrMalformedInput, err)
+		return nil, fmt.Errorf("%w: unable to parse meta.version: %s", ErrMalformedInput, err)
 	}
 
 	// Verify that the event type and version combo is supported.
