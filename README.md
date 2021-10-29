@@ -22,7 +22,66 @@
 # Eiffel Events SDK – Go
 This repository contains data types, constants, and functions for working with Eiffel events in the [Go](https://golang.org/) language, including serialization to and from JSON. Its goal is to make it easy to create and process Eiffel events in Go.
 
-At the moment the repository is under development and contains no contents except this document.
+The module declares a Go struct for every major version of each event type.
+These structs are generated from the JSON schemas and named as in the example
+below. For now you have to initialize all fields yourself but in the future
+there will be factory functions for initializing structs with `meta.type`,
+`meta.version`, `meta.id`, and `meta.time`.
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/eiffel-community/eiffelevents-sdk-go"
+)
+
+func main() {
+	var event eiffelevents.CompositionDefinedV3
+	event.Meta.Type = "EiffelCompositionDefinedEvent"
+	event.Meta.Version = "3.2.0"
+	event.Meta.ID = "87dac043-2e1b-41c5-833a-712833f2a613"
+	event.Meta.Time = time.Now().UnixMilli()
+	event.Data.Name = "my-composition"
+	fmt.Println(event.String())
+}
+```
+
+To unmarshal a JSON string into one of these structs use the UnmarshalAny
+function and use e.g. a type switch to access the event members:
+
+```go
+package main
+
+import (
+	"fmt"
+	"io"
+	"os"
+
+	"github.com/eiffel-community/eiffelevents-sdk-go"
+)
+
+func main() {
+	input, err := io.ReadAll(os.Stdin)
+	if err != nil {
+		panic(err)
+	}
+
+	anyEvent, err := eiffelevents.UnmarshalAny(input)
+	if err != nil {
+		panic(err)
+	}
+
+	switch event := anyEvent.(type) {
+	case *eiffelevents.CompositionDefinedV3:
+		fmt.Printf("Received %s composition\n", event.Data.Name)
+	default:
+		fmt.Printf("This event I don't know much about: %s\n", event)
+	}
+}
+```
 
 ## Code of Conduct and Contributing
 To get involved, please see [Code of Conduct](https://github.com/eiffel-community/.github/blob/master/CODE_OF_CONDUCT.md) and [contribution guidelines](https://github.com/eiffel-community/.github/blob/master/CONTRIBUTING.md).

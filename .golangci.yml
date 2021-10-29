@@ -1,0 +1,25 @@
+---
+linters:
+  disable-all: true
+  enable:
+    - bodyclose
+    - deadcode
+    - errcheck
+    - exportloopref
+    - gocyclo
+    - godot
+    - gofmt
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - staticcheck
+    - typecheck
+    - unconvert
+    - unused
+    - varcheck
+    - whitespace
+linters-settings:
+  misspell:
+    locale: US
