@@ -19,8 +19,25 @@
 package eiffelevents
 
 import (
+	"time"
+
 	"github.com/clarketm/json"
+	"github.com/google/uuid"
 )
+
+// NewTestExecutionRecipeCollectionCreatedV4 creates a new struct pointer that represents
+// major version 4 of EiffelTestExecutionRecipeCollectionCreatedEvent.
+// The returned struct has all required meta members populated.
+// The event version is set to the most recent 4.x.x
+// currently known by this SDK.
+func NewTestExecutionRecipeCollectionCreatedV4() (*TestExecutionRecipeCollectionCreatedV4, error) {
+	var event TestExecutionRecipeCollectionCreatedV4
+	event.Meta.Type = "EiffelTestExecutionRecipeCollectionCreatedEvent"
+	event.Meta.ID = uuid.NewString()
+	event.Meta.Version = eventTypeTable[event.Meta.Type][4].latestVersion
+	event.Meta.Time = time.Now().UnixMilli()
+	return &event, nil
+}
 
 // MarshalJSON returns the JSON encoding of the event.
 func (e *TestExecutionRecipeCollectionCreatedV4) MarshalJSON() ([]byte, error) {

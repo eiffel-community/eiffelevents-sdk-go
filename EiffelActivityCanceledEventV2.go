@@ -19,8 +19,25 @@
 package eiffelevents
 
 import (
+	"time"
+
 	"github.com/clarketm/json"
+	"github.com/google/uuid"
 )
+
+// NewActivityCanceledV2 creates a new struct pointer that represents
+// major version 2 of EiffelActivityCanceledEvent.
+// The returned struct has all required meta members populated.
+// The event version is set to the most recent 2.x.x
+// currently known by this SDK.
+func NewActivityCanceledV2() (*ActivityCanceledV2, error) {
+	var event ActivityCanceledV2
+	event.Meta.Type = "EiffelActivityCanceledEvent"
+	event.Meta.ID = uuid.NewString()
+	event.Meta.Version = eventTypeTable[event.Meta.Type][2].latestVersion
+	event.Meta.Time = time.Now().UnixMilli()
+	return &event, nil
+}
 
 // MarshalJSON returns the JSON encoding of the event.
 func (e *ActivityCanceledV2) MarshalJSON() ([]byte, error) {

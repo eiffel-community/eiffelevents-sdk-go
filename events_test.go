@@ -21,7 +21,9 @@ import (
 	"io"
 	"os"
 	"testing"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -53,4 +55,24 @@ func TestRoundtrip(t *testing.T) {
 			assert.JSONEq(t, string(input), string(output))
 		})
 	}
+}
+
+// TestMajorVersionFactory calls the factory for a randomly chosen major
+// version of an event type and checks that we get reasonable results.
+// All factory functions are generated so we assume that if one is okay
+// then so are the rest.
+func TestMajorVersionFactory(t *testing.T) {
+	// We're deliberately avoiding the most recent major version to avoid having
+	// to update this test if there's another minor version of the event.
+	event, err := NewActivityTriggeredV3()
+	assert.NoError(t, err)
+
+	assert.Equal(t, "EiffelActivityTriggeredEvent", event.Meta.Type)
+	_, err = uuid.Parse(event.Meta.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, "3.0.0", event.Meta.Version)
+
+	// Sanity check that meta.time is within two minutes of the current time.
+	eventTime := time.UnixMilli(0).Add(time.Duration(event.Meta.Time) * time.Millisecond)
+	assert.WithinDuration(t, time.Now(), eventTime, 2*time.Minute)
 }

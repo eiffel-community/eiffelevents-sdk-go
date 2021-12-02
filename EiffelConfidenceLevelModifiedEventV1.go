@@ -19,8 +19,25 @@
 package eiffelevents
 
 import (
+	"time"
+
 	"github.com/clarketm/json"
+	"github.com/google/uuid"
 )
+
+// NewConfidenceLevelModifiedV1 creates a new struct pointer that represents
+// major version 1 of EiffelConfidenceLevelModifiedEvent.
+// The returned struct has all required meta members populated.
+// The event version is set to the most recent 1.x.x
+// currently known by this SDK.
+func NewConfidenceLevelModifiedV1() (*ConfidenceLevelModifiedV1, error) {
+	var event ConfidenceLevelModifiedV1
+	event.Meta.Type = "EiffelConfidenceLevelModifiedEvent"
+	event.Meta.ID = uuid.NewString()
+	event.Meta.Version = eventTypeTable[event.Meta.Type][1].latestVersion
+	event.Meta.Time = time.Now().UnixMilli()
+	return &event, nil
+}
 
 // MarshalJSON returns the JSON encoding of the event.
 func (e *ConfidenceLevelModifiedV1) MarshalJSON() ([]byte, error) {

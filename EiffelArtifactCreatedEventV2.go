@@ -19,8 +19,25 @@
 package eiffelevents
 
 import (
+	"time"
+
 	"github.com/clarketm/json"
+	"github.com/google/uuid"
 )
+
+// NewArtifactCreatedV2 creates a new struct pointer that represents
+// major version 2 of EiffelArtifactCreatedEvent.
+// The returned struct has all required meta members populated.
+// The event version is set to the most recent 2.x.x
+// currently known by this SDK.
+func NewArtifactCreatedV2() (*ArtifactCreatedV2, error) {
+	var event ArtifactCreatedV2
+	event.Meta.Type = "EiffelArtifactCreatedEvent"
+	event.Meta.ID = uuid.NewString()
+	event.Meta.Version = eventTypeTable[event.Meta.Type][2].latestVersion
+	event.Meta.Time = time.Now().UnixMilli()
+	return &event, nil
+}
 
 // MarshalJSON returns the JSON encoding of the event.
 func (e *ArtifactCreatedV2) MarshalJSON() ([]byte, error) {

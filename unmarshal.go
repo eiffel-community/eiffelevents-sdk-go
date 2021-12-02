@@ -73,7 +73,7 @@ func UnmarshalAny(input []byte) (interface{}, error) {
 	}
 
 	// Create an instance of the right struct and unmarshal the payload into it.
-	value := reflect.New(eventTypeTable[metaType][version.Major()]).Interface()
+	value := reflect.New(eventTypeTable[metaType][version.Major()].structType).Interface()
 	if err := json.Unmarshal(input, &value); err != nil {
 		// Ideally we should wrap both ErrMalformedInput and err
 		// but I couldn't figure out an elegant way of doing that.

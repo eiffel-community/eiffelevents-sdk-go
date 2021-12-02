@@ -19,8 +19,25 @@
 package eiffelevents
 
 import (
+	"time"
+
 	"github.com/clarketm/json"
+	"github.com/google/uuid"
 )
+
+// NewCompositionDefinedV3 creates a new struct pointer that represents
+// major version 3 of EiffelCompositionDefinedEvent.
+// The returned struct has all required meta members populated.
+// The event version is set to the most recent 3.x.x
+// currently known by this SDK.
+func NewCompositionDefinedV3() (*CompositionDefinedV3, error) {
+	var event CompositionDefinedV3
+	event.Meta.Type = "EiffelCompositionDefinedEvent"
+	event.Meta.ID = uuid.NewString()
+	event.Meta.Version = eventTypeTable[event.Meta.Type][3].latestVersion
+	event.Meta.Time = time.Now().UnixMilli()
+	return &event, nil
+}
 
 // MarshalJSON returns the JSON encoding of the event.
 func (e *CompositionDefinedV3) MarshalJSON() ([]byte, error) {

@@ -24,9 +24,7 @@ This repository contains data types, constants, and functions for working with E
 
 The module declares a Go struct for every major version of each event type.
 These structs are generated from the JSON schemas and named as in the example
-below. For now you have to initialize all fields yourself but in the future
-there will be factory functions for initializing structs with `meta.type`,
-`meta.version`, `meta.id`, and `meta.time`.
+below.
 
 ```go
 package main
@@ -39,13 +37,25 @@ import (
 )
 
 func main() {
-	var event eiffelevents.CompositionDefinedV3
-	event.Meta.Type = "EiffelCompositionDefinedEvent"
-	event.Meta.Version = "3.2.0"
-	event.Meta.ID = "87dac043-2e1b-41c5-833a-712833f2a613"
-	event.Meta.Time = time.Now().UnixMilli()
-	event.Data.Name = "my-composition"
-	fmt.Println(event.String())
+	// Manual initialization of all struct members.
+	var event1 eiffelevents.CompositionDefinedV3
+	event1.Meta.Type = "EiffelCompositionDefinedEvent"
+	event1.Meta.Version = "3.2.0"
+	event1.Meta.ID = "87dac043-2e1b-41c5-833a-712833f2a613"
+	event1.Meta.Time = time.Now().UnixMilli()
+	event1.Data.Name = "my-composition"
+	fmt.Println(event1.String())
+
+	// Equivalent example using the factory function that pre-populates all
+	// required meta members (picking the most recent event version in
+	// the chosen major version). Note that the factory function returns
+	// a struct pointer.
+	event2, err := eiffelevents.NewCompositionDefinedV3()
+	if err != nil {
+		panic(err)
+	}
+	event2.Data.Name = "my-composition"
+	fmt.Println(event2.String())
 }
 ```
 

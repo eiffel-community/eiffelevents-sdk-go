@@ -19,8 +19,25 @@
 package eiffelevents
 
 import (
+	"time"
+
 	"github.com/clarketm/json"
+	"github.com/google/uuid"
 )
+
+// NewActivityTriggeredV4 creates a new struct pointer that represents
+// major version 4 of EiffelActivityTriggeredEvent.
+// The returned struct has all required meta members populated.
+// The event version is set to the most recent 4.x.x
+// currently known by this SDK.
+func NewActivityTriggeredV4() (*ActivityTriggeredV4, error) {
+	var event ActivityTriggeredV4
+	event.Meta.Type = "EiffelActivityTriggeredEvent"
+	event.Meta.ID = uuid.NewString()
+	event.Meta.Version = eventTypeTable[event.Meta.Type][4].latestVersion
+	event.Meta.Time = time.Now().UnixMilli()
+	return &event, nil
+}
 
 // MarshalJSON returns the JSON encoding of the event.
 func (e *ActivityTriggeredV4) MarshalJSON() ([]byte, error) {
