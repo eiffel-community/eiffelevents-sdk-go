@@ -19,6 +19,8 @@
 package eiffelevents
 
 import (
+	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/clarketm/json"
@@ -30,12 +32,17 @@ import (
 // The returned struct has all required meta members populated.
 // The event version is set to the most recent 2.x.x
 // currently known by this SDK.
-func NewActivityTriggeredV2() (*ActivityTriggeredV2, error) {
+func NewActivityTriggeredV2(modifiers ...Modifier) (*ActivityTriggeredV2, error) {
 	var event ActivityTriggeredV2
 	event.Meta.Type = "EiffelActivityTriggeredEvent"
 	event.Meta.ID = uuid.NewString()
 	event.Meta.Version = eventTypeTable[event.Meta.Type][2].latestVersion
 	event.Meta.Time = time.Now().UnixMilli()
+	for _, modifier := range modifiers {
+		if err := modifier(&event); err != nil {
+			return nil, fmt.Errorf("error applying modifier to new ActivityTriggeredV2: %w", err)
+		}
+	}
 	return &event, nil
 }
 
@@ -66,6 +73,10 @@ func (e *ActivityTriggeredV2) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s)
 }
 
+func (e *ActivityTriggeredV2) SetField(fieldName string, value interface{}) error {
+	return setField(reflect.ValueOf(e), fieldName, value)
+}
+
 // String returns the JSON encoding of the event.
 func (e *ActivityTriggeredV2) String() string {
 	b, err := e.MarshalJSON()
@@ -77,6 +88,8 @@ func (e *ActivityTriggeredV2) String() string {
 	}
 	return string(b)
 }
+
+var _ FieldSetter = &ActivityTriggeredV2{}
 
 type ActivityTriggeredV2 struct {
 	// Mandatory fields

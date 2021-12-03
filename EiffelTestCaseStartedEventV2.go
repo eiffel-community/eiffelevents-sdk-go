@@ -19,6 +19,8 @@
 package eiffelevents
 
 import (
+	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/clarketm/json"
@@ -30,12 +32,17 @@ import (
 // The returned struct has all required meta members populated.
 // The event version is set to the most recent 2.x.x
 // currently known by this SDK.
-func NewTestCaseStartedV2() (*TestCaseStartedV2, error) {
+func NewTestCaseStartedV2(modifiers ...Modifier) (*TestCaseStartedV2, error) {
 	var event TestCaseStartedV2
 	event.Meta.Type = "EiffelTestCaseStartedEvent"
 	event.Meta.ID = uuid.NewString()
 	event.Meta.Version = eventTypeTable[event.Meta.Type][2].latestVersion
 	event.Meta.Time = time.Now().UnixMilli()
+	for _, modifier := range modifiers {
+		if err := modifier(&event); err != nil {
+			return nil, fmt.Errorf("error applying modifier to new TestCaseStartedV2: %w", err)
+		}
+	}
 	return &event, nil
 }
 
@@ -66,6 +73,10 @@ func (e *TestCaseStartedV2) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s)
 }
 
+func (e *TestCaseStartedV2) SetField(fieldName string, value interface{}) error {
+	return setField(reflect.ValueOf(e), fieldName, value)
+}
+
 // String returns the JSON encoding of the event.
 func (e *TestCaseStartedV2) String() string {
 	b, err := e.MarshalJSON()
@@ -77,6 +88,8 @@ func (e *TestCaseStartedV2) String() string {
 	}
 	return string(b)
 }
+
+var _ FieldSetter = &TestCaseStartedV2{}
 
 type TestCaseStartedV2 struct {
 	// Mandatory fields

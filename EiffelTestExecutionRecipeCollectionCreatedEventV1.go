@@ -19,6 +19,8 @@
 package eiffelevents
 
 import (
+	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/clarketm/json"
@@ -30,12 +32,17 @@ import (
 // The returned struct has all required meta members populated.
 // The event version is set to the most recent 1.x.x
 // currently known by this SDK.
-func NewTestExecutionRecipeCollectionCreatedV1() (*TestExecutionRecipeCollectionCreatedV1, error) {
+func NewTestExecutionRecipeCollectionCreatedV1(modifiers ...Modifier) (*TestExecutionRecipeCollectionCreatedV1, error) {
 	var event TestExecutionRecipeCollectionCreatedV1
 	event.Meta.Type = "EiffelTestExecutionRecipeCollectionCreatedEvent"
 	event.Meta.ID = uuid.NewString()
 	event.Meta.Version = eventTypeTable[event.Meta.Type][1].latestVersion
 	event.Meta.Time = time.Now().UnixMilli()
+	for _, modifier := range modifiers {
+		if err := modifier(&event); err != nil {
+			return nil, fmt.Errorf("error applying modifier to new TestExecutionRecipeCollectionCreatedV1: %w", err)
+		}
+	}
 	return &event, nil
 }
 
@@ -66,6 +73,10 @@ func (e *TestExecutionRecipeCollectionCreatedV1) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s)
 }
 
+func (e *TestExecutionRecipeCollectionCreatedV1) SetField(fieldName string, value interface{}) error {
+	return setField(reflect.ValueOf(e), fieldName, value)
+}
+
 // String returns the JSON encoding of the event.
 func (e *TestExecutionRecipeCollectionCreatedV1) String() string {
 	b, err := e.MarshalJSON()
@@ -77,6 +88,8 @@ func (e *TestExecutionRecipeCollectionCreatedV1) String() string {
 	}
 	return string(b)
 }
+
+var _ FieldSetter = &TestExecutionRecipeCollectionCreatedV1{}
 
 type TestExecutionRecipeCollectionCreatedV1 struct {
 	// Mandatory fields

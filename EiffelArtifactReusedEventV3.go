@@ -19,6 +19,8 @@
 package eiffelevents
 
 import (
+	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/clarketm/json"
@@ -30,12 +32,17 @@ import (
 // The returned struct has all required meta members populated.
 // The event version is set to the most recent 3.x.x
 // currently known by this SDK.
-func NewArtifactReusedV3() (*ArtifactReusedV3, error) {
+func NewArtifactReusedV3(modifiers ...Modifier) (*ArtifactReusedV3, error) {
 	var event ArtifactReusedV3
 	event.Meta.Type = "EiffelArtifactReusedEvent"
 	event.Meta.ID = uuid.NewString()
 	event.Meta.Version = eventTypeTable[event.Meta.Type][3].latestVersion
 	event.Meta.Time = time.Now().UnixMilli()
+	for _, modifier := range modifiers {
+		if err := modifier(&event); err != nil {
+			return nil, fmt.Errorf("error applying modifier to new ArtifactReusedV3: %w", err)
+		}
+	}
 	return &event, nil
 }
 
@@ -66,6 +73,10 @@ func (e *ArtifactReusedV3) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s)
 }
 
+func (e *ArtifactReusedV3) SetField(fieldName string, value interface{}) error {
+	return setField(reflect.ValueOf(e), fieldName, value)
+}
+
 // String returns the JSON encoding of the event.
 func (e *ArtifactReusedV3) String() string {
 	b, err := e.MarshalJSON()
@@ -77,6 +88,8 @@ func (e *ArtifactReusedV3) String() string {
 	}
 	return string(b)
 }
+
+var _ FieldSetter = &ArtifactReusedV3{}
 
 type ArtifactReusedV3 struct {
 	// Mandatory fields

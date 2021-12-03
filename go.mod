@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/Masterminds/semver v1.5.0
+	github.com/Showmax/go-fqdn v1.0.0
 	github.com/clarketm/json v1.17.1
 	github.com/gertd/go-pluralize v0.1.7
 	github.com/google/renameio v1.0.1

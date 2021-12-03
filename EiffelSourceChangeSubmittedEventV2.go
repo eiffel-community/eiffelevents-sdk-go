@@ -19,6 +19,8 @@
 package eiffelevents
 
 import (
+	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/clarketm/json"
@@ -30,12 +32,17 @@ import (
 // The returned struct has all required meta members populated.
 // The event version is set to the most recent 2.x.x
 // currently known by this SDK.
-func NewSourceChangeSubmittedV2() (*SourceChangeSubmittedV2, error) {
+func NewSourceChangeSubmittedV2(modifiers ...Modifier) (*SourceChangeSubmittedV2, error) {
 	var event SourceChangeSubmittedV2
 	event.Meta.Type = "EiffelSourceChangeSubmittedEvent"
 	event.Meta.ID = uuid.NewString()
 	event.Meta.Version = eventTypeTable[event.Meta.Type][2].latestVersion
 	event.Meta.Time = time.Now().UnixMilli()
+	for _, modifier := range modifiers {
+		if err := modifier(&event); err != nil {
+			return nil, fmt.Errorf("error applying modifier to new SourceChangeSubmittedV2: %w", err)
+		}
+	}
 	return &event, nil
 }
 
@@ -66,6 +73,10 @@ func (e *SourceChangeSubmittedV2) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s)
 }
 
+func (e *SourceChangeSubmittedV2) SetField(fieldName string, value interface{}) error {
+	return setField(reflect.ValueOf(e), fieldName, value)
+}
+
 // String returns the JSON encoding of the event.
 func (e *SourceChangeSubmittedV2) String() string {
 	b, err := e.MarshalJSON()
@@ -77,6 +88,8 @@ func (e *SourceChangeSubmittedV2) String() string {
 	}
 	return string(b)
 }
+
+var _ FieldSetter = &SourceChangeSubmittedV2{}
 
 type SourceChangeSubmittedV2 struct {
 	// Mandatory fields

@@ -21,11 +21,20 @@
 [![Sandbox badge](https://img.shields.io/badge/Stage-Sandbox-yellow)](https://github.com/eiffel-community/community/blob/master/PROJECT_LIFECYCLE.md#stage-sandbox)
 
 # Eiffel Events SDK – Go
-This repository contains data types, constants, and functions for working with Eiffel events in the [Go](https://golang.org/) language, including serialization to and from JSON. Its goal is to make it easy to create and process Eiffel events in Go.
+This repository contains data types, constants, and functions for working with Eiffel events in the [Go](https://golang.org/) language, including marshaling to and from JSON. Its goal is to make it easy to create and process Eiffel events in Go.
 
 The module declares a Go struct for every major version of each event type.
-These structs are generated from the JSON schemas and named as in the example
+These structs are generated from the JSON schemas and named as in the examples
 below.
+
+## Creating new events
+
+The struct types used to represent Eiffel events are named after the event
+types without the "Eiffel" prefix and "Event" suffix, and the event's major
+version as a suffix. Hence, each event's major version gets its own struct.
+
+The following example shows two methods of creating events, with and without
+a factory.
 
 ```go
 package main
@@ -47,9 +56,9 @@ func main() {
 	event1.Data.Name = "my-composition"
 	fmt.Println(event1.String())
 
-	// Equivalent example using the factory function that pre-populates all
+	// Equivalent example using the factory that pre-populates all
 	// required meta members (picking the most recent event version in
-	// the chosen major version). Note that the factory function returns
+	// the chosen major version). Note that the factory returns
 	// a struct pointer.
 	event2, err := eiffelevents.NewCompositionDefinedV3()
 	if err != nil {
@@ -60,8 +69,58 @@ func main() {
 }
 ```
 
-To unmarshal a JSON string into one of these structs use the UnmarshalAny
-function and use e.g. a type switch to access the event members:
+The example below shows how modifier functions can be passed to factories
+to populate the newly created events with additional fields. In trivial
+cases modifiers are superfluous and the caller can just set the desired fields
+after obtaining the event from the factory, but apart from being a compact
+representation modifiers can be used with any event type. You can also use them
+to create custom factories that apply a preconfigured set of modifiers.
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/eiffel-community/eiffelevents-sdk-go"
+)
+
+func main() {
+	// Create an event with modifiers that select a particular
+	// version of the event and makes sure meta.source.host is
+	// populated with the name of the current host.
+	event1, err := eiffelevents.NewCompositionDefinedV3(
+		eiffelevents.WithVersion("3.1.0"),
+		eiffelevents.WithAutoSourceHost(),
+	)
+	if err != nil {
+		panic(err)
+	}
+	event1.Data.Name = "my-composition"
+	fmt.Println(event1.String())
+
+	// Create a custom factory with the chosen modifiers.
+	newComposition := func() (*eiffelevents.CompositionDefinedV3, error) {
+		return eiffelevents.NewCompositionDefinedV3(
+			eiffelevents.WithVersion("3.1.0"),
+			eiffelevents.WithAutoSourceHost(),
+		)
+	}
+
+	// Create a new event using the custom factory.
+	event2, err := newComposition()
+	if err != nil {
+		panic(err)
+	}
+	event2.Data.Name = "my-composition"
+	fmt.Println(event2.String())
+}
+```
+
+## Unmarshaling event JSON strings into Go structs
+
+To unmarshal a JSON string into one of the structs defined in this package use
+the UnmarshalAny function and use e.g. a type switch to access the event members:
 
 ```go
 package main

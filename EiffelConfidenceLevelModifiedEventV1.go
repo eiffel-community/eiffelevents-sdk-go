@@ -19,6 +19,8 @@
 package eiffelevents
 
 import (
+	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/clarketm/json"
@@ -30,12 +32,17 @@ import (
 // The returned struct has all required meta members populated.
 // The event version is set to the most recent 1.x.x
 // currently known by this SDK.
-func NewConfidenceLevelModifiedV1() (*ConfidenceLevelModifiedV1, error) {
+func NewConfidenceLevelModifiedV1(modifiers ...Modifier) (*ConfidenceLevelModifiedV1, error) {
 	var event ConfidenceLevelModifiedV1
 	event.Meta.Type = "EiffelConfidenceLevelModifiedEvent"
 	event.Meta.ID = uuid.NewString()
 	event.Meta.Version = eventTypeTable[event.Meta.Type][1].latestVersion
 	event.Meta.Time = time.Now().UnixMilli()
+	for _, modifier := range modifiers {
+		if err := modifier(&event); err != nil {
+			return nil, fmt.Errorf("error applying modifier to new ConfidenceLevelModifiedV1: %w", err)
+		}
+	}
 	return &event, nil
 }
 
@@ -66,6 +73,10 @@ func (e *ConfidenceLevelModifiedV1) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s)
 }
 
+func (e *ConfidenceLevelModifiedV1) SetField(fieldName string, value interface{}) error {
+	return setField(reflect.ValueOf(e), fieldName, value)
+}
+
 // String returns the JSON encoding of the event.
 func (e *ConfidenceLevelModifiedV1) String() string {
 	b, err := e.MarshalJSON()
@@ -77,6 +88,8 @@ func (e *ConfidenceLevelModifiedV1) String() string {
 	}
 	return string(b)
 }
+
+var _ FieldSetter = &ConfidenceLevelModifiedV1{}
 
 type ConfidenceLevelModifiedV1 struct {
 	// Mandatory fields
