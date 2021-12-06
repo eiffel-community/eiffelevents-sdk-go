@@ -19,8 +19,25 @@
 package eiffelevents
 
 import (
+	"time"
+
 	"github.com/clarketm/json"
+	"github.com/google/uuid"
 )
+
+// NewEnvironmentDefinedV2 creates a new struct pointer that represents
+// major version 2 of EiffelEnvironmentDefinedEvent.
+// The returned struct has all required meta members populated.
+// The event version is set to the most recent 2.x.x
+// currently known by this SDK.
+func NewEnvironmentDefinedV2() (*EnvironmentDefinedV2, error) {
+	var event EnvironmentDefinedV2
+	event.Meta.Type = "EiffelEnvironmentDefinedEvent"
+	event.Meta.ID = uuid.NewString()
+	event.Meta.Version = eventTypeTable[event.Meta.Type][2].latestVersion
+	event.Meta.Time = time.Now().UnixMilli()
+	return &event, nil
+}
 
 // MarshalJSON returns the JSON encoding of the event.
 func (e *EnvironmentDefinedV2) MarshalJSON() ([]byte, error) {

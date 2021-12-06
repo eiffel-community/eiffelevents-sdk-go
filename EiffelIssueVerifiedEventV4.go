@@ -19,8 +19,25 @@
 package eiffelevents
 
 import (
+	"time"
+
 	"github.com/clarketm/json"
+	"github.com/google/uuid"
 )
+
+// NewIssueVerifiedV4 creates a new struct pointer that represents
+// major version 4 of EiffelIssueVerifiedEvent.
+// The returned struct has all required meta members populated.
+// The event version is set to the most recent 4.x.x
+// currently known by this SDK.
+func NewIssueVerifiedV4() (*IssueVerifiedV4, error) {
+	var event IssueVerifiedV4
+	event.Meta.Type = "EiffelIssueVerifiedEvent"
+	event.Meta.ID = uuid.NewString()
+	event.Meta.Version = eventTypeTable[event.Meta.Type][4].latestVersion
+	event.Meta.Time = time.Now().UnixMilli()
+	return &event, nil
+}
 
 // MarshalJSON returns the JSON encoding of the event.
 func (e *IssueVerifiedV4) MarshalJSON() ([]byte, error) {

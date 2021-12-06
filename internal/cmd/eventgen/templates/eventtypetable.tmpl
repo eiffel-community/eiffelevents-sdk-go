@@ -20,11 +20,17 @@ package eiffelevents
 
 import "reflect"
 
-// eventTypeTable maps the major version of each event to a type reference to
-// the Go type used to represent the event.
-var eventTypeTable = map[string]map[int64]reflect.Type{
+type majorEventVersion struct {
+	structType    reflect.Type
+	latestVersion string
+}
+
+// eventTypeTable maps the major versions of each event to a struct containing
+// a type reference to the Go type used to represent that event and the most
+// recent version of that event within that major version.
+var eventTypeTable = map[string]map[int64]majorEventVersion{
     {{range $event, $versions := .}}{{printf "%#v" $event}}: {
-        {{range $major, $struct := $versions}}{{$major}}: reflect.TypeOf({{$struct}}{}),
+        {{range $major, $structInfo := $versions}}{{$major}}: majorEventVersion{reflect.TypeOf({{$structInfo.StructName}}{}), {{printf "%q" $structInfo.LatestVersion}}},
         {{end}}
     },
     {{end}}

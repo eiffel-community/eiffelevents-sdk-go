@@ -8,6 +8,8 @@ github.com/gertd/go-pluralize v0.1.7 h1:RgvJTJ5W7olOoAks97BOwOlekBFsLEyh00W48Z6Z
 github.com/gertd/go-pluralize v0.1.7/go.mod h1:O4eNeeIf91MHh1GJ2I47DNtaesm66NYvjYgAahcqSDQ=
 github.com/google/renameio v1.0.1 h1:Lh/jXZmvZxb0BBeSY5VKEfidcbcbenKjZFzM/q0fSeU=
 github.com/google/renameio v1.0.1/go.mod h1:t/HQoYBZSsWSNK35C6CO/TpPLDVWvxOHboWUAweKUpk=
+github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
+github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/lestrrat-go/jspointer v0.0.0-20181205001929-82fadba7561c h1:pGh5EFIfczeDHwgMHgfwjhZzL+8/E3uZF6T7vER/W8c=
 github.com/lestrrat-go/jspointer v0.0.0-20181205001929-82fadba7561c/go.mod h1:xw2Gm4Mg+ST9s8fHR1VkUIyOJMJnSloRZlPQB+wyVpY=
 github.com/lestrrat-go/jsref v0.0.0-20181205001954-1b590508f37d h1:1eeFdKL5ySmmYevvKv7iECIc4dTATeKTtBqP4/nXxDk=

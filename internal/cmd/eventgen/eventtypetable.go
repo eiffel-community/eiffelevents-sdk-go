@@ -23,6 +23,11 @@ import (
 	"github.com/eiffel-community/eiffelevents-sdk-go/internal/codetemplate"
 )
 
+type MajorEventVersion struct {
+	StructName    string
+	LatestVersion string
+}
+
 //go:embed templates/eventtypetable.tmpl
 var eventTableFileTemplate string
 
@@ -30,13 +35,17 @@ var eventTableFileTemplate string
 // a variable that maps the major version of each event to a type
 // reference to the Go type used to represent the event.
 func generateEventTypeTable(schemas map[string][]eventSchemaFile, outputFile string) error {
-	table := make(map[string]map[int]string)
+	table := make(map[string]map[int]MajorEventVersion)
 	for _, eventSchemas := range schemas {
-		for _, schema := range eventSchemas {
+		latestVersions := latestMajorVersions(eventSchemas)
+		for majorVersion, schema := range latestVersions {
 			if table[schema.EventType] == nil {
-				table[schema.EventType] = make(map[int]string)
+				table[schema.EventType] = make(map[int]MajorEventVersion)
 			}
-			table[schema.EventType][int(schema.Version.Major())] = eiffelevents.EventStructName(schema.EventType, schema.Version)
+			table[schema.EventType][int(majorVersion)] = MajorEventVersion{
+				eiffelevents.EventStructName(schema.EventType, schema.Version),
+				schema.Version.String(),
+			}
 		}
 	}
 	output := codetemplate.New(outputFile)

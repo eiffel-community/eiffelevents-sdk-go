@@ -19,8 +19,25 @@
 package eiffelevents
 
 import (
+	"time"
+
 	"github.com/clarketm/json"
+	"github.com/google/uuid"
 )
+
+// NewArtifactReusedV1 creates a new struct pointer that represents
+// major version 1 of EiffelArtifactReusedEvent.
+// The returned struct has all required meta members populated.
+// The event version is set to the most recent 1.x.x
+// currently known by this SDK.
+func NewArtifactReusedV1() (*ArtifactReusedV1, error) {
+	var event ArtifactReusedV1
+	event.Meta.Type = "EiffelArtifactReusedEvent"
+	event.Meta.ID = uuid.NewString()
+	event.Meta.Version = eventTypeTable[event.Meta.Type][1].latestVersion
+	event.Meta.Time = time.Now().UnixMilli()
+	return &event, nil
+}
 
 // MarshalJSON returns the JSON encoding of the event.
 func (e *ArtifactReusedV1) MarshalJSON() ([]byte, error) {
