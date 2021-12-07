@@ -17,6 +17,7 @@
 
 <img src="./images/logo.png" alt="Eiffel Events SDK – Go" width="350"/>
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/eiffel-community/eiffelevents-sdk-go.svg)](https://pkg.go.dev/github.com/eiffel-community/eiffelevents-sdk-go)
 [![Sandbox badge](https://img.shields.io/badge/Stage-Sandbox-yellow)](https://github.com/eiffel-community/community/blob/master/PROJECT_LIFECYCLE.md#stage-sandbox)
 
 # Eiffel Events SDK – Go
