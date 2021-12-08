@@ -43,7 +43,7 @@ func generateEventTypeTable(schemas map[string][]eventSchemaFile, outputFile str
 				table[schema.EventType] = make(map[int]MajorEventVersion)
 			}
 			table[schema.EventType][int(majorVersion)] = MajorEventVersion{
-				eiffelevents.EventStructName(schema.EventType, schema.Version),
+				eiffelevents.VersionedEventStructName(schema.EventType, schema.Version),
 				schema.Version.String(),
 			}
 		}
