@@ -18,6 +18,7 @@ package eiffelevents
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"os"
 	"testing"
@@ -75,4 +76,30 @@ func TestMajorVersionFactory(t *testing.T) {
 	// Sanity check that meta.time is within two minutes of the current time.
 	eventTime := time.UnixMilli(0).Add(time.Duration(event.Meta.Time) * time.Millisecond)
 	assert.WithinDuration(t, time.Now(), eventTime, 2*time.Minute)
+}
+
+// TestFactoriesWithModifiers tests that factories interact nicely with
+// the optional list of Modifier functions. The functions themselves have
+// their own tests.
+func TestFactoriesWithModifiers(t *testing.T) {
+	// Single modifier
+	event, err := NewActivityTriggeredV3(WithSourceName("name"))
+	assert.NoError(t, err)
+	assert.Equal(t, "name", event.Meta.Source.Name)
+
+	// Modifiers are applied in order
+	event, err = NewActivityTriggeredV3(WithSourceName("name1"), WithSourceName("name2"))
+	assert.NoError(t, err)
+	assert.Equal(t, "name2", event.Meta.Source.Name)
+
+	// Different kinds of modifiers
+	event, err = NewActivityTriggeredV3(WithSourceHost("host"), WithSourceName("name"))
+	assert.NoError(t, err)
+	assert.Equal(t, "host", event.Meta.Source.Host)
+	assert.Equal(t, "name", event.Meta.Source.Name)
+
+	// Modifier errors are propagated
+	modifierError := errors.New("the modifier failed")
+	_, err = NewActivityTriggeredV3(func(fieldSetter FieldSetter) error { return modifierError })
+	assert.ErrorIs(t, err, modifierError)
 }

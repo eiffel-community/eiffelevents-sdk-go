@@ -19,6 +19,8 @@
 package eiffelevents
 
 import (
+	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/clarketm/json"
@@ -30,12 +32,17 @@ import (
 // The returned struct has all required meta members populated.
 // The event version is set to the most recent 3.x.x
 // currently known by this SDK.
-func NewEnvironmentDefinedV3() (*EnvironmentDefinedV3, error) {
+func NewEnvironmentDefinedV3(modifiers ...Modifier) (*EnvironmentDefinedV3, error) {
 	var event EnvironmentDefinedV3
 	event.Meta.Type = "EiffelEnvironmentDefinedEvent"
 	event.Meta.ID = uuid.NewString()
 	event.Meta.Version = eventTypeTable[event.Meta.Type][3].latestVersion
 	event.Meta.Time = time.Now().UnixMilli()
+	for _, modifier := range modifiers {
+		if err := modifier(&event); err != nil {
+			return nil, fmt.Errorf("error applying modifier to new EnvironmentDefinedV3: %w", err)
+		}
+	}
 	return &event, nil
 }
 
@@ -66,6 +73,10 @@ func (e *EnvironmentDefinedV3) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s)
 }
 
+func (e *EnvironmentDefinedV3) SetField(fieldName string, value interface{}) error {
+	return setField(reflect.ValueOf(e), fieldName, value)
+}
+
 // String returns the JSON encoding of the event.
 func (e *EnvironmentDefinedV3) String() string {
 	b, err := e.MarshalJSON()
@@ -77,6 +88,8 @@ func (e *EnvironmentDefinedV3) String() string {
 	}
 	return string(b)
 }
+
+var _ FieldSetter = &EnvironmentDefinedV3{}
 
 type EnvironmentDefinedV3 struct {
 	// Mandatory fields

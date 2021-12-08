@@ -19,6 +19,8 @@
 package eiffelevents
 
 import (
+	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/clarketm/json"
@@ -30,12 +32,17 @@ import (
 // The returned struct has all required meta members populated.
 // The event version is set to the most recent 3.x.x
 // currently known by this SDK.
-func NewActivityFinishedV3() (*ActivityFinishedV3, error) {
+func NewActivityFinishedV3(modifiers ...Modifier) (*ActivityFinishedV3, error) {
 	var event ActivityFinishedV3
 	event.Meta.Type = "EiffelActivityFinishedEvent"
 	event.Meta.ID = uuid.NewString()
 	event.Meta.Version = eventTypeTable[event.Meta.Type][3].latestVersion
 	event.Meta.Time = time.Now().UnixMilli()
+	for _, modifier := range modifiers {
+		if err := modifier(&event); err != nil {
+			return nil, fmt.Errorf("error applying modifier to new ActivityFinishedV3: %w", err)
+		}
+	}
 	return &event, nil
 }
 
@@ -66,6 +73,10 @@ func (e *ActivityFinishedV3) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s)
 }
 
+func (e *ActivityFinishedV3) SetField(fieldName string, value interface{}) error {
+	return setField(reflect.ValueOf(e), fieldName, value)
+}
+
 // String returns the JSON encoding of the event.
 func (e *ActivityFinishedV3) String() string {
 	b, err := e.MarshalJSON()
@@ -77,6 +88,8 @@ func (e *ActivityFinishedV3) String() string {
 	}
 	return string(b)
 }
+
+var _ FieldSetter = &ActivityFinishedV3{}
 
 type ActivityFinishedV3 struct {
 	// Mandatory fields
