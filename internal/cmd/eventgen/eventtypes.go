@@ -204,7 +204,7 @@ func generateEventFile(eventType string, version *semver.Version, schema io.Read
 	}{
 		EventType:         eventType,
 		EventTypeAbbrev:   eventTypeAbbrev,
-		StructName:        eiffelevents.EventStructName(eventType, version),
+		StructName:        eiffelevents.VersionedEventStructName(eventType, version),
 		SubTypeNamePrefix: fmt.Sprintf("%sV%d", eventTypeAbbrev, version.Major()),
 		MajorVersion:      version.Major(),
 	}

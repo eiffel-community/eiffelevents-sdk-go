@@ -117,6 +117,37 @@ func main() {
 }
 ```
 
+## Preferring events from a particular Eiffel edition
+
+Each Eiffel edition has a subpackage containing version-less struct type
+aliases and factories for creating events with the correct version for
+the chosen edition. This removes much of the need to litter the code with
+"V3" etc suffixes.
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/eiffel-community/eiffelevents-sdk-go/editions/lyon"
+)
+
+func main() {
+	event, err := eiffelevents.NewCompositionDefined()
+	if err != nil {
+		panic(err)
+	}
+	// The event struct has the type eiffelevents.CompositionDefined,
+	// which is an alias for the parent package's CompositionDefinedV3.
+	// The event version is set to 3.2.0. By instead importing the paris
+	// subpackage the event version would've been set to 3.1.0.
+
+	event.Data.Name = "my-composition"
+	fmt.Println(event.String())
+}
+```
+
 ## Unmarshaling event JSON strings into Go structs
 
 To unmarshal a JSON string into one of the structs defined in this package use
