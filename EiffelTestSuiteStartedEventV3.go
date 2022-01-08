@@ -90,12 +90,38 @@ func (e *TestSuiteStartedV3) String() string {
 }
 
 var _ FieldSetter = &TestSuiteStartedV3{}
+var _ MetaTeller = &TestSuiteStartedV3{}
+
+// ID returns the value of the meta.id field.
+func (e TestSuiteStartedV3) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e TestSuiteStartedV3) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e TestSuiteStartedV3) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e TestSuiteStartedV3) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e TestSuiteStartedV3) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type TestSuiteStartedV3 struct {
 	// Mandatory fields
-	Data  TSSV3Data   `json:"data"`
-	Links []TSSV3Link `json:"links"`
-	Meta  TSSV3Meta   `json:"meta"`
+	Data  TSSV3Data  `json:"data"`
+	Links TSSV3Links `json:"links"`
+	Meta  TSSV3Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -152,6 +178,20 @@ const (
 	TSSV3DataType_Stability        TSSV3DataType = "STABILITY"
 	TSSV3DataType_Usability        TSSV3DataType = "USABILITY"
 )
+
+// TSSV3Links represents a slice of TSSV3Link values with helper methods
+// for adding new links.
+type TSSV3Links []TSSV3Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *TSSV3Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, TSSV3Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *TSSV3Links) AddByID(linkType string, target string) {
+	*links = append(*links, TSSV3Link{Target: target, Type: linkType})
+}
 
 type TSSV3Link struct {
 	// Mandatory fields

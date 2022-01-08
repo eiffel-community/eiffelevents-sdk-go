@@ -17,40 +17,49 @@
 package main
 
 import (
-	"github.com/gertd/go-pluralize"
+	_ "embed"
+
 	jsschema "github.com/lestrrat-go/jsschema"
 
 	"github.com/eiffel-community/eiffelevents-sdk-go/internal/codetemplate"
 )
 
-// goSlice represents the type of a slice value.
-type goSlice struct {
-	Type goType // The type
+// goLinkSlice represents the type of a slice value.
+type goLinkSlice struct {
+	TypeName   string
+	SlicedType goType // The type that's being sliced
 }
 
-var pluralizeClient = pluralize.NewClient()
-
-func newSlice(parent *goStruct, name string, items *jsschema.ItemSpec) (*goSlice, error) {
+func newLinkSlice(parent *goStruct, name string, items *jsschema.ItemSpec) (*goLinkSlice, error) {
 	// The type created for this array should use the singular form of the noun, i.e. we want
-	//     Items []XXXItem
+	//     Links XXXLink
 	// and not this:
-	//     Items []XXXItems
+	//     Links XXXLinks
 	typ, err := goTypeFromSchema(parent, pluralizeClient.Singular(name), items.Schemas[0])
 	if err != nil {
 		return nil, err
 	}
-	return &goSlice{
-		Type: typ,
+	return &goLinkSlice{
+		TypeName:   parent.SubTypeNamePrefix + fieldTitle(name),
+		SlicedType: typ,
 	}, nil
 }
 
-func (t *goSlice) declare(ct *codetemplate.OutputFile) error {
-	if declarer, ok := t.Type.(goTypeDeclarer); ok {
+//go:embed templates/linkslice_decl.tmpl
+var linkSliceDeclTemplate string
+
+func (t *goLinkSlice) declare(ct *codetemplate.OutputFile) error {
+	// Declare the custom slice type itself.
+	if err := ct.ExpandTemplate(linkSliceDeclTemplate, t); err != nil {
+		return err
+	}
+
+	if declarer, ok := t.SlicedType.(goTypeDeclarer); ok {
 		return declarer.declare(ct)
 	}
 	return nil
 }
 
-func (t *goSlice) String() string {
-	return "[]" + t.Type.String()
+func (t *goLinkSlice) String() string {
+	return t.TypeName
 }

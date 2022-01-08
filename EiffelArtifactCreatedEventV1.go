@@ -90,12 +90,38 @@ func (e *ArtifactCreatedV1) String() string {
 }
 
 var _ FieldSetter = &ArtifactCreatedV1{}
+var _ MetaTeller = &ArtifactCreatedV1{}
+
+// ID returns the value of the meta.id field.
+func (e ArtifactCreatedV1) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e ArtifactCreatedV1) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e ArtifactCreatedV1) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e ArtifactCreatedV1) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e ArtifactCreatedV1) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type ArtifactCreatedV1 struct {
 	// Mandatory fields
-	Data  ArtCV1Data   `json:"data"`
-	Links []ArtCV1Link `json:"links"`
-	Meta  ArtCV1Meta   `json:"meta"`
+	Data  ArtCV1Data  `json:"data"`
+	Links ArtCV1Links `json:"links"`
+	Meta  ArtCV1Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -171,6 +197,20 @@ const (
 	ArtCV1DataRequiresImplementation_ExactlyOne ArtCV1DataRequiresImplementation = "EXACTLY_ONE"
 	ArtCV1DataRequiresImplementation_AtLeastOne ArtCV1DataRequiresImplementation = "AT_LEAST_ONE"
 )
+
+// ArtCV1Links represents a slice of ArtCV1Link values with helper methods
+// for adding new links.
+type ArtCV1Links []ArtCV1Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *ArtCV1Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, ArtCV1Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *ArtCV1Links) AddByID(linkType string, target string) {
+	*links = append(*links, ArtCV1Link{Target: target, Type: linkType})
+}
 
 type ArtCV1Link struct {
 	// Mandatory fields

@@ -90,12 +90,38 @@ func (e *TestCaseTriggeredV2) String() string {
 }
 
 var _ FieldSetter = &TestCaseTriggeredV2{}
+var _ MetaTeller = &TestCaseTriggeredV2{}
+
+// ID returns the value of the meta.id field.
+func (e TestCaseTriggeredV2) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e TestCaseTriggeredV2) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e TestCaseTriggeredV2) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e TestCaseTriggeredV2) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e TestCaseTriggeredV2) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type TestCaseTriggeredV2 struct {
 	// Mandatory fields
-	Data  TCTV2Data   `json:"data"`
-	Links []TCTV2Link `json:"links"`
-	Meta  TCTV2Meta   `json:"meta"`
+	Data  TCTV2Data  `json:"data"`
+	Links TCTV2Links `json:"links"`
+	Meta  TCTV2Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -167,6 +193,20 @@ const (
 	TCTV2DataTriggerType_Timer        TCTV2DataTriggerType = "TIMER"
 	TCTV2DataTriggerType_Other        TCTV2DataTriggerType = "OTHER"
 )
+
+// TCTV2Links represents a slice of TCTV2Link values with helper methods
+// for adding new links.
+type TCTV2Links []TCTV2Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *TCTV2Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, TCTV2Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *TCTV2Links) AddByID(linkType string, target string) {
+	*links = append(*links, TCTV2Link{Target: target, Type: linkType})
+}
 
 type TCTV2Link struct {
 	// Mandatory fields

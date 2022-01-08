@@ -90,12 +90,38 @@ func (e *FlowContextDefinedV3) String() string {
 }
 
 var _ FieldSetter = &FlowContextDefinedV3{}
+var _ MetaTeller = &FlowContextDefinedV3{}
+
+// ID returns the value of the meta.id field.
+func (e FlowContextDefinedV3) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e FlowContextDefinedV3) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e FlowContextDefinedV3) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e FlowContextDefinedV3) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e FlowContextDefinedV3) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type FlowContextDefinedV3 struct {
 	// Mandatory fields
-	Data  FCDV3Data   `json:"data"`
-	Links []FCDV3Link `json:"links"`
-	Meta  FCDV3Meta   `json:"meta"`
+	Data  FCDV3Data  `json:"data"`
+	Links FCDV3Links `json:"links"`
+	Meta  FCDV3Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -120,6 +146,20 @@ type FCDV3DataCustomDatum struct {
 
 	// Optional fields
 
+}
+
+// FCDV3Links represents a slice of FCDV3Link values with helper methods
+// for adding new links.
+type FCDV3Links []FCDV3Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *FCDV3Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, FCDV3Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *FCDV3Links) AddByID(linkType string, target string) {
+	*links = append(*links, FCDV3Link{Target: target, Type: linkType})
 }
 
 type FCDV3Link struct {

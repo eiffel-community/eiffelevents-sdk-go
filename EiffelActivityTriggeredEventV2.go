@@ -90,12 +90,38 @@ func (e *ActivityTriggeredV2) String() string {
 }
 
 var _ FieldSetter = &ActivityTriggeredV2{}
+var _ MetaTeller = &ActivityTriggeredV2{}
+
+// ID returns the value of the meta.id field.
+func (e ActivityTriggeredV2) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e ActivityTriggeredV2) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e ActivityTriggeredV2) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e ActivityTriggeredV2) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e ActivityTriggeredV2) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type ActivityTriggeredV2 struct {
 	// Mandatory fields
-	Data  ActTV2Data   `json:"data"`
-	Links []ActTV2Link `json:"links"`
-	Meta  ActTV2Meta   `json:"meta"`
+	Data  ActTV2Data  `json:"data"`
+	Links ActTV2Links `json:"links"`
+	Meta  ActTV2Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -147,6 +173,20 @@ const (
 	ActTV2DataTriggerType_Timer        ActTV2DataTriggerType = "TIMER"
 	ActTV2DataTriggerType_Other        ActTV2DataTriggerType = "OTHER"
 )
+
+// ActTV2Links represents a slice of ActTV2Link values with helper methods
+// for adding new links.
+type ActTV2Links []ActTV2Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *ActTV2Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, ActTV2Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *ActTV2Links) AddByID(linkType string, target string) {
+	*links = append(*links, ActTV2Link{Target: target, Type: linkType})
+}
 
 type ActTV2Link struct {
 	// Mandatory fields

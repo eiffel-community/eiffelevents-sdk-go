@@ -90,12 +90,38 @@ func (e *CompositionDefinedV2) String() string {
 }
 
 var _ FieldSetter = &CompositionDefinedV2{}
+var _ MetaTeller = &CompositionDefinedV2{}
+
+// ID returns the value of the meta.id field.
+func (e CompositionDefinedV2) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e CompositionDefinedV2) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e CompositionDefinedV2) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e CompositionDefinedV2) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e CompositionDefinedV2) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type CompositionDefinedV2 struct {
 	// Mandatory fields
-	Data  CDV2Data   `json:"data"`
-	Links []CDV2Link `json:"links"`
-	Meta  CDV2Meta   `json:"meta"`
+	Data  CDV2Data  `json:"data"`
+	Links CDV2Links `json:"links"`
+	Meta  CDV2Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -117,6 +143,20 @@ type CDV2DataCustomDatum struct {
 
 	// Optional fields
 
+}
+
+// CDV2Links represents a slice of CDV2Link values with helper methods
+// for adding new links.
+type CDV2Links []CDV2Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *CDV2Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, CDV2Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *CDV2Links) AddByID(linkType string, target string) {
+	*links = append(*links, CDV2Link{Target: target, Type: linkType})
 }
 
 type CDV2Link struct {

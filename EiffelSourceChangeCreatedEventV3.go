@@ -90,12 +90,38 @@ func (e *SourceChangeCreatedV3) String() string {
 }
 
 var _ FieldSetter = &SourceChangeCreatedV3{}
+var _ MetaTeller = &SourceChangeCreatedV3{}
+
+// ID returns the value of the meta.id field.
+func (e SourceChangeCreatedV3) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e SourceChangeCreatedV3) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e SourceChangeCreatedV3) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e SourceChangeCreatedV3) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e SourceChangeCreatedV3) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type SourceChangeCreatedV3 struct {
 	// Mandatory fields
-	Data  SCCV3Data   `json:"data"`
-	Links []SCCV3Link `json:"links"`
-	Meta  SCCV3Meta   `json:"meta"`
+	Data  SCCV3Data  `json:"data"`
+	Links SCCV3Links `json:"links"`
+	Meta  SCCV3Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -183,6 +209,20 @@ type SCCV3DataSvnIdentifier struct {
 
 	// Optional fields
 	RepoName string `json:"repoName,omitempty"`
+}
+
+// SCCV3Links represents a slice of SCCV3Link values with helper methods
+// for adding new links.
+type SCCV3Links []SCCV3Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *SCCV3Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, SCCV3Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *SCCV3Links) AddByID(linkType string, target string) {
+	*links = append(*links, SCCV3Link{Target: target, Type: linkType})
 }
 
 type SCCV3Link struct {

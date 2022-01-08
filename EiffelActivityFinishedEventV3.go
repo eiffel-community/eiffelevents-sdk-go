@@ -90,12 +90,38 @@ func (e *ActivityFinishedV3) String() string {
 }
 
 var _ FieldSetter = &ActivityFinishedV3{}
+var _ MetaTeller = &ActivityFinishedV3{}
+
+// ID returns the value of the meta.id field.
+func (e ActivityFinishedV3) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e ActivityFinishedV3) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e ActivityFinishedV3) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e ActivityFinishedV3) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e ActivityFinishedV3) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type ActivityFinishedV3 struct {
 	// Mandatory fields
-	Data  ActFV3Data   `json:"data"`
-	Links []ActFV3Link `json:"links"`
-	Meta  ActFV3Meta   `json:"meta"`
+	Data  ActFV3Data  `json:"data"`
+	Links ActFV3Links `json:"links"`
+	Meta  ActFV3Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -146,6 +172,20 @@ type ActFV3DataPersistentLog struct {
 	// Optional fields
 	MediaType string   `json:"mediaType,omitempty"`
 	Tags      []string `json:"tags,omitempty"`
+}
+
+// ActFV3Links represents a slice of ActFV3Link values with helper methods
+// for adding new links.
+type ActFV3Links []ActFV3Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *ActFV3Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, ActFV3Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *ActFV3Links) AddByID(linkType string, target string) {
+	*links = append(*links, ActFV3Link{Target: target, Type: linkType})
 }
 
 type ActFV3Link struct {

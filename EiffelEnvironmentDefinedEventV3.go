@@ -90,12 +90,38 @@ func (e *EnvironmentDefinedV3) String() string {
 }
 
 var _ FieldSetter = &EnvironmentDefinedV3{}
+var _ MetaTeller = &EnvironmentDefinedV3{}
+
+// ID returns the value of the meta.id field.
+func (e EnvironmentDefinedV3) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e EnvironmentDefinedV3) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e EnvironmentDefinedV3) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e EnvironmentDefinedV3) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e EnvironmentDefinedV3) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type EnvironmentDefinedV3 struct {
 	// Mandatory fields
-	Data  EDV3Data   `json:"data"`
-	Links []EDV3Link `json:"links"`
-	Meta  EDV3Meta   `json:"meta"`
+	Data  EDV3Data  `json:"data"`
+	Links EDV3Links `json:"links"`
+	Meta  EDV3Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -129,6 +155,20 @@ type EDV3DataHost struct {
 
 	// Optional fields
 
+}
+
+// EDV3Links represents a slice of EDV3Link values with helper methods
+// for adding new links.
+type EDV3Links []EDV3Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *EDV3Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, EDV3Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *EDV3Links) AddByID(linkType string, target string) {
+	*links = append(*links, EDV3Link{Target: target, Type: linkType})
 }
 
 type EDV3Link struct {
