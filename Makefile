@@ -54,9 +54,14 @@ test:
 tidy:
 	$(GOMOD) tidy
 
+# Check that the workspace is clean, i.e. that there are no modified or untracked files.
 .PHONY: check-dirty
 check-dirty:
 	$(GIT) diff --exit-code HEAD
+	if $(GIT) ls-files --others --exclude-standard | grep . ; then \
+		echo "Untracked or deleted files in the workspace" >&2 ; \
+		exit 1 ; \
+	fi
 
 .PHONY: clean
 clean:
