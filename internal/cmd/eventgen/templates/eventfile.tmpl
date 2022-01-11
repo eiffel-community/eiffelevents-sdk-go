@@ -90,3 +90,29 @@ func (e *{{.StructName}}) String() string {
 }
 
 var _ FieldSetter = &{{.StructName}}{}
+var _ MetaTeller = &{{.StructName}}{}
+
+// ID returns the value of the meta.id field.
+func (e {{.StructName}}) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e {{.StructName}}) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e {{.StructName}}) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e {{.StructName}}) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e {{.StructName}}) DomainID() string {
+	return e.Meta.Source.DomainID
+}

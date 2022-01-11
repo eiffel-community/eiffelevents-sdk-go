@@ -90,12 +90,38 @@ func (e *AnnouncementPublishedV1) String() string {
 }
 
 var _ FieldSetter = &AnnouncementPublishedV1{}
+var _ MetaTeller = &AnnouncementPublishedV1{}
+
+// ID returns the value of the meta.id field.
+func (e AnnouncementPublishedV1) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e AnnouncementPublishedV1) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e AnnouncementPublishedV1) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e AnnouncementPublishedV1) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e AnnouncementPublishedV1) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type AnnouncementPublishedV1 struct {
 	// Mandatory fields
-	Data  AnnPV1Data   `json:"data"`
-	Links []AnnPV1Link `json:"links"`
-	Meta  AnnPV1Meta   `json:"meta"`
+	Data  AnnPV1Data  `json:"data"`
+	Links AnnPV1Links `json:"links"`
+	Meta  AnnPV1Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -131,6 +157,20 @@ const (
 	AnnPV1DataSeverity_Closed   AnnPV1DataSeverity = "CLOSED"
 	AnnPV1DataSeverity_Canceled AnnPV1DataSeverity = "CANCELED"
 )
+
+// AnnPV1Links represents a slice of AnnPV1Link values with helper methods
+// for adding new links.
+type AnnPV1Links []AnnPV1Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *AnnPV1Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, AnnPV1Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *AnnPV1Links) AddByID(linkType string, target string) {
+	*links = append(*links, AnnPV1Link{Target: target, Type: linkType})
+}
 
 type AnnPV1Link struct {
 	// Mandatory fields

@@ -90,12 +90,38 @@ func (e *ConfidenceLevelModifiedV3) String() string {
 }
 
 var _ FieldSetter = &ConfidenceLevelModifiedV3{}
+var _ MetaTeller = &ConfidenceLevelModifiedV3{}
+
+// ID returns the value of the meta.id field.
+func (e ConfidenceLevelModifiedV3) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e ConfidenceLevelModifiedV3) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e ConfidenceLevelModifiedV3) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e ConfidenceLevelModifiedV3) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e ConfidenceLevelModifiedV3) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type ConfidenceLevelModifiedV3 struct {
 	// Mandatory fields
-	Data  CLMV3Data   `json:"data"`
-	Links []CLMV3Link `json:"links"`
-	Meta  CLMV3Meta   `json:"meta"`
+	Data  CLMV3Data  `json:"data"`
+	Links CLMV3Links `json:"links"`
+	Meta  CLMV3Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -137,6 +163,20 @@ const (
 	CLMV3DataValue_Failure      CLMV3DataValue = "FAILURE"
 	CLMV3DataValue_Inconclusive CLMV3DataValue = "INCONCLUSIVE"
 )
+
+// CLMV3Links represents a slice of CLMV3Link values with helper methods
+// for adding new links.
+type CLMV3Links []CLMV3Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *CLMV3Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, CLMV3Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *CLMV3Links) AddByID(linkType string, target string) {
+	*links = append(*links, CLMV3Link{Target: target, Type: linkType})
+}
 
 type CLMV3Link struct {
 	// Mandatory fields

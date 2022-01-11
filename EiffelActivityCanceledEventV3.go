@@ -90,12 +90,38 @@ func (e *ActivityCanceledV3) String() string {
 }
 
 var _ FieldSetter = &ActivityCanceledV3{}
+var _ MetaTeller = &ActivityCanceledV3{}
+
+// ID returns the value of the meta.id field.
+func (e ActivityCanceledV3) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e ActivityCanceledV3) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e ActivityCanceledV3) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e ActivityCanceledV3) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e ActivityCanceledV3) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type ActivityCanceledV3 struct {
 	// Mandatory fields
-	Data  ActCV3Data   `json:"data"`
-	Links []ActCV3Link `json:"links"`
-	Meta  ActCV3Meta   `json:"meta"`
+	Data  ActCV3Data  `json:"data"`
+	Links ActCV3Links `json:"links"`
+	Meta  ActCV3Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -116,6 +142,20 @@ type ActCV3DataCustomDatum struct {
 
 	// Optional fields
 
+}
+
+// ActCV3Links represents a slice of ActCV3Link values with helper methods
+// for adding new links.
+type ActCV3Links []ActCV3Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *ActCV3Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, ActCV3Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *ActCV3Links) AddByID(linkType string, target string) {
+	*links = append(*links, ActCV3Link{Target: target, Type: linkType})
 }
 
 type ActCV3Link struct {

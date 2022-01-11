@@ -90,12 +90,38 @@ func (e *ActivityStartedV3) String() string {
 }
 
 var _ FieldSetter = &ActivityStartedV3{}
+var _ MetaTeller = &ActivityStartedV3{}
+
+// ID returns the value of the meta.id field.
+func (e ActivityStartedV3) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e ActivityStartedV3) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e ActivityStartedV3) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e ActivityStartedV3) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e ActivityStartedV3) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type ActivityStartedV3 struct {
 	// Mandatory fields
-	Data  ActSV3Data   `json:"data"`
-	Links []ActSV3Link `json:"links"`
-	Meta  ActSV3Meta   `json:"meta"`
+	Data  ActSV3Data  `json:"data"`
+	Links ActSV3Links `json:"links"`
+	Meta  ActSV3Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -126,6 +152,20 @@ type ActSV3DataLiveLog struct {
 
 	// Optional fields
 
+}
+
+// ActSV3Links represents a slice of ActSV3Link values with helper methods
+// for adding new links.
+type ActSV3Links []ActSV3Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *ActSV3Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, ActSV3Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *ActSV3Links) AddByID(linkType string, target string) {
+	*links = append(*links, ActSV3Link{Target: target, Type: linkType})
 }
 
 type ActSV3Link struct {

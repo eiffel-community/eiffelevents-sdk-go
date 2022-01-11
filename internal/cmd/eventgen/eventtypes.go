@@ -105,6 +105,8 @@ func goTypeFromSchema(parent *goStruct, name string, schema *jsschema.Schema) (g
 	var typ goType
 	var err error
 
+	fullName := parent.qualifiedFieldName(name)
+
 	switch schema.Type[0] {
 	case jsschema.StringType:
 		typ = &goPrimitiveType{name: "string"}
@@ -122,7 +124,14 @@ func goTypeFromSchema(parent *goStruct, name string, schema *jsschema.Schema) (g
 			typ, err = newStruct(parent, name, schema)
 		}
 	case jsschema.ArrayType:
-		typ, err = newSlice(parent, name, schema.Items)
+		// The links slice at the event root should have its distinct type
+		// XXXLinks instead of simply []XXXLink like how other slices are
+		// represented.
+		if fullName == "links" {
+			typ, err = newLinkSlice(parent, name, schema.Items)
+		} else {
+			typ, err = newSlice(parent, name, schema.Items)
+		}
 	default:
 		err = fmt.Errorf("unsupported type: %s", schema.Type[0])
 	}
@@ -134,7 +143,6 @@ func goTypeFromSchema(parent *goStruct, name string, schema *jsschema.Schema) (g
 	// couple of exceptions in the schema where a single-value enum has been
 	// used instead of a validating regexp or similar. We don't want an enum
 	// type to be created for those.
-	fullName := parent.qualifiedFieldName(name)
 	if fullName != "meta.type" && fullName != "meta.version" && len(schema.Enum) > 0 {
 		typ, err = newEnum(parent, name, typ, schema.Enum)
 	}

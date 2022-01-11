@@ -90,12 +90,38 @@ func (e *EnvironmentDefinedV2) String() string {
 }
 
 var _ FieldSetter = &EnvironmentDefinedV2{}
+var _ MetaTeller = &EnvironmentDefinedV2{}
+
+// ID returns the value of the meta.id field.
+func (e EnvironmentDefinedV2) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e EnvironmentDefinedV2) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e EnvironmentDefinedV2) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e EnvironmentDefinedV2) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e EnvironmentDefinedV2) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type EnvironmentDefinedV2 struct {
 	// Mandatory fields
-	Data  EDV2Data   `json:"data"`
-	Links []EDV2Link `json:"links"`
-	Meta  EDV2Meta   `json:"meta"`
+	Data  EDV2Data  `json:"data"`
+	Links EDV2Links `json:"links"`
+	Meta  EDV2Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -129,6 +155,20 @@ type EDV2DataHost struct {
 
 	// Optional fields
 
+}
+
+// EDV2Links represents a slice of EDV2Link values with helper methods
+// for adding new links.
+type EDV2Links []EDV2Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *EDV2Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, EDV2Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *EDV2Links) AddByID(linkType string, target string) {
+	*links = append(*links, EDV2Link{Target: target, Type: linkType})
 }
 
 type EDV2Link struct {

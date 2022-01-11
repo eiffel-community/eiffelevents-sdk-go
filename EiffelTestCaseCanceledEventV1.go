@@ -90,12 +90,38 @@ func (e *TestCaseCanceledV1) String() string {
 }
 
 var _ FieldSetter = &TestCaseCanceledV1{}
+var _ MetaTeller = &TestCaseCanceledV1{}
+
+// ID returns the value of the meta.id field.
+func (e TestCaseCanceledV1) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e TestCaseCanceledV1) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e TestCaseCanceledV1) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e TestCaseCanceledV1) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e TestCaseCanceledV1) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type TestCaseCanceledV1 struct {
 	// Mandatory fields
-	Data  TCCV1Data   `json:"data"`
-	Links []TCCV1Link `json:"links"`
-	Meta  TCCV1Meta   `json:"meta"`
+	Data  TCCV1Data  `json:"data"`
+	Links TCCV1Links `json:"links"`
+	Meta  TCCV1Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -116,6 +142,20 @@ type TCCV1DataCustomDatum struct {
 
 	// Optional fields
 
+}
+
+// TCCV1Links represents a slice of TCCV1Link values with helper methods
+// for adding new links.
+type TCCV1Links []TCCV1Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *TCCV1Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, TCCV1Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *TCCV1Links) AddByID(linkType string, target string) {
+	*links = append(*links, TCCV1Link{Target: target, Type: linkType})
 }
 
 type TCCV1Link struct {

@@ -90,12 +90,38 @@ func (e *ActivityFinishedV2) String() string {
 }
 
 var _ FieldSetter = &ActivityFinishedV2{}
+var _ MetaTeller = &ActivityFinishedV2{}
+
+// ID returns the value of the meta.id field.
+func (e ActivityFinishedV2) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e ActivityFinishedV2) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e ActivityFinishedV2) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e ActivityFinishedV2) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e ActivityFinishedV2) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type ActivityFinishedV2 struct {
 	// Mandatory fields
-	Data  ActFV2Data   `json:"data"`
-	Links []ActFV2Link `json:"links"`
-	Meta  ActFV2Meta   `json:"meta"`
+	Data  ActFV2Data  `json:"data"`
+	Links ActFV2Links `json:"links"`
+	Meta  ActFV2Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -145,6 +171,20 @@ type ActFV2DataPersistentLog struct {
 
 	// Optional fields
 
+}
+
+// ActFV2Links represents a slice of ActFV2Link values with helper methods
+// for adding new links.
+type ActFV2Links []ActFV2Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *ActFV2Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, ActFV2Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *ActFV2Links) AddByID(linkType string, target string) {
+	*links = append(*links, ActFV2Link{Target: target, Type: linkType})
 }
 
 type ActFV2Link struct {

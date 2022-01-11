@@ -90,14 +90,40 @@ func (e *IssueDefinedV1) String() string {
 }
 
 var _ FieldSetter = &IssueDefinedV1{}
+var _ MetaTeller = &IssueDefinedV1{}
+
+// ID returns the value of the meta.id field.
+func (e IssueDefinedV1) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e IssueDefinedV1) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e IssueDefinedV1) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e IssueDefinedV1) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e IssueDefinedV1) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type IssueDefinedV1 struct {
 	// Mandatory fields
 
 	// Optional fields
-	Data  IDV1Data   `json:"data,omitempty"`
-	Links []IDV1Link `json:"links,omitempty"`
-	Meta  IDV1Meta   `json:"meta,omitempty"`
+	Data  IDV1Data  `json:"data,omitempty"`
+	Links IDV1Links `json:"links,omitempty"`
+	Meta  IDV1Meta  `json:"meta,omitempty"`
 }
 
 type IDV1Data struct {
@@ -131,6 +157,20 @@ const (
 	IDV1DataType_Requirement IDV1DataType = "REQUIREMENT"
 	IDV1DataType_Other       IDV1DataType = "OTHER"
 )
+
+// IDV1Links represents a slice of IDV1Link values with helper methods
+// for adding new links.
+type IDV1Links []IDV1Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *IDV1Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, IDV1Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *IDV1Links) AddByID(linkType string, target string) {
+	*links = append(*links, IDV1Link{Target: target, Type: linkType})
+}
 
 type IDV1Link struct {
 	// Mandatory fields

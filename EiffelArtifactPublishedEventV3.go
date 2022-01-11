@@ -90,12 +90,38 @@ func (e *ArtifactPublishedV3) String() string {
 }
 
 var _ FieldSetter = &ArtifactPublishedV3{}
+var _ MetaTeller = &ArtifactPublishedV3{}
+
+// ID returns the value of the meta.id field.
+func (e ArtifactPublishedV3) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e ArtifactPublishedV3) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e ArtifactPublishedV3) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e ArtifactPublishedV3) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e ArtifactPublishedV3) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type ArtifactPublishedV3 struct {
 	// Mandatory fields
-	Data  ArtPV3Data   `json:"data"`
-	Links []ArtPV3Link `json:"links"`
-	Meta  ArtPV3Meta   `json:"meta"`
+	Data  ArtPV3Data  `json:"data"`
+	Links ArtPV3Links `json:"links"`
+	Meta  ArtPV3Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -135,6 +161,20 @@ const (
 	ArtPV3DataLocationType_Plain       ArtPV3DataLocationType = "PLAIN"
 	ArtPV3DataLocationType_Other       ArtPV3DataLocationType = "OTHER"
 )
+
+// ArtPV3Links represents a slice of ArtPV3Link values with helper methods
+// for adding new links.
+type ArtPV3Links []ArtPV3Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *ArtPV3Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, ArtPV3Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *ArtPV3Links) AddByID(linkType string, target string) {
+	*links = append(*links, ArtPV3Link{Target: target, Type: linkType})
+}
 
 type ArtPV3Link struct {
 	// Mandatory fields

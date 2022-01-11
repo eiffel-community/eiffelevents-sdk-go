@@ -90,12 +90,38 @@ func (e *TestExecutionRecipeCollectionCreatedV4) String() string {
 }
 
 var _ FieldSetter = &TestExecutionRecipeCollectionCreatedV4{}
+var _ MetaTeller = &TestExecutionRecipeCollectionCreatedV4{}
+
+// ID returns the value of the meta.id field.
+func (e TestExecutionRecipeCollectionCreatedV4) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e TestExecutionRecipeCollectionCreatedV4) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e TestExecutionRecipeCollectionCreatedV4) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e TestExecutionRecipeCollectionCreatedV4) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e TestExecutionRecipeCollectionCreatedV4) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type TestExecutionRecipeCollectionCreatedV4 struct {
 	// Mandatory fields
-	Data  TERCCV4Data   `json:"data"`
-	Links []TERCCV4Link `json:"links"`
-	Meta  TERCCV4Meta   `json:"meta"`
+	Data  TERCCV4Data  `json:"data"`
+	Links TERCCV4Links `json:"links"`
+	Meta  TERCCV4Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -173,6 +199,20 @@ type TERCCV4DataSelectionStrategy struct {
 	// Optional fields
 	Tracker string `json:"tracker,omitempty"`
 	URI     string `json:"uri,omitempty"`
+}
+
+// TERCCV4Links represents a slice of TERCCV4Link values with helper methods
+// for adding new links.
+type TERCCV4Links []TERCCV4Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *TERCCV4Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, TERCCV4Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *TERCCV4Links) AddByID(linkType string, target string) {
+	*links = append(*links, TERCCV4Link{Target: target, Type: linkType})
 }
 
 type TERCCV4Link struct {

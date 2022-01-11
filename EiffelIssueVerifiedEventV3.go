@@ -90,12 +90,38 @@ func (e *IssueVerifiedV3) String() string {
 }
 
 var _ FieldSetter = &IssueVerifiedV3{}
+var _ MetaTeller = &IssueVerifiedV3{}
+
+// ID returns the value of the meta.id field.
+func (e IssueVerifiedV3) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e IssueVerifiedV3) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e IssueVerifiedV3) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e IssueVerifiedV3) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e IssueVerifiedV3) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type IssueVerifiedV3 struct {
 	// Mandatory fields
-	Data  IVV3Data   `json:"data"`
-	Links []IVV3Link `json:"links"`
-	Meta  IVV3Meta   `json:"meta"`
+	Data  IVV3Data  `json:"data"`
+	Links IVV3Links `json:"links"`
+	Meta  IVV3Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -115,6 +141,20 @@ type IVV3DataCustomDatum struct {
 
 	// Optional fields
 
+}
+
+// IVV3Links represents a slice of IVV3Link values with helper methods
+// for adding new links.
+type IVV3Links []IVV3Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *IVV3Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, IVV3Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *IVV3Links) AddByID(linkType string, target string) {
+	*links = append(*links, IVV3Link{Target: target, Type: linkType})
 }
 
 type IVV3Link struct {

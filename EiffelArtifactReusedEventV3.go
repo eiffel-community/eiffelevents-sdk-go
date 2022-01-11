@@ -90,12 +90,38 @@ func (e *ArtifactReusedV3) String() string {
 }
 
 var _ FieldSetter = &ArtifactReusedV3{}
+var _ MetaTeller = &ArtifactReusedV3{}
+
+// ID returns the value of the meta.id field.
+func (e ArtifactReusedV3) ID() string {
+	return e.Meta.ID
+}
+
+// Type returns the value of the meta.type field.
+func (e ArtifactReusedV3) Type() string {
+	return e.Meta.Type
+}
+
+// Version returns the value of the meta.version field.
+func (e ArtifactReusedV3) Version() string {
+	return e.Meta.Version
+}
+
+// Time returns the value of the meta.time field.
+func (e ArtifactReusedV3) Time() int64 {
+	return e.Meta.Time
+}
+
+// DomainID returns the value of the meta.source.domainId field.
+func (e ArtifactReusedV3) DomainID() string {
+	return e.Meta.Source.DomainID
+}
 
 type ArtifactReusedV3 struct {
 	// Mandatory fields
-	Data  ArtRV3Data   `json:"data"`
-	Links []ArtRV3Link `json:"links"`
-	Meta  ArtRV3Meta   `json:"meta"`
+	Data  ArtRV3Data  `json:"data"`
+	Links ArtRV3Links `json:"links"`
+	Meta  ArtRV3Meta  `json:"meta"`
 
 	// Optional fields
 
@@ -115,6 +141,20 @@ type ArtRV3DataCustomDatum struct {
 
 	// Optional fields
 
+}
+
+// ArtRV3Links represents a slice of ArtRV3Link values with helper methods
+// for adding new links.
+type ArtRV3Links []ArtRV3Link
+
+// Add adds a new link of the specified type to a target event.
+func (links *ArtRV3Links) Add(linkType string, target MetaTeller) {
+	*links = append(*links, ArtRV3Link{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *ArtRV3Links) AddByID(linkType string, target string) {
+	*links = append(*links, ArtRV3Link{Target: target, Type: linkType})
 }
 
 type ArtRV3Link struct {

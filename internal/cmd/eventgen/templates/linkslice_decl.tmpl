@@ -1,0 +1,13 @@
+// {{.TypeName}} represents a slice of {{.SlicedType}} values with helper methods
+// for adding new links.
+type {{.TypeName}} []{{.SlicedType}}
+
+// Add adds a new link of the specified type to a target event.
+func (links *{{.TypeName}}) Add(linkType string, target MetaTeller) {
+	*links = append(*links, {{.SlicedType}}{Target: target.ID(), Type: linkType})
+}
+
+// Add adds a new link of the specified type to a target event identified by an ID.
+func (links *{{.TypeName}}) AddByID(linkType string, target string) {
+	*links = append(*links, {{.SlicedType}}{Target: target, Type: linkType})
+}
