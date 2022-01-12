@@ -103,3 +103,103 @@ func TestFactoriesWithModifiers(t *testing.T) {
 	_, err = NewActivityTriggeredV3(func(fieldSetter FieldSetter) error { return modifierError })
 	assert.ErrorIs(t, err, modifierError)
 }
+
+// TestLinksFindAll tests the functionaltiy of the generated FindAll method
+// for one of the XXXLinks types.
+func TestLinksFindAll(t *testing.T) {
+	testcases := []struct {
+		name     string
+		links    ActTV3Links
+		wanted   string
+		expected []string
+	}{
+		{
+			"Empty list of links",
+			ActTV3Links{},
+			"CAUSE",
+			[]string{},
+		},
+		{
+			"Single matching link",
+			ActTV3Links{
+				ActTV3Link{"context id", "CONTEXT"},
+				ActTV3Link{"cause id", "CAUSE"},
+			},
+			"CAUSE",
+			[]string{"cause id"},
+		},
+		{
+			"No matching links",
+			ActTV3Links{
+				ActTV3Link{"context id", "CONTEXT"},
+			},
+			"CAUSE",
+			[]string{},
+		},
+		{
+			"Returns all matching links",
+			ActTV3Links{
+				ActTV3Link{"cause id 1", "CAUSE"},
+				ActTV3Link{"context id", "CONTEXT"},
+				ActTV3Link{"cause id 2", "CAUSE"},
+			},
+			"CAUSE",
+			[]string{"cause id 1", "cause id 2"},
+		},
+	}
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.expected, tc.links.FindAll(tc.wanted))
+		})
+	}
+}
+
+// TestLinksFindFirst tests the functionaltiy of the generated FindFirst method
+// for one of the XXXLinks types.
+func TestLinksFindFirst(t *testing.T) {
+	testcases := []struct {
+		name     string
+		links    ActTV3Links
+		wanted   string
+		expected string
+	}{
+		{
+			"Empty list of links",
+			ActTV3Links{},
+			"CAUSE",
+			"",
+		},
+		{
+			"Single matching link",
+			ActTV3Links{
+				ActTV3Link{"context id", "CONTEXT"},
+				ActTV3Link{"cause id", "CAUSE"},
+			},
+			"CAUSE",
+			"cause id",
+		},
+		{
+			"No matching links",
+			ActTV3Links{
+				ActTV3Link{"context id", "CONTEXT"},
+			},
+			"CAUSE",
+			"",
+		},
+		{
+			"Returns first of multiple matching links",
+			ActTV3Links{
+				ActTV3Link{"cause id 1", "CAUSE"},
+				ActTV3Link{"context id", "CONTEXT"},
+				ActTV3Link{"cause id 2", "CAUSE"},
+			},
+			"CAUSE",
+			"cause id 1",
+		},
+	}
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.expected, tc.links.FindFirst(tc.wanted))
+		})
+	}
+}

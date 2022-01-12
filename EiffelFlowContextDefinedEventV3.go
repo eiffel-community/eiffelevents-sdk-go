@@ -152,6 +152,8 @@ type FCDV3DataCustomDatum struct {
 // for adding new links.
 type FCDV3Links []FCDV3Link
 
+var _ LinkFinder = &FCDV3Links{}
+
 // Add adds a new link of the specified type to a target event.
 func (links *FCDV3Links) Add(linkType string, target MetaTeller) {
 	*links = append(*links, FCDV3Link{Target: target.ID(), Type: linkType})
@@ -160,6 +162,29 @@ func (links *FCDV3Links) Add(linkType string, target MetaTeller) {
 // Add adds a new link of the specified type to a target event identified by an ID.
 func (links *FCDV3Links) AddByID(linkType string, target string) {
 	*links = append(*links, FCDV3Link{Target: target, Type: linkType})
+}
+
+// FindAll returns the IDs of all links of the specified type, or an empty
+// slice if no such links are found.
+func (links FCDV3Links) FindAll(linkType string) []string {
+	result := make([]string, 0, len(links))
+	for _, link := range links {
+		if link.Type == linkType {
+			result = append(result, link.Target)
+		}
+	}
+	return result
+}
+
+// FindFirst returns the ID of the first encountered link of the specified
+// type, or an empty string if no such link is found.
+func (links FCDV3Links) FindFirst(linkType string) string {
+	for _, link := range links {
+		if link.Type == linkType {
+			return link.Target
+		}
+	}
+	return ""
 }
 
 type FCDV3Link struct {
