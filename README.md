@@ -184,6 +184,48 @@ func main() {
 }
 ```
 
+If you have a compound JSON structure containing e.g. an array of event
+objects you can declare its type to be []*eiffelevents.Any. After unmarshaling
+the data you can use a type switch to process the events:
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"os"
+
+	"github.com/eiffel-community/eiffelevents-sdk-go"
+)
+
+func main() {
+	input, err := io.ReadAll(os.Stdin)
+	if err != nil {
+		panic(err)
+	}
+
+	var apiResponse struct {
+		Events []*eiffelevents.Any `json:"events"`
+	}
+
+	err = json.Unmarshal(input, &apiResponse)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, anyEvent := range apiResponse.Events {
+		switch event := anyEvent.Get().(type) {
+		case *eiffelevents.CompositionDefinedV3:
+			fmt.Printf("Received %s composition\n", event.Data.Name)
+		default:
+			fmt.Printf("This event I don't know much about: %s\n", event)
+		}
+	}
+}
+```
+
 ## Code of Conduct and Contributing
 To get involved, please see [Code of Conduct](https://github.com/eiffel-community/.github/blob/master/CODE_OF_CONDUCT.md) and [contribution guidelines](https://github.com/eiffel-community/.github/blob/master/CONTRIBUTING.md).
 
