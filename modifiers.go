@@ -17,9 +17,13 @@
 package eiffelevents
 
 import (
+	"errors"
 	"fmt"
+	"path"
+	"runtime/debug"
 
 	"github.com/Showmax/go-fqdn"
+	"github.com/package-url/packageurl-go"
 )
 
 // Modifier defines a kind of function that modifies an untyped Eiffel event.
@@ -46,6 +50,29 @@ func WithAutoSourceHost() Modifier {
 	}
 }
 
+// WithAutoSourceSerializer sets the meta.source.serializer field to a purl
+// describing the program's main package. It can't figure out the main package
+// version so that value needs to be passed via the version parameter.
+func WithAutoSourceSerializer(version string) Modifier {
+	return func(fieldsetter FieldSetter) error {
+		bi, ok := debug.ReadBuildInfo()
+		if !ok {
+			return errors.New("no build information available")
+		}
+		purl := purlFromBuildInfo(bi)
+		purl.Version = version
+		return fieldsetter.SetField("meta.source.serializer", purl.String())
+	}
+}
+
+func purlFromBuildInfo(bi *debug.BuildInfo) *packageurl.PackageURL {
+	namespace := path.Dir(bi.Path)
+	if namespace == "." {
+		namespace = ""
+	}
+	return packageurl.NewPackageURL("golang", namespace, path.Base(bi.Path), "", packageurl.Qualifiers{}, "")
+}
+
 // WithSourceDomainID sets the meta.source.domainId field of a newly created event.
 func WithSourceDomainID(domainID string) Modifier {
 	return func(fieldSetter FieldSetter) error {
@@ -64,6 +91,13 @@ func WithSourceHost(hostname string) Modifier {
 func WithSourceName(name string) Modifier {
 	return func(fieldSetter FieldSetter) error {
 		return fieldSetter.SetField("meta.source.name", name)
+	}
+}
+
+// WithSourceSerializer sets the meta.source.serializer field of a newly created event.
+func WithSourceSerializer(serializer string) Modifier {
+	return func(fieldSetter FieldSetter) error {
+		return fieldSetter.SetField("meta.source.serializer", serializer)
 	}
 }
 

@@ -18,6 +18,7 @@ package eiffelevents
 
 import (
 	"fmt"
+	"runtime/debug"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -36,6 +37,34 @@ func ExampleModifier() {
 	// Output: example.com
 }
 
+func TestPurlFromBuildInfo(t *testing.T) {
+	testcases := []struct {
+		name     string
+		input    debug.BuildInfo
+		expected string
+	}{
+		{
+			name: "Non-empty namespace",
+			input: debug.BuildInfo{
+				Path: "github.com/foo/bar",
+			},
+			expected: "pkg:golang/github.com/foo/bar",
+		},
+		{
+			name: "Empty namespace",
+			input: debug.BuildInfo{
+				Path: "main",
+			},
+			expected: "pkg:golang/main",
+		},
+	}
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.expected, purlFromBuildInfo(&tc.input).String())
+		})
+	}
+}
+
 func TestWithSourceDomainID(t *testing.T) {
 	event, err := NewCompositionDefinedV3(WithSourceDomainID("example.com"))
 	assert.NoError(t, err)
@@ -52,6 +81,12 @@ func TestWithSourceName(t *testing.T) {
 	event, err := NewCompositionDefinedV3(WithSourceName("My Application"))
 	assert.NoError(t, err)
 	assert.Equal(t, "My Application", event.Meta.Source.Name)
+}
+
+func TestWithSourceSerializer(t *testing.T) {
+	event, err := NewCompositionDefinedV3(WithSourceSerializer("pkg:golang/github.com/foo/bar"))
+	assert.NoError(t, err)
+	assert.Equal(t, "pkg:golang/github.com/foo/bar", event.Meta.Source.Serializer)
 }
 
 func TestWithSourceURI(t *testing.T) {
