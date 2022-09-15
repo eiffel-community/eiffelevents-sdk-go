@@ -11,6 +11,7 @@ require (
 	github.com/google/renameio v1.0.1
 	github.com/google/uuid v1.3.0
 	github.com/lestrrat-go/jsschema v0.0.0-20181205002244-5c81c58ffcc3
+	github.com/package-url/packageurl-go v0.1.0
 	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/gjson v1.9.4
 )
