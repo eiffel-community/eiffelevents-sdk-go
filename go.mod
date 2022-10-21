@@ -13,7 +13,7 @@ require (
 	github.com/lestrrat-go/jsschema v0.0.0-20181205002244-5c81c58ffcc3
 	github.com/package-url/packageurl-go v0.1.0
 	github.com/stretchr/testify v1.8.0
-	github.com/tidwall/gjson v1.9.4
+	github.com/tidwall/gjson v1.14.3
 )
 
 require (
