@@ -18,6 +18,7 @@ package main
 
 import (
 	_ "embed"
+	"strings"
 
 	"github.com/eiffel-community/eiffelevents-sdk-go"
 	"github.com/eiffel-community/eiffelevents-sdk-go/internal/codetemplate"
@@ -39,6 +40,9 @@ func generateEventTypeTable(schemas map[string][]eventSchemaFile, outputFile str
 	for _, eventSchemas := range schemas {
 		latestVersions := latestMajorVersions(eventSchemas)
 		for majorVersion, schema := range latestVersions {
+			if !strings.HasSuffix(schema.EventType, "Event") {
+				continue
+			}
 			if table[schema.EventType] == nil {
 				table[schema.EventType] = make(map[int]MajorEventVersion)
 			}

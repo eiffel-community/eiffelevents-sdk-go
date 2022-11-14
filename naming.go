@@ -23,14 +23,29 @@ import (
 	"github.com/Masterminds/semver"
 )
 
+// trimmedTypeNameSuffixes lists the schema name suffixes that'll get trimmed
+// when turning the schema into a Go type.
+var trimmedTypeNameSuffixes = []string{
+	"Event",
+	"Property",
+}
+
 // EventStructName returns the non-versioned name of the Go struct used to
-// represent an event type.
+// represent a type.
 func EventStructName(eventType string, eventVersion *semver.Version) string {
-	return strings.TrimPrefix(strings.TrimSuffix(eventType, "Event"), "Eiffel")
+	s := strings.TrimPrefix(eventType, "Eiffel")
+	for _, suffix := range trimmedTypeNameSuffixes {
+		// We want to break after the first removed suffix so we can't just
+		//  call strings.TrimSuffix.
+		if strings.HasSuffix(s, suffix) {
+			return strings.TrimSuffix(s, suffix)
+		}
+	}
+	return s
 }
 
 // VersionedEventStructName returns the name of the Go struct used to represent
-// a particular version of an event type.
+// a particular version of a type.
 func VersionedEventStructName(eventType string, eventVersion *semver.Version) string {
 	return fmt.Sprintf("%sV%d", EventStructName(eventType, eventVersion), eventVersion.Major())
 }

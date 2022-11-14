@@ -35,10 +35,10 @@ type eventSchemaFile struct {
 
 // findSchemas looks for Eiffel event schemas in the specified
 // root directory. Schema files are assumed to have
-// the path <root>/<event>/<version>.json. Returns a collection
-// of eventSchemaFile structs grouped per event type.
+// the path <root>/<type>/<version>.yml. Returns a collection
+// of eventSchemaFile structs grouped per type.
 func findSchemas(rootDir string) (map[string][]eventSchemaFile, error) {
-	schemaFiles, err := filepath.Glob(filepath.Join(rootDir, "Eiffel*Event", "*.json"))
+	schemaFiles, err := filepath.Glob(filepath.Join(rootDir, "Eiffel*", "*.yml"))
 	if err != nil {
 		return nil, err
 	}

@@ -17,7 +17,9 @@
 package main
 
 import (
+	"bytes"
 	_ "embed"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -25,6 +27,7 @@ import (
 
 	"github.com/Masterminds/semver"
 	jsschema "github.com/lestrrat-go/jsschema"
+	"gopkg.in/yaml.v3"
 
 	"github.com/eiffel-community/eiffelevents-sdk-go"
 	"github.com/eiffel-community/eiffelevents-sdk-go/internal/codetemplate"
@@ -72,8 +75,18 @@ func generateEventTypes(eventSchemas map[string][]eventSchemaFile, outputDir str
 			}
 			defer schemaFile.Close()
 
+			// Convert input YAML to JSON acceptable to github.com/lestrrat-go/jsschema.
+			var def interface{}
+			if err := yaml.NewDecoder(schemaFile).Decode(&def); err != nil {
+				return err
+			}
+			var jsonDef bytes.Buffer
+			if err := json.NewEncoder(&jsonDef).Encode(def); err != nil {
+				return err
+			}
+
 			outputFile := filepath.Join(outputDir, fmt.Sprintf("%sV%d.go", schema.EventType, majorVersion))
-			if err = generateEventFile(schema.EventType, schema.Version, schemaFile, outputFile); err != nil {
+			if err = generateEventFile(schema.EventType, schema.Version, &jsonDef, outputFile); err != nil {
 				return err
 			}
 		}
@@ -97,6 +110,11 @@ func latestMajorVersions(schemas []eventSchemaFile) map[int64]eventSchemaFile {
 
 // goTypeFromSchema returns a goType that represents a node in a JSON schema.
 func goTypeFromSchema(parent *goStruct, name string, schema *jsschema.Schema) (goType, error) {
+	// Are we dealing with a JSON reference, i.e. a $ref key pointing to another schema file?
+	if len(schema.Reference) != 0 {
+		return newPredeclaredType(schema.Reference)
+	}
+
 	// Special case for data.customData.value which has an empty definition.
 	if len(schema.Type) == 0 {
 		return &goInterface{}, nil
