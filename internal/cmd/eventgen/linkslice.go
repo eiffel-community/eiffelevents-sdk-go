@@ -18,6 +18,7 @@ package main
 
 import (
 	_ "embed"
+	"text/template"
 
 	jsschema "github.com/lestrrat-go/jsschema"
 
@@ -50,7 +51,7 @@ var linkSliceDeclTemplate string
 
 func (t *goLinkSlice) declare(ct *codetemplate.OutputFile) error {
 	// Declare the custom slice type itself.
-	if err := ct.ExpandTemplate(linkSliceDeclTemplate, t); err != nil {
+	if err := ct.ExpandTemplate(linkSliceDeclTemplate, t, template.FuncMap{}); err != nil {
 		return err
 	}
 

@@ -19,6 +19,7 @@ package main
 import (
 	_ "embed"
 	"strings"
+	"text/template"
 
 	"github.com/eiffel-community/eiffelevents-sdk-go"
 	"github.com/eiffel-community/eiffelevents-sdk-go/internal/codetemplate"
@@ -53,7 +54,7 @@ func generateEventTypeTable(schemas map[string][]eventSchemaFile, outputFile str
 		}
 	}
 	output := codetemplate.New(outputFile)
-	if err := output.ExpandTemplate(eventTableFileTemplate, table); err != nil {
+	if err := output.ExpandTemplate(eventTableFileTemplate, table, template.FuncMap{}); err != nil {
 		return err
 	}
 	return output.Close()

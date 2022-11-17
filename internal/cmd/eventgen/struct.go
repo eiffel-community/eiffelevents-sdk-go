@@ -20,6 +20,7 @@ import (
 	_ "embed"
 	"sort"
 	"strings"
+	"text/template"
 
 	jsschema "github.com/lestrrat-go/jsschema"
 
@@ -64,7 +65,7 @@ var structDeclTemplate string
 
 func (t *goStruct) declare(ct *codetemplate.OutputFile) error {
 	// Declare the struct itself.
-	if err := ct.ExpandTemplate(structDeclTemplate, t); err != nil {
+	if err := ct.ExpandTemplate(structDeclTemplate, t, template.FuncMap{}); err != nil {
 		return err
 	}
 

@@ -24,6 +24,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"text/template"
 
 	"github.com/Masterminds/semver"
 	jsschema "github.com/lestrrat-go/jsschema"
@@ -241,7 +242,18 @@ func generateEventFile(eventType string, version *semver.Version, schema io.Read
 	}
 
 	ct := codetemplate.New(outputFile)
-	if err := ct.ExpandTemplate(eventFileTemplate, eventMeta); err != nil {
+	funcs := template.FuncMap{
+		// The FieldType function allows the template to look up the declared type of any struct member.
+		"FieldType": func(name string) (string, error) {
+			for _, f := range rootStruct.Fields {
+				if f.JSONField == name {
+					return f.Type.String(), nil
+				}
+			}
+			return "", fmt.Errorf("no field %q found in struct", name)
+		},
+	}
+	if err := ct.ExpandTemplate(eventFileTemplate, eventMeta, funcs); err != nil {
 		return err
 	}
 	if err := rootStruct.declare(ct); err != nil {

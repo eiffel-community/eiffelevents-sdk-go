@@ -59,12 +59,12 @@ func (e *{{.StructName}}) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]{{.EventTypeAbbrev}}V{{.MajorVersion}}Link, 0)
+		links = make({{FieldType "links"}}, 0)
 	}
 	s := struct{
-		Data  *{{.EventTypeAbbrev}}V{{.MajorVersion}}Data  `json:"data"`
-		Links []{{.EventTypeAbbrev}}V{{.MajorVersion}}Link `json:"links"`
-		Meta  *{{.EventTypeAbbrev}}V{{.MajorVersion}}Meta  `json:"meta"`
+		Data  *{{FieldType "data"}} `json:"data"`
+		Links {{FieldType "links"}} `json:"links"`
+		Meta  *{{FieldType "meta"}} `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,

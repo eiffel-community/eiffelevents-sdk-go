@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"text/template"
 
 	"github.com/eiffel-community/eiffelevents-sdk-go/internal/codetemplate"
 )
@@ -65,7 +66,7 @@ func newEnum(parent *goStruct, name string, typ goType, values []interface{}) (*
 var enumDeclTemplate string
 
 func (t *goEnum) declare(ct *codetemplate.OutputFile) error {
-	return ct.ExpandTemplate(enumDeclTemplate, t)
+	return ct.ExpandTemplate(enumDeclTemplate, t, template.FuncMap{})
 }
 
 func (t *goEnum) String() string {
