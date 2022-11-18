@@ -59,12 +59,12 @@ func (e *ArtifactCreatedV2) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]ArtCV2Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
 		Data  *ArtCV2Data  `json:"data"`
-		Links []ArtCV2Link `json:"links"`
-		Meta  *ArtCV2Meta  `json:"meta"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV2      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e ArtifactCreatedV2) DomainID() string {
 
 type ArtifactCreatedV2 struct {
 	// Mandatory fields
-	Data  ArtCV2Data  `json:"data"`
-	Links ArtCV2Links `json:"links"`
-	Meta  ArtCV2Meta  `json:"meta"`
+	Data  ArtCV2Data   `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV2       `json:"meta"`
 
 	// Optional fields
 
@@ -133,21 +133,12 @@ type ArtCV2Data struct {
 
 	// Optional fields
 	BuildCommand           string                           `json:"buildCommand,omitempty"`
-	CustomData             []ArtCV2DataCustomDatum          `json:"customData,omitempty"`
+	CustomData             []CustomDataV1                   `json:"customData,omitempty"`
 	DependsOn              []string                         `json:"dependsOn,omitempty"`
 	FileInformation        []ArtCV2DataFileInformation      `json:"fileInformation,omitempty"`
 	Implements             []string                         `json:"implements,omitempty"`
 	Name                   string                           `json:"name,omitempty"`
 	RequiresImplementation ArtCV2DataRequiresImplementation `json:"requiresImplementation,omitempty"`
-}
-
-type ArtCV2DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
 }
 
 type ArtCV2DataFileInformation struct {
@@ -166,91 +157,3 @@ const (
 	ArtCV2DataRequiresImplementation_ExactlyOne ArtCV2DataRequiresImplementation = "EXACTLY_ONE"
 	ArtCV2DataRequiresImplementation_AtLeastOne ArtCV2DataRequiresImplementation = "AT_LEAST_ONE"
 )
-
-// ArtCV2Links represents a slice of ArtCV2Link values with helper methods
-// for adding new links.
-type ArtCV2Links []ArtCV2Link
-
-var _ LinkFinder = &ArtCV2Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *ArtCV2Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, ArtCV2Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *ArtCV2Links) AddByID(linkType string, target string) {
-	*links = append(*links, ArtCV2Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links ArtCV2Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links ArtCV2Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type ArtCV2Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-
-}
-
-type ArtCV2Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security ArtCV2MetaSecurity `json:"security,omitempty"`
-	Source   ArtCV2MetaSource   `json:"source,omitempty"`
-	Tags     []string           `json:"tags,omitempty"`
-}
-
-type ArtCV2MetaSecurity struct {
-	// Mandatory fields
-
-	// Optional fields
-	SDM ArtCV2MetaSecuritySDM `json:"sdm,omitempty"`
-}
-
-type ArtCV2MetaSecuritySDM struct {
-	// Mandatory fields
-	AuthorIdentity  string `json:"authorIdentity"`
-	EncryptedDigest string `json:"encryptedDigest"`
-
-	// Optional fields
-
-}
-
-type ArtCV2MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
-}

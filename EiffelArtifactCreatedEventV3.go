@@ -59,12 +59,12 @@ func (e *ArtifactCreatedV3) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]ArtCV3Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
 		Data  *ArtCV3Data  `json:"data"`
-		Links []ArtCV3Link `json:"links"`
-		Meta  *ArtCV3Meta  `json:"meta"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV3      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e ArtifactCreatedV3) DomainID() string {
 
 type ArtifactCreatedV3 struct {
 	// Mandatory fields
-	Data  ArtCV3Data  `json:"data"`
-	Links ArtCV3Links `json:"links"`
-	Meta  ArtCV3Meta  `json:"meta"`
+	Data  ArtCV3Data   `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV3       `json:"meta"`
 
 	// Optional fields
 
@@ -133,21 +133,12 @@ type ArtCV3Data struct {
 
 	// Optional fields
 	BuildCommand           string                           `json:"buildCommand,omitempty"`
-	CustomData             []ArtCV3DataCustomDatum          `json:"customData,omitempty"`
+	CustomData             []CustomDataV1                   `json:"customData,omitempty"`
 	DependsOn              []string                         `json:"dependsOn,omitempty"`
 	FileInformation        []ArtCV3DataFileInformation      `json:"fileInformation,omitempty"`
 	Implements             []string                         `json:"implements,omitempty"`
 	Name                   string                           `json:"name,omitempty"`
 	RequiresImplementation ArtCV3DataRequiresImplementation `json:"requiresImplementation,omitempty"`
-}
-
-type ArtCV3DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
 }
 
 type ArtCV3DataFileInformation struct {
@@ -166,119 +157,3 @@ const (
 	ArtCV3DataRequiresImplementation_ExactlyOne ArtCV3DataRequiresImplementation = "EXACTLY_ONE"
 	ArtCV3DataRequiresImplementation_AtLeastOne ArtCV3DataRequiresImplementation = "AT_LEAST_ONE"
 )
-
-// ArtCV3Links represents a slice of ArtCV3Link values with helper methods
-// for adding new links.
-type ArtCV3Links []ArtCV3Link
-
-var _ LinkFinder = &ArtCV3Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *ArtCV3Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, ArtCV3Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *ArtCV3Links) AddByID(linkType string, target string) {
-	*links = append(*links, ArtCV3Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links ArtCV3Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links ArtCV3Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type ArtCV3Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-	DomainID string `json:"domainId,omitempty"`
-}
-
-type ArtCV3Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security ArtCV3MetaSecurity `json:"security,omitempty"`
-	Source   ArtCV3MetaSource   `json:"source,omitempty"`
-	Tags     []string           `json:"tags,omitempty"`
-}
-
-type ArtCV3MetaSecurity struct {
-	// Mandatory fields
-	AuthorIdentity string `json:"authorIdentity"`
-
-	// Optional fields
-	IntegrityProtection ArtCV3MetaSecurityIntegrityProtection  `json:"integrityProtection,omitempty"`
-	SequenceProtection  []ArtCV3MetaSecuritySequenceProtection `json:"sequenceProtection,omitempty"`
-}
-
-type ArtCV3MetaSecurityIntegrityProtection struct {
-	// Mandatory fields
-	Alg       ArtCV3MetaSecurityIntegrityProtectionAlg `json:"alg"`
-	Signature string                                   `json:"signature"`
-
-	// Optional fields
-	PublicKey string `json:"publicKey,omitempty"`
-}
-
-type ArtCV3MetaSecurityIntegrityProtectionAlg string
-
-const (
-	ArtCV3MetaSecurityIntegrityProtectionAlg_HS256 ArtCV3MetaSecurityIntegrityProtectionAlg = "HS256"
-	ArtCV3MetaSecurityIntegrityProtectionAlg_HS384 ArtCV3MetaSecurityIntegrityProtectionAlg = "HS384"
-	ArtCV3MetaSecurityIntegrityProtectionAlg_HS512 ArtCV3MetaSecurityIntegrityProtectionAlg = "HS512"
-	ArtCV3MetaSecurityIntegrityProtectionAlg_RS256 ArtCV3MetaSecurityIntegrityProtectionAlg = "RS256"
-	ArtCV3MetaSecurityIntegrityProtectionAlg_RS384 ArtCV3MetaSecurityIntegrityProtectionAlg = "RS384"
-	ArtCV3MetaSecurityIntegrityProtectionAlg_RS512 ArtCV3MetaSecurityIntegrityProtectionAlg = "RS512"
-	ArtCV3MetaSecurityIntegrityProtectionAlg_ES256 ArtCV3MetaSecurityIntegrityProtectionAlg = "ES256"
-	ArtCV3MetaSecurityIntegrityProtectionAlg_ES384 ArtCV3MetaSecurityIntegrityProtectionAlg = "ES384"
-	ArtCV3MetaSecurityIntegrityProtectionAlg_ES512 ArtCV3MetaSecurityIntegrityProtectionAlg = "ES512"
-	ArtCV3MetaSecurityIntegrityProtectionAlg_PS256 ArtCV3MetaSecurityIntegrityProtectionAlg = "PS256"
-	ArtCV3MetaSecurityIntegrityProtectionAlg_PS384 ArtCV3MetaSecurityIntegrityProtectionAlg = "PS384"
-	ArtCV3MetaSecurityIntegrityProtectionAlg_PS512 ArtCV3MetaSecurityIntegrityProtectionAlg = "PS512"
-)
-
-type ArtCV3MetaSecuritySequenceProtection struct {
-	// Mandatory fields
-	Position     int64  `json:"position"`
-	SequenceName string `json:"sequenceName"`
-
-	// Optional fields
-
-}
-
-type ArtCV3MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
-}

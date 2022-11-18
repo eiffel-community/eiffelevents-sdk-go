@@ -105,43 +105,43 @@ func TestFactoriesWithModifiers(t *testing.T) {
 }
 
 // TestLinksFindAll tests the functionaltiy of the generated FindAll method
-// for one of the XXXLinks types.
+// for one of the EventLinksVx types.
 func TestLinksFindAll(t *testing.T) {
 	testcases := []struct {
 		name     string
-		links    ActTV3Links
+		links    EventLinksV1
 		wanted   string
 		expected []string
 	}{
 		{
 			"Empty list of links",
-			ActTV3Links{},
+			EventLinksV1{},
 			"CAUSE",
 			[]string{},
 		},
 		{
 			"Single matching link",
-			ActTV3Links{
-				ActTV3Link{"context id", "CONTEXT"},
-				ActTV3Link{"cause id", "CAUSE"},
+			EventLinksV1{
+				EventLinkV1{"context id", "CONTEXT", ""},
+				EventLinkV1{"cause id", "CAUSE", ""},
 			},
 			"CAUSE",
 			[]string{"cause id"},
 		},
 		{
 			"No matching links",
-			ActTV3Links{
-				ActTV3Link{"context id", "CONTEXT"},
+			EventLinksV1{
+				EventLinkV1{"context id", "CONTEXT", ""},
 			},
 			"CAUSE",
 			[]string{},
 		},
 		{
 			"Returns all matching links",
-			ActTV3Links{
-				ActTV3Link{"cause id 1", "CAUSE"},
-				ActTV3Link{"context id", "CONTEXT"},
-				ActTV3Link{"cause id 2", "CAUSE"},
+			EventLinksV1{
+				EventLinkV1{"cause id 1", "CAUSE", ""},
+				EventLinkV1{"context id", "CONTEXT", ""},
+				EventLinkV1{"cause id 2", "CAUSE", ""},
 			},
 			"CAUSE",
 			[]string{"cause id 1", "cause id 2"},
@@ -155,43 +155,43 @@ func TestLinksFindAll(t *testing.T) {
 }
 
 // TestLinksFindFirst tests the functionaltiy of the generated FindFirst method
-// for one of the XXXLinks types.
+// for one of the EventLinksVx types.
 func TestLinksFindFirst(t *testing.T) {
 	testcases := []struct {
 		name     string
-		links    ActTV3Links
+		links    EventLinksV1
 		wanted   string
 		expected string
 	}{
 		{
 			"Empty list of links",
-			ActTV3Links{},
+			EventLinksV1{},
 			"CAUSE",
 			"",
 		},
 		{
 			"Single matching link",
-			ActTV3Links{
-				ActTV3Link{"context id", "CONTEXT"},
-				ActTV3Link{"cause id", "CAUSE"},
+			EventLinksV1{
+				EventLinkV1{"context id", "CONTEXT", ""},
+				EventLinkV1{"cause id", "CAUSE", ""},
 			},
 			"CAUSE",
 			"cause id",
 		},
 		{
 			"No matching links",
-			ActTV3Links{
-				ActTV3Link{"context id", "CONTEXT"},
+			EventLinksV1{
+				EventLinkV1{"context id", "CONTEXT", ""},
 			},
 			"CAUSE",
 			"",
 		},
 		{
 			"Returns first of multiple matching links",
-			ActTV3Links{
-				ActTV3Link{"cause id 1", "CAUSE"},
-				ActTV3Link{"context id", "CONTEXT"},
-				ActTV3Link{"cause id 2", "CAUSE"},
+			EventLinksV1{
+				EventLinkV1{"cause id 1", "CAUSE", ""},
+				EventLinkV1{"context id", "CONTEXT", ""},
+				EventLinkV1{"cause id 2", "CAUSE", ""},
 			},
 			"CAUSE",
 			"cause id 1",

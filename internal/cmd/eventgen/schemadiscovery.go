@@ -17,6 +17,7 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
 	"path/filepath"
 	"sort"
@@ -25,19 +26,11 @@ import (
 	"github.com/Masterminds/semver"
 )
 
-// eventSchemaFile holds information about a particular version of
-// an Eiffel event and where the event's schema can be located.
-type eventSchemaFile struct {
-	Filename  string
-	EventType string
-	Version   *semver.Version
-}
-
 // findSchemas looks for Eiffel event schemas in the specified
 // root directory. Schema files are assumed to have
 // the path <root>/<type>/<version>.yml. Returns a collection
 // of eventSchemaFile structs grouped per type.
-func findSchemas(rootDir string) (map[string][]eventSchemaFile, error) {
+func findSchemas(rootDir string) (map[string][]schemaDefinitionRenderer, error) {
 	schemaFiles, err := filepath.Glob(filepath.Join(rootDir, "Eiffel*", "*.yml"))
 	if err != nil {
 		return nil, err
@@ -46,7 +39,7 @@ func findSchemas(rootDir string) (map[string][]eventSchemaFile, error) {
 	// Make sure the files have a well-defined order to make it easier to write tests.
 	sort.Strings(schemaFiles)
 
-	result := make(map[string][]eventSchemaFile)
+	result := make(map[string][]schemaDefinitionRenderer)
 	for _, schemaFile := range schemaFiles {
 		eventType := filepath.Base(filepath.Dir(schemaFile))
 		stem := strings.TrimSuffix(filepath.Base(schemaFile), filepath.Ext(filepath.Base(schemaFile)))
@@ -54,7 +47,25 @@ func findSchemas(rootDir string) (map[string][]eventSchemaFile, error) {
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", stem, err)
 		}
-		result[eventType] = append(result[eventType], eventSchemaFile{schemaFile, eventType, version})
+
+		// Use the filename to determine whether this is an event or some other (struct) type.
+		var r schemaDefinitionRenderer
+		if strings.HasSuffix(eventType, "Event") {
+			r = &eventDefinitionFile{
+				definitionFile: definitionFile{schemaFile, eventType, version},
+			}
+		} else if strings.HasSuffix(eventType, "Link") {
+			r = &structDefinitionFile{
+				definitionFile: definitionFile{schemaFile, eventType, version},
+				templateFile:   linkStructFileTemplate,
+			}
+		} else {
+			r = &structDefinitionFile{
+				definitionFile: definitionFile{schemaFile, eventType, version},
+				templateFile:   structFileTemplate,
+			}
+		}
+		result[eventType] = append(result[eventType], r)
 	}
 	return result, nil
 }

@@ -59,12 +59,12 @@ func (e *ActivityCanceledV2) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]ActCV2Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
 		Data  *ActCV2Data  `json:"data"`
-		Links []ActCV2Link `json:"links"`
-		Meta  *ActCV2Meta  `json:"meta"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV2      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e ActivityCanceledV2) DomainID() string {
 
 type ActivityCanceledV2 struct {
 	// Mandatory fields
-	Data  ActCV2Data  `json:"data"`
-	Links ActCV2Links `json:"links"`
-	Meta  ActCV2Meta  `json:"meta"`
+	Data  ActCV2Data   `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV2       `json:"meta"`
 
 	// Optional fields
 
@@ -131,103 +131,6 @@ type ActCV2Data struct {
 	// Mandatory fields
 
 	// Optional fields
-	CustomData []ActCV2DataCustomDatum `json:"customData,omitempty"`
-	Reason     string                  `json:"reason,omitempty"`
-}
-
-type ActCV2DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
-}
-
-// ActCV2Links represents a slice of ActCV2Link values with helper methods
-// for adding new links.
-type ActCV2Links []ActCV2Link
-
-var _ LinkFinder = &ActCV2Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *ActCV2Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, ActCV2Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *ActCV2Links) AddByID(linkType string, target string) {
-	*links = append(*links, ActCV2Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links ActCV2Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links ActCV2Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type ActCV2Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-
-}
-
-type ActCV2Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security ActCV2MetaSecurity `json:"security,omitempty"`
-	Source   ActCV2MetaSource   `json:"source,omitempty"`
-	Tags     []string           `json:"tags,omitempty"`
-}
-
-type ActCV2MetaSecurity struct {
-	// Mandatory fields
-
-	// Optional fields
-	SDM ActCV2MetaSecuritySDM `json:"sdm,omitempty"`
-}
-
-type ActCV2MetaSecuritySDM struct {
-	// Mandatory fields
-	AuthorIdentity  string `json:"authorIdentity"`
-	EncryptedDigest string `json:"encryptedDigest"`
-
-	// Optional fields
-
-}
-
-type ActCV2MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
+	CustomData []CustomDataV1 `json:"customData,omitempty"`
+	Reason     string         `json:"reason,omitempty"`
 }

@@ -59,12 +59,12 @@ func (e *TestCaseStartedV1) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]TCSV1Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *TCSV1Data  `json:"data"`
-		Links []TCSV1Link `json:"links"`
-		Meta  *TCSV1Meta  `json:"meta"`
+		Data  *TCSV1Data   `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV1      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e TestCaseStartedV1) DomainID() string {
 
 type TestCaseStartedV1 struct {
 	// Mandatory fields
-	Data  TCSV1Data  `json:"data"`
-	Links TCSV1Links `json:"links"`
-	Meta  TCSV1Meta  `json:"meta"`
+	Data  TCSV1Data    `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV1       `json:"meta"`
 
 	// Optional fields
 
@@ -131,122 +131,15 @@ type TCSV1Data struct {
 	// Mandatory fields
 
 	// Optional fields
-	CustomData []TCSV1DataCustomDatum `json:"customData,omitempty"`
-	Executor   string                 `json:"executor,omitempty"`
-	LiveLogs   []TCSV1DataLiveLog     `json:"liveLogs,omitempty"`
-}
-
-type TCSV1DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
+	CustomData []CustomDataV1     `json:"customData,omitempty"`
+	Executor   string             `json:"executor,omitempty"`
+	LiveLogs   []TCSV1DataLiveLog `json:"liveLogs,omitempty"`
 }
 
 type TCSV1DataLiveLog struct {
 	// Mandatory fields
 	Name string `json:"name"`
 	URI  string `json:"uri"`
-
-	// Optional fields
-
-}
-
-// TCSV1Links represents a slice of TCSV1Link values with helper methods
-// for adding new links.
-type TCSV1Links []TCSV1Link
-
-var _ LinkFinder = &TCSV1Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *TCSV1Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, TCSV1Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *TCSV1Links) AddByID(linkType string, target string) {
-	*links = append(*links, TCSV1Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links TCSV1Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links TCSV1Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type TCSV1Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-
-}
-
-type TCSV1Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security TCSV1MetaSecurity `json:"security,omitempty"`
-	Source   TCSV1MetaSource   `json:"source,omitempty"`
-	Tags     []string          `json:"tags,omitempty"`
-}
-
-type TCSV1MetaSecurity struct {
-	// Mandatory fields
-
-	// Optional fields
-	SDM TCSV1MetaSecuritySDM `json:"sdm,omitempty"`
-}
-
-type TCSV1MetaSecuritySDM struct {
-	// Mandatory fields
-	AuthorIdentity  string `json:"authorIdentity"`
-	EncryptedDigest string `json:"encryptedDigest"`
-
-	// Optional fields
-
-}
-
-type TCSV1MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string                    `json:"domainId,omitempty"`
-	Host       string                    `json:"host,omitempty"`
-	Name       string                    `json:"name,omitempty"`
-	Serializer TCSV1MetaSourceSerializer `json:"serializer,omitempty"`
-	URI        string                    `json:"uri,omitempty"`
-}
-
-type TCSV1MetaSourceSerializer struct {
-	// Mandatory fields
-	ArtifactID string `json:"artifactId"`
-	GroupID    string `json:"groupId"`
-	Version    string `json:"version"`
 
 	// Optional fields
 

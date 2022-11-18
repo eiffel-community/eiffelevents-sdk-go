@@ -59,12 +59,12 @@ func (e *IssueDefinedV2) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]IDV2Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *IDV2Data  `json:"data"`
-		Links []IDV2Link `json:"links"`
-		Meta  *IDV2Meta  `json:"meta"`
+		Data  *IDV2Data    `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV2      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -121,9 +121,9 @@ type IssueDefinedV2 struct {
 	// Mandatory fields
 
 	// Optional fields
-	Data  IDV2Data  `json:"data,omitempty"`
-	Links IDV2Links `json:"links,omitempty"`
-	Meta  IDV2Meta  `json:"meta,omitempty"`
+	Data  IDV2Data     `json:"data,omitempty"`
+	Links EventLinksV1 `json:"links,omitempty"`
+	Meta  MetaV2       `json:"meta,omitempty"`
 }
 
 type IDV2Data struct {
@@ -134,17 +134,8 @@ type IDV2Data struct {
 	URI     string       `json:"uri"`
 
 	// Optional fields
-	CustomData []IDV2DataCustomDatum `json:"customData,omitempty"`
-	Title      string                `json:"title,omitempty"`
-}
-
-type IDV2DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
+	CustomData []CustomDataV1 `json:"customData,omitempty"`
+	Title      string         `json:"title,omitempty"`
 }
 
 type IDV2DataType string
@@ -157,91 +148,3 @@ const (
 	IDV2DataType_Requirement IDV2DataType = "REQUIREMENT"
 	IDV2DataType_Other       IDV2DataType = "OTHER"
 )
-
-// IDV2Links represents a slice of IDV2Link values with helper methods
-// for adding new links.
-type IDV2Links []IDV2Link
-
-var _ LinkFinder = &IDV2Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *IDV2Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, IDV2Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *IDV2Links) AddByID(linkType string, target string) {
-	*links = append(*links, IDV2Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links IDV2Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links IDV2Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type IDV2Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-
-}
-
-type IDV2Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security IDV2MetaSecurity `json:"security,omitempty"`
-	Source   IDV2MetaSource   `json:"source,omitempty"`
-	Tags     []string         `json:"tags,omitempty"`
-}
-
-type IDV2MetaSecurity struct {
-	// Mandatory fields
-
-	// Optional fields
-	SDM IDV2MetaSecuritySDM `json:"sdm,omitempty"`
-}
-
-type IDV2MetaSecuritySDM struct {
-	// Mandatory fields
-	AuthorIdentity  string `json:"authorIdentity"`
-	EncryptedDigest string `json:"encryptedDigest"`
-
-	// Optional fields
-
-}
-
-type IDV2MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
-}

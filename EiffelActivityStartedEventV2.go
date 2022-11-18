@@ -59,12 +59,12 @@ func (e *ActivityStartedV2) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]ActSV2Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
 		Data  *ActSV2Data  `json:"data"`
-		Links []ActSV2Link `json:"links"`
-		Meta  *ActSV2Meta  `json:"meta"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV2      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e ActivityStartedV2) DomainID() string {
 
 type ActivityStartedV2 struct {
 	// Mandatory fields
-	Data  ActSV2Data  `json:"data"`
-	Links ActSV2Links `json:"links"`
-	Meta  ActSV2Meta  `json:"meta"`
+	Data  ActSV2Data   `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV2       `json:"meta"`
 
 	// Optional fields
 
@@ -131,18 +131,9 @@ type ActSV2Data struct {
 	// Mandatory fields
 
 	// Optional fields
-	CustomData   []ActSV2DataCustomDatum `json:"customData,omitempty"`
-	ExecutionURI string                  `json:"executionUri,omitempty"`
-	LiveLogs     []ActSV2DataLiveLog     `json:"liveLogs,omitempty"`
-}
-
-type ActSV2DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
+	CustomData   []CustomDataV1      `json:"customData,omitempty"`
+	ExecutionURI string              `json:"executionUri,omitempty"`
+	LiveLogs     []ActSV2DataLiveLog `json:"liveLogs,omitempty"`
 }
 
 type ActSV2DataLiveLog struct {
@@ -152,92 +143,4 @@ type ActSV2DataLiveLog struct {
 
 	// Optional fields
 
-}
-
-// ActSV2Links represents a slice of ActSV2Link values with helper methods
-// for adding new links.
-type ActSV2Links []ActSV2Link
-
-var _ LinkFinder = &ActSV2Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *ActSV2Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, ActSV2Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *ActSV2Links) AddByID(linkType string, target string) {
-	*links = append(*links, ActSV2Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links ActSV2Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links ActSV2Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type ActSV2Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-
-}
-
-type ActSV2Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security ActSV2MetaSecurity `json:"security,omitempty"`
-	Source   ActSV2MetaSource   `json:"source,omitempty"`
-	Tags     []string           `json:"tags,omitempty"`
-}
-
-type ActSV2MetaSecurity struct {
-	// Mandatory fields
-
-	// Optional fields
-	SDM ActSV2MetaSecuritySDM `json:"sdm,omitempty"`
-}
-
-type ActSV2MetaSecuritySDM struct {
-	// Mandatory fields
-	AuthorIdentity  string `json:"authorIdentity"`
-	EncryptedDigest string `json:"encryptedDigest"`
-
-	// Optional fields
-
-}
-
-type ActSV2MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
 }

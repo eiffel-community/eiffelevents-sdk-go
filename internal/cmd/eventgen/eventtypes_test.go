@@ -26,30 +26,52 @@ import (
 func TestLatestMajorVersions(t *testing.T) {
 	testcases := []struct {
 		name     string
-		input    []eventSchemaFile
-		expected map[int64]eventSchemaFile
+		input    []schemaDefinitionRenderer
+		expected map[int64]schemaDefinitionRenderer
 	}{
 		{
 			name:     "Empty input map",
-			input:    []eventSchemaFile{},
-			expected: map[int64]eventSchemaFile{},
+			input:    []schemaDefinitionRenderer{},
+			expected: map[int64]schemaDefinitionRenderer{},
 		},
 		{
 			name: "Multiple major versions",
-			input: []eventSchemaFile{
-				{"/path/to/EiffelActivityStartedEvent/1.0.0.json", "EiffelActivityStartedEvent", semver.MustParse("1.0.0")},
-				{"/path/to/EiffelActivityStartedEvent/1.1.0.json", "EiffelActivityStartedEvent", semver.MustParse("1.1.0")},
-				{"/path/to/EiffelActivityStartedEvent/2.0.0.json", "EiffelActivityStartedEvent", semver.MustParse("2.0.0")},
-				{"/path/to/EiffelActivityStartedEvent/3.0.0.json", "EiffelActivityStartedEvent", semver.MustParse("3.0.0")},
-				{"/path/to/EiffelActivityStartedEvent/4.0.0.json", "EiffelActivityStartedEvent", semver.MustParse("4.0.0")},
-				{"/path/to/EiffelActivityStartedEvent/4.1.0.json", "EiffelActivityStartedEvent", semver.MustParse("4.1.0")},
-				{"/path/to/EiffelActivityStartedEvent/4.2.0.json", "EiffelActivityStartedEvent", semver.MustParse("4.2.0")},
+			input: []schemaDefinitionRenderer{
+				&eventDefinitionFile{
+					definitionFile: definitionFile{"/path/to/EiffelActivityStartedEvent/1.0.0.json", "EiffelActivityStartedEvent", semver.MustParse("1.0.0")},
+				},
+				&eventDefinitionFile{
+					definitionFile: definitionFile{"/path/to/EiffelActivityStartedEvent/1.1.0.json", "EiffelActivityStartedEvent", semver.MustParse("1.1.0")},
+				},
+				&eventDefinitionFile{
+					definitionFile: definitionFile{"/path/to/EiffelActivityStartedEvent/2.0.0.json", "EiffelActivityStartedEvent", semver.MustParse("2.0.0")},
+				},
+				&eventDefinitionFile{
+					definitionFile: definitionFile{"/path/to/EiffelActivityStartedEvent/3.0.0.json", "EiffelActivityStartedEvent", semver.MustParse("3.0.0")},
+				},
+				&eventDefinitionFile{
+					definitionFile: definitionFile{"/path/to/EiffelActivityStartedEvent/4.0.0.json", "EiffelActivityStartedEvent", semver.MustParse("4.0.0")},
+				},
+				&eventDefinitionFile{
+					definitionFile: definitionFile{"/path/to/EiffelActivityStartedEvent/4.1.0.json", "EiffelActivityStartedEvent", semver.MustParse("4.1.0")},
+				},
+				&eventDefinitionFile{
+					definitionFile: definitionFile{"/path/to/EiffelActivityStartedEvent/4.2.0.json", "EiffelActivityStartedEvent", semver.MustParse("4.2.0")},
+				},
 			},
-			expected: map[int64]eventSchemaFile{
-				1: {"/path/to/EiffelActivityStartedEvent/1.1.0.json", "EiffelActivityStartedEvent", semver.MustParse("1.1.0")},
-				2: {"/path/to/EiffelActivityStartedEvent/2.0.0.json", "EiffelActivityStartedEvent", semver.MustParse("2.0.0")},
-				3: {"/path/to/EiffelActivityStartedEvent/3.0.0.json", "EiffelActivityStartedEvent", semver.MustParse("3.0.0")},
-				4: {"/path/to/EiffelActivityStartedEvent/4.2.0.json", "EiffelActivityStartedEvent", semver.MustParse("4.2.0")},
+			expected: map[int64]schemaDefinitionRenderer{
+				1: &eventDefinitionFile{
+					definitionFile: definitionFile{"/path/to/EiffelActivityStartedEvent/1.1.0.json", "EiffelActivityStartedEvent", semver.MustParse("1.1.0")},
+				},
+				2: &eventDefinitionFile{
+					definitionFile: definitionFile{"/path/to/EiffelActivityStartedEvent/2.0.0.json", "EiffelActivityStartedEvent", semver.MustParse("2.0.0")},
+				},
+				3: &eventDefinitionFile{
+					definitionFile: definitionFile{"/path/to/EiffelActivityStartedEvent/3.0.0.json", "EiffelActivityStartedEvent", semver.MustParse("3.0.0")},
+				},
+				4: &eventDefinitionFile{
+					definitionFile: definitionFile{"/path/to/EiffelActivityStartedEvent/4.2.0.json", "EiffelActivityStartedEvent", semver.MustParse("4.2.0")},
+				},
 			},
 		},
 	}

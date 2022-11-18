@@ -18,19 +18,14 @@ package main
 
 import (
 	"bytes"
-	_ "embed"
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
-	"text/template"
 
-	"github.com/Masterminds/semver"
 	jsschema "github.com/lestrrat-go/jsschema"
 	"gopkg.in/yaml.v3"
 
-	"github.com/eiffel-community/eiffelevents-sdk-go"
 	"github.com/eiffel-community/eiffelevents-sdk-go/internal/codetemplate"
 )
 
@@ -67,10 +62,10 @@ func (t *goInterface) String() string {
 // generateEventTypes generates Go struct declarations (and all types
 // referenced in those structs) for the latest event version within
 // each major version of each event type.
-func generateEventTypes(eventSchemas map[string][]eventSchemaFile, outputDir string) error {
+func generateEventTypes(eventSchemas map[string][]schemaDefinitionRenderer, outputDir string) error {
 	for _, schemas := range eventSchemas {
 		for majorVersion, schema := range latestMajorVersions(schemas) {
-			schemaFile, err := os.Open(schema.Filename)
+			schemaFile, err := os.Open(schema.Filename())
 			if err != nil {
 				return err
 			}
@@ -86,8 +81,8 @@ func generateEventTypes(eventSchemas map[string][]eventSchemaFile, outputDir str
 				return err
 			}
 
-			outputFile := filepath.Join(outputDir, fmt.Sprintf("%sV%d.go", schema.EventType, majorVersion))
-			if err = generateEventFile(schema.EventType, schema.Version, &jsonDef, outputFile); err != nil {
+			outputFile := filepath.Join(outputDir, fmt.Sprintf("%sV%d.go", schema.EventType(), majorVersion))
+			if err = schema.Render(&jsonDef, outputFile); err != nil {
 				return err
 			}
 		}
@@ -99,11 +94,11 @@ func generateEventTypes(eventSchemas map[string][]eventSchemaFile, outputDir str
 // maps each encountered major version to the schemadiscovery.EventSchemaFile
 // that represents the most recent minor.patch version within that major
 // version.
-func latestMajorVersions(schemas []eventSchemaFile) map[int64]eventSchemaFile {
-	majorVersions := map[int64]eventSchemaFile{}
+func latestMajorVersions(schemas []schemaDefinitionRenderer) map[int64]schemaDefinitionRenderer {
+	majorVersions := map[int64]schemaDefinitionRenderer{}
 	for _, schema := range schemas {
-		if current, exists := majorVersions[schema.Version.Major()]; !exists || current.Version.LessThan(schema.Version) {
-			majorVersions[schema.Version.Major()] = schema
+		if current, exists := majorVersions[schema.Version().Major()]; !exists || current.Version().LessThan(schema.Version()) {
+			majorVersions[schema.Version().Major()] = schema
 		}
 	}
 	return majorVersions
@@ -143,9 +138,9 @@ func goTypeFromSchema(parent *goStruct, name string, schema *jsschema.Schema) (g
 			typ, err = newStruct(parent, name, schema)
 		}
 	case jsschema.ArrayType:
-		// The links slice at the event root should have its distinct type
-		// XXXLinks instead of simply []XXXLink like how other slices are
-		// represented.
+		// The links slice at the event root should have its own type,
+		// e.g. EventLinksV1 instead of []EventLinkV1 like how other slices
+		// are represented.
 		if fullName == "links" {
 			typ, err = newLinkSlice(parent, name, schema.Items)
 		} else {
@@ -167,97 +162,4 @@ func goTypeFromSchema(parent *goStruct, name string, schema *jsschema.Schema) (g
 	}
 
 	return typ, err
-}
-
-//go:embed templates/eventfile.tmpl
-var eventFileTemplate string
-
-// eventTypeAbbrevMap maps event type name to their abbreviations. For now
-// the contents of this map is created by running
-//
-//     sed -n 's/^# \([^ ]*\) (\([A-Za-z]*\))/"\1": "\2",/p' eiffel-vocubulary/*.md
-//
-// in the Eiffel protocol repository but when
-// https://github.com/eiffel-community/eiffel/issues/282 has been addressed
-// we can hopefully do it in a better way.
-var eventTypeAbbrevMap = map[string]string{
-	"EiffelActivityCanceledEvent":                     "ActC",
-	"EiffelActivityFinishedEvent":                     "ActF",
-	"EiffelActivityStartedEvent":                      "ActS",
-	"EiffelActivityTriggeredEvent":                    "ActT",
-	"EiffelAnnouncementPublishedEvent":                "AnnP",
-	"EiffelArtifactCreatedEvent":                      "ArtC",
-	"EiffelArtifactPublishedEvent":                    "ArtP",
-	"EiffelArtifactReusedEvent":                       "ArtR",
-	"EiffelCompositionDefinedEvent":                   "CD",
-	"EiffelConfidenceLevelModifiedEvent":              "CLM",
-	"EiffelEnvironmentDefinedEvent":                   "ED",
-	"EiffelFlowContextDefinedEvent":                   "FCD",
-	"EiffelIssueDefinedEvent":                         "ID",
-	"EiffelIssueVerifiedEvent":                        "IV",
-	"EiffelSourceChangeCreatedEvent":                  "SCC",
-	"EiffelSourceChangeSubmittedEvent":                "SCS",
-	"EiffelTestCaseCanceledEvent":                     "TCC",
-	"EiffelTestCaseFinishedEvent":                     "TCF",
-	"EiffelTestCaseStartedEvent":                      "TCS",
-	"EiffelTestCaseTriggeredEvent":                    "TCT",
-	"EiffelTestExecutionRecipeCollectionCreatedEvent": "TERCC",
-	"EiffelTestSuiteFinishedEvent":                    "TSF",
-	"EiffelTestSuiteStartedEvent":                     "TSS",
-}
-
-// generateEventFile generates a Go source file with the Go struct and
-// associated types needed to represent a particular major version of
-// an Eiffel event, given its JSON schema.
-func generateEventFile(eventType string, version *semver.Version, schema io.Reader, outputFile string) error {
-	s, err := jsschema.Read(schema)
-	if err != nil {
-		return err
-	}
-
-	eventTypeAbbrev := eventTypeAbbrevMap[eventType]
-	if eventTypeAbbrev == "" {
-		return fmt.Errorf("the event type %q isn't supported (no known abbreviation)", eventType)
-	}
-
-	// Gather some metadata about the event type. This struct is later
-	// supplied to the template that generates the event source file.
-	eventMeta := struct {
-		EventType         string // The name of the event type, e.g. EiffelActivityTriggeredEvent.
-		EventTypeAbbrev   string // The abbreviated event type name, e.g. ActT.
-		StructName        string // The name of the struct that represents the event type.
-		SubTypeNamePrefix string // The prefix that any subtypes of the event type struct gets to their names.
-		MajorVersion      int64  // The event type's major version.
-	}{
-		EventType:         eventType,
-		EventTypeAbbrev:   eventTypeAbbrev,
-		StructName:        eiffelevents.VersionedEventStructName(eventType, version),
-		SubTypeNamePrefix: fmt.Sprintf("%sV%d", eventTypeAbbrev, version.Major()),
-		MajorVersion:      version.Major(),
-	}
-
-	rootStruct, err := newEventStruct(eventMeta.SubTypeNamePrefix, eventMeta.StructName, s)
-	if err != nil {
-		return err
-	}
-
-	ct := codetemplate.New(outputFile)
-	funcs := template.FuncMap{
-		// The FieldType function allows the template to look up the declared type of any struct member.
-		"FieldType": func(name string) (string, error) {
-			for _, f := range rootStruct.Fields {
-				if f.JSONField == name {
-					return f.Type.String(), nil
-				}
-			}
-			return "", fmt.Errorf("no field %q found in struct", name)
-		},
-	}
-	if err := ct.ExpandTemplate(eventFileTemplate, eventMeta, funcs); err != nil {
-		return err
-	}
-	if err := rootStruct.declare(ct); err != nil {
-		return err
-	}
-	return ct.Close()
 }

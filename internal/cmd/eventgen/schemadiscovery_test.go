@@ -36,66 +36,110 @@ func TestFindSchemas(t *testing.T) {
 	testcases := []struct {
 		name          string
 		filenames     []string
-		expected      map[string][]eventSchemaFile
+		expected      map[string][]schemaDefinitionRenderer
 		expectedError error
 	}{
 		{
 			name:      "Empty schema directory",
 			filenames: []string{},
-			expected:  map[string][]eventSchemaFile{},
+			expected:  map[string][]schemaDefinitionRenderer{},
 		},
 		{
 			name: "Ignores non-Eiffel directory",
 			filenames: []string{
-				"SomeOtherDirectory/1.0.0.json",
+				"SomeOtherDirectory/1.0.0.yml",
 			},
-			expected: map[string][]eventSchemaFile{},
+			expected: map[string][]schemaDefinitionRenderer{},
 		},
 		{
 			name: "Ignores non-JSON file",
 			filenames: []string{
 				"EiffelCompositionDefinedEvent/this-is-not-json.txt",
 			},
-			expected: map[string][]eventSchemaFile{},
+			expected: map[string][]schemaDefinitionRenderer{},
 		},
 		{
 			name: "Error on bad version",
 			filenames: []string{
-				"EiffelCompositionDefinedEvent/this-is-not-a-valid-version.json",
+				"EiffelCompositionDefinedEvent/this-is-not-a-valid-version.yml",
 			},
 			expectedError: semver.ErrInvalidSemVer,
 		},
 		{
+			name: "Non-event struct",
+			filenames: []string{
+				"EiffelMetaProperty/1.0.0.yml",
+			},
+			expected: map[string][]schemaDefinitionRenderer{
+				"EiffelMetaProperty": {
+					&structDefinitionFile{
+						definitionFile: definitionFile{
+							filepath.Join(tempDir, "Non-event struct", "EiffelMetaProperty/1.0.0.yml"),
+							"EiffelMetaProperty",
+							semver.MustParse("1.0.0"),
+						},
+						templateFile: structFileTemplate,
+					},
+				},
+			},
+		},
+		{
+			name: "Link struct",
+			filenames: []string{
+				"EiffelEventLink/1.0.0.yml",
+			},
+			expected: map[string][]schemaDefinitionRenderer{
+				"EiffelEventLink": {
+					&structDefinitionFile{
+						definitionFile: definitionFile{
+							filepath.Join(tempDir, "Link struct", "EiffelEventLink/1.0.0.yml"),
+							"EiffelEventLink",
+							semver.MustParse("1.0.0"),
+						},
+						templateFile: linkStructFileTemplate,
+					},
+				},
+			},
+		},
+		{
 			name: "Multiple events with multiple versions",
 			filenames: []string{
-				"EiffelArtifactCreatedEvent/1.0.0.json",
-				"EiffelArtifactCreatedEvent/2.0.0.json",
-				"EiffelCompositionDefinedEvent/3.0.0.json",
-				"EiffelCompositionDefinedEvent/4.0.0.json",
+				"EiffelArtifactCreatedEvent/1.0.0.yml",
+				"EiffelArtifactCreatedEvent/2.0.0.yml",
+				"EiffelCompositionDefinedEvent/3.0.0.yml",
+				"EiffelCompositionDefinedEvent/4.0.0.yml",
 			},
-			expected: map[string][]eventSchemaFile{
+			expected: map[string][]schemaDefinitionRenderer{
 				"EiffelArtifactCreatedEvent": {
-					{
-						filepath.Join(tempDir, "Multiple events with multiple versions", "EiffelArtifactCreatedEvent/1.0.0.json"),
-						"EiffelArtifactCreatedEvent",
-						semver.MustParse("1.0.0"),
+					&eventDefinitionFile{
+						definitionFile: definitionFile{
+							filepath.Join(tempDir, "Multiple events with multiple versions", "EiffelArtifactCreatedEvent/1.0.0.yml"),
+							"EiffelArtifactCreatedEvent",
+							semver.MustParse("1.0.0"),
+						},
 					},
-					{
-						filepath.Join(tempDir, "Multiple events with multiple versions", "EiffelArtifactCreatedEvent/2.0.0.json"),
-						"EiffelArtifactCreatedEvent",
-						semver.MustParse("2.0.0"),
+					&eventDefinitionFile{
+						definitionFile: definitionFile{
+							filepath.Join(tempDir, "Multiple events with multiple versions", "EiffelArtifactCreatedEvent/2.0.0.yml"),
+							"EiffelArtifactCreatedEvent",
+							semver.MustParse("2.0.0"),
+						},
 					},
 				},
 				"EiffelCompositionDefinedEvent": {
-					{
-						filepath.Join(tempDir, "Multiple events with multiple versions", "EiffelCompositionDefinedEvent/3.0.0.json"),
-						"EiffelCompositionDefinedEvent",
-						semver.MustParse("3.0.0"),
+					&eventDefinitionFile{
+						definitionFile: definitionFile{
+							filepath.Join(tempDir, "Multiple events with multiple versions", "EiffelCompositionDefinedEvent/3.0.0.yml"),
+							"EiffelCompositionDefinedEvent",
+							semver.MustParse("3.0.0"),
+						},
 					},
-					{
-						filepath.Join(tempDir, "Multiple events with multiple versions", "EiffelCompositionDefinedEvent/4.0.0.json"),
-						"EiffelCompositionDefinedEvent",
-						semver.MustParse("4.0.0"),
+					&eventDefinitionFile{
+						definitionFile: definitionFile{
+							filepath.Join(tempDir, "Multiple events with multiple versions", "EiffelCompositionDefinedEvent/4.0.0.yml"),
+							"EiffelCompositionDefinedEvent",
+							semver.MustParse("4.0.0"),
+						},
 					},
 				},
 			},

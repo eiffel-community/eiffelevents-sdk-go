@@ -59,12 +59,12 @@ func (e *ActivityFinishedV2) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]ActFV2Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
 		Data  *ActFV2Data  `json:"data"`
-		Links []ActFV2Link `json:"links"`
-		Meta  *ActFV2Meta  `json:"meta"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV2      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e ActivityFinishedV2) DomainID() string {
 
 type ActivityFinishedV2 struct {
 	// Mandatory fields
-	Data  ActFV2Data  `json:"data"`
-	Links ActFV2Links `json:"links"`
-	Meta  ActFV2Meta  `json:"meta"`
+	Data  ActFV2Data   `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV2       `json:"meta"`
 
 	// Optional fields
 
@@ -132,17 +132,8 @@ type ActFV2Data struct {
 	Outcome ActFV2DataOutcome `json:"outcome"`
 
 	// Optional fields
-	CustomData     []ActFV2DataCustomDatum   `json:"customData,omitempty"`
+	CustomData     []CustomDataV1            `json:"customData,omitempty"`
 	PersistentLogs []ActFV2DataPersistentLog `json:"persistentLogs,omitempty"`
-}
-
-type ActFV2DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
 }
 
 type ActFV2DataOutcome struct {
@@ -171,92 +162,4 @@ type ActFV2DataPersistentLog struct {
 
 	// Optional fields
 
-}
-
-// ActFV2Links represents a slice of ActFV2Link values with helper methods
-// for adding new links.
-type ActFV2Links []ActFV2Link
-
-var _ LinkFinder = &ActFV2Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *ActFV2Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, ActFV2Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *ActFV2Links) AddByID(linkType string, target string) {
-	*links = append(*links, ActFV2Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links ActFV2Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links ActFV2Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type ActFV2Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-
-}
-
-type ActFV2Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security ActFV2MetaSecurity `json:"security,omitempty"`
-	Source   ActFV2MetaSource   `json:"source,omitempty"`
-	Tags     []string           `json:"tags,omitempty"`
-}
-
-type ActFV2MetaSecurity struct {
-	// Mandatory fields
-
-	// Optional fields
-	SDM ActFV2MetaSecuritySDM `json:"sdm,omitempty"`
-}
-
-type ActFV2MetaSecuritySDM struct {
-	// Mandatory fields
-	AuthorIdentity  string `json:"authorIdentity"`
-	EncryptedDigest string `json:"encryptedDigest"`
-
-	// Optional fields
-
-}
-
-type ActFV2MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
 }

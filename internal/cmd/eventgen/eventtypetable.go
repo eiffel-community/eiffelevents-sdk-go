@@ -36,20 +36,20 @@ var eventTableFileTemplate string
 // generateEventTypeTable generates a small Go source file containing
 // a variable that maps the major version of each event to a type
 // reference to the Go type used to represent the event.
-func generateEventTypeTable(schemas map[string][]eventSchemaFile, outputFile string) error {
+func generateEventTypeTable(schemas map[string][]schemaDefinitionRenderer, outputFile string) error {
 	table := make(map[string]map[int]MajorEventVersion)
 	for _, eventSchemas := range schemas {
 		latestVersions := latestMajorVersions(eventSchemas)
 		for majorVersion, schema := range latestVersions {
-			if !strings.HasSuffix(schema.EventType, "Event") {
+			if !strings.HasSuffix(schema.EventType(), "Event") {
 				continue
 			}
-			if table[schema.EventType] == nil {
-				table[schema.EventType] = make(map[int]MajorEventVersion)
+			if table[schema.EventType()] == nil {
+				table[schema.EventType()] = make(map[int]MajorEventVersion)
 			}
-			table[schema.EventType][int(majorVersion)] = MajorEventVersion{
-				eiffelevents.VersionedEventStructName(schema.EventType, schema.Version),
-				schema.Version.String(),
+			table[schema.EventType()][int(majorVersion)] = MajorEventVersion{
+				eiffelevents.VersionedEventStructName(schema.EventType(), schema.Version()),
+				schema.Version().String(),
 			}
 		}
 	}

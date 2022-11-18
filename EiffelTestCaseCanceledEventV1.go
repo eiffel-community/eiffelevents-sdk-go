@@ -59,12 +59,12 @@ func (e *TestCaseCanceledV1) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]TCCV1Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *TCCV1Data  `json:"data"`
-		Links []TCCV1Link `json:"links"`
-		Meta  *TCCV1Meta  `json:"meta"`
+		Data  *TCCV1Data   `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV1      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e TestCaseCanceledV1) DomainID() string {
 
 type TestCaseCanceledV1 struct {
 	// Mandatory fields
-	Data  TCCV1Data  `json:"data"`
-	Links TCCV1Links `json:"links"`
-	Meta  TCCV1Meta  `json:"meta"`
+	Data  TCCV1Data    `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV1       `json:"meta"`
 
 	// Optional fields
 
@@ -131,113 +131,6 @@ type TCCV1Data struct {
 	// Mandatory fields
 
 	// Optional fields
-	CustomData []TCCV1DataCustomDatum `json:"customData,omitempty"`
-	Reason     string                 `json:"reason,omitempty"`
-}
-
-type TCCV1DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
-}
-
-// TCCV1Links represents a slice of TCCV1Link values with helper methods
-// for adding new links.
-type TCCV1Links []TCCV1Link
-
-var _ LinkFinder = &TCCV1Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *TCCV1Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, TCCV1Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *TCCV1Links) AddByID(linkType string, target string) {
-	*links = append(*links, TCCV1Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links TCCV1Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links TCCV1Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type TCCV1Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-
-}
-
-type TCCV1Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security TCCV1MetaSecurity `json:"security,omitempty"`
-	Source   TCCV1MetaSource   `json:"source,omitempty"`
-	Tags     []string          `json:"tags,omitempty"`
-}
-
-type TCCV1MetaSecurity struct {
-	// Mandatory fields
-
-	// Optional fields
-	SDM TCCV1MetaSecuritySDM `json:"sdm,omitempty"`
-}
-
-type TCCV1MetaSecuritySDM struct {
-	// Mandatory fields
-	AuthorIdentity  string `json:"authorIdentity"`
-	EncryptedDigest string `json:"encryptedDigest"`
-
-	// Optional fields
-
-}
-
-type TCCV1MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string                    `json:"domainId,omitempty"`
-	Host       string                    `json:"host,omitempty"`
-	Name       string                    `json:"name,omitempty"`
-	Serializer TCCV1MetaSourceSerializer `json:"serializer,omitempty"`
-	URI        string                    `json:"uri,omitempty"`
-}
-
-type TCCV1MetaSourceSerializer struct {
-	// Mandatory fields
-	ArtifactID string `json:"artifactId"`
-	GroupID    string `json:"groupId"`
-	Version    string `json:"version"`
-
-	// Optional fields
-
+	CustomData []CustomDataV1 `json:"customData,omitempty"`
+	Reason     string         `json:"reason,omitempty"`
 }

@@ -18,47 +18,35 @@ package main
 
 import (
 	_ "embed"
-	"text/template"
+	"fmt"
 
+	"github.com/eiffel-community/eiffelevents-sdk-go"
 	jsschema "github.com/lestrrat-go/jsschema"
-
-	"github.com/eiffel-community/eiffelevents-sdk-go/internal/codetemplate"
 )
 
-// goLinkSlice represents the type of a slice value.
+// goLinkSlice represents the type of a slice of links. It's different from
+// normal slices in that it gets its own type, e.g. EventLinksV1 defined as
+// []EventLinkV1, which allows us to define new methods on the slice itself.
 type goLinkSlice struct {
 	TypeName   string
 	SlicedType goType // The type that's being sliced
 }
 
 func newLinkSlice(parent *goStruct, name string, items *jsschema.ItemSpec) (*goLinkSlice, error) {
-	// The type created for this array should use the singular form of the noun, i.e. we want
-	//     Links XXXLink
-	// and not this:
-	//     Links XXXLinks
+	// We expect to be handed an array where the elements are of a predeclared
+	// type. Extract that type so that we can turn it into a slice type.
 	typ, err := goTypeFromSchema(parent, pluralizeClient.Singular(name), items.Schemas[0])
 	if err != nil {
 		return nil, err
 	}
+	predeclType, ok := typ.(*goPredeclaredType)
+	if !ok {
+		return nil, fmt.Errorf("type %T of link array items was unexpected", predeclType)
+	}
 	return &goLinkSlice{
-		TypeName:   parent.SubTypeNamePrefix + fieldTitle(name),
+		TypeName:   eiffelevents.VersionedEventStructName(pluralizeClient.Plural(predeclType.BaseName), predeclType.Version),
 		SlicedType: typ,
 	}, nil
-}
-
-//go:embed templates/linkslice_decl.tmpl
-var linkSliceDeclTemplate string
-
-func (t *goLinkSlice) declare(ct *codetemplate.OutputFile) error {
-	// Declare the custom slice type itself.
-	if err := ct.ExpandTemplate(linkSliceDeclTemplate, t, template.FuncMap{}); err != nil {
-		return err
-	}
-
-	if declarer, ok := t.SlicedType.(goTypeDeclarer); ok {
-		return declarer.declare(ct)
-	}
-	return nil
 }
 
 func (t *goLinkSlice) String() string {

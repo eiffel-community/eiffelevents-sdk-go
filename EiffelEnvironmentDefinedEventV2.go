@@ -59,12 +59,12 @@ func (e *EnvironmentDefinedV2) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]EDV2Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *EDV2Data  `json:"data"`
-		Links []EDV2Link `json:"links"`
-		Meta  *EDV2Meta  `json:"meta"`
+		Data  *EDV2Data    `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV2      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e EnvironmentDefinedV2) DomainID() string {
 
 type EnvironmentDefinedV2 struct {
 	// Mandatory fields
-	Data  EDV2Data  `json:"data"`
-	Links EDV2Links `json:"links"`
-	Meta  EDV2Meta  `json:"meta"`
+	Data  EDV2Data     `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV2       `json:"meta"`
 
 	// Optional fields
 
@@ -132,20 +132,11 @@ type EDV2Data struct {
 	Name string `json:"name"`
 
 	// Optional fields
-	CustomData []EDV2DataCustomDatum `json:"customData,omitempty"`
-	Host       EDV2DataHost          `json:"host,omitempty"`
-	Image      string                `json:"image,omitempty"`
-	URI        string                `json:"uri,omitempty"`
-	Version    string                `json:"version,omitempty"`
-}
-
-type EDV2DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
+	CustomData []CustomDataV1 `json:"customData,omitempty"`
+	Host       EDV2DataHost   `json:"host,omitempty"`
+	Image      string         `json:"image,omitempty"`
+	URI        string         `json:"uri,omitempty"`
+	Version    string         `json:"version,omitempty"`
 }
 
 type EDV2DataHost struct {
@@ -155,92 +146,4 @@ type EDV2DataHost struct {
 
 	// Optional fields
 
-}
-
-// EDV2Links represents a slice of EDV2Link values with helper methods
-// for adding new links.
-type EDV2Links []EDV2Link
-
-var _ LinkFinder = &EDV2Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *EDV2Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, EDV2Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *EDV2Links) AddByID(linkType string, target string) {
-	*links = append(*links, EDV2Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links EDV2Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links EDV2Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type EDV2Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-
-}
-
-type EDV2Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security EDV2MetaSecurity `json:"security,omitempty"`
-	Source   EDV2MetaSource   `json:"source,omitempty"`
-	Tags     []string         `json:"tags,omitempty"`
-}
-
-type EDV2MetaSecurity struct {
-	// Mandatory fields
-
-	// Optional fields
-	SDM EDV2MetaSecuritySDM `json:"sdm,omitempty"`
-}
-
-type EDV2MetaSecuritySDM struct {
-	// Mandatory fields
-	AuthorIdentity  string `json:"authorIdentity"`
-	EncryptedDigest string `json:"encryptedDigest"`
-
-	// Optional fields
-
-}
-
-type EDV2MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
 }

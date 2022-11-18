@@ -59,12 +59,12 @@ func (e *IssueVerifiedV4) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]IVV4Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *IVV4Data  `json:"data"`
-		Links []IVV4Link `json:"links"`
-		Meta  *IVV4Meta  `json:"meta"`
+		Data  *IVV4Data    `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV3      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e IssueVerifiedV4) DomainID() string {
 
 type IssueVerifiedV4 struct {
 	// Mandatory fields
-	Data  IVV4Data  `json:"data"`
-	Links IVV4Links `json:"links"`
-	Meta  IVV4Meta  `json:"meta"`
+	Data  IVV4Data     `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV3       `json:"meta"`
 
 	// Optional fields
 
@@ -131,130 +131,5 @@ type IVV4Data struct {
 	// Mandatory fields
 
 	// Optional fields
-	CustomData []IVV4DataCustomDatum `json:"customData,omitempty"`
-}
-
-type IVV4DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
-}
-
-// IVV4Links represents a slice of IVV4Link values with helper methods
-// for adding new links.
-type IVV4Links []IVV4Link
-
-var _ LinkFinder = &IVV4Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *IVV4Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, IVV4Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *IVV4Links) AddByID(linkType string, target string) {
-	*links = append(*links, IVV4Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links IVV4Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links IVV4Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type IVV4Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-	DomainID string `json:"domainId,omitempty"`
-}
-
-type IVV4Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security IVV4MetaSecurity `json:"security,omitempty"`
-	Source   IVV4MetaSource   `json:"source,omitempty"`
-	Tags     []string         `json:"tags,omitempty"`
-}
-
-type IVV4MetaSecurity struct {
-	// Mandatory fields
-	AuthorIdentity string `json:"authorIdentity"`
-
-	// Optional fields
-	IntegrityProtection IVV4MetaSecurityIntegrityProtection  `json:"integrityProtection,omitempty"`
-	SequenceProtection  []IVV4MetaSecuritySequenceProtection `json:"sequenceProtection,omitempty"`
-}
-
-type IVV4MetaSecurityIntegrityProtection struct {
-	// Mandatory fields
-	Alg       IVV4MetaSecurityIntegrityProtectionAlg `json:"alg"`
-	Signature string                                 `json:"signature"`
-
-	// Optional fields
-	PublicKey string `json:"publicKey,omitempty"`
-}
-
-type IVV4MetaSecurityIntegrityProtectionAlg string
-
-const (
-	IVV4MetaSecurityIntegrityProtectionAlg_HS256 IVV4MetaSecurityIntegrityProtectionAlg = "HS256"
-	IVV4MetaSecurityIntegrityProtectionAlg_HS384 IVV4MetaSecurityIntegrityProtectionAlg = "HS384"
-	IVV4MetaSecurityIntegrityProtectionAlg_HS512 IVV4MetaSecurityIntegrityProtectionAlg = "HS512"
-	IVV4MetaSecurityIntegrityProtectionAlg_RS256 IVV4MetaSecurityIntegrityProtectionAlg = "RS256"
-	IVV4MetaSecurityIntegrityProtectionAlg_RS384 IVV4MetaSecurityIntegrityProtectionAlg = "RS384"
-	IVV4MetaSecurityIntegrityProtectionAlg_RS512 IVV4MetaSecurityIntegrityProtectionAlg = "RS512"
-	IVV4MetaSecurityIntegrityProtectionAlg_ES256 IVV4MetaSecurityIntegrityProtectionAlg = "ES256"
-	IVV4MetaSecurityIntegrityProtectionAlg_ES384 IVV4MetaSecurityIntegrityProtectionAlg = "ES384"
-	IVV4MetaSecurityIntegrityProtectionAlg_ES512 IVV4MetaSecurityIntegrityProtectionAlg = "ES512"
-	IVV4MetaSecurityIntegrityProtectionAlg_PS256 IVV4MetaSecurityIntegrityProtectionAlg = "PS256"
-	IVV4MetaSecurityIntegrityProtectionAlg_PS384 IVV4MetaSecurityIntegrityProtectionAlg = "PS384"
-	IVV4MetaSecurityIntegrityProtectionAlg_PS512 IVV4MetaSecurityIntegrityProtectionAlg = "PS512"
-)
-
-type IVV4MetaSecuritySequenceProtection struct {
-	// Mandatory fields
-	Position     int64  `json:"position"`
-	SequenceName string `json:"sequenceName"`
-
-	// Optional fields
-
-}
-
-type IVV4MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
+	CustomData []CustomDataV1 `json:"customData,omitempty"`
 }
