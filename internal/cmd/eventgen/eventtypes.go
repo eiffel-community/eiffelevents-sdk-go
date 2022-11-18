@@ -59,12 +59,11 @@ func (t *goInterface) String() string {
 	return "interface{}"
 }
 
-// generateEventTypes generates Go struct declarations (and all types
-// referenced in those structs) for the latest event version within
-// each major version of each event type.
-func generateEventTypes(eventSchemas map[string][]schemaDefinitionRenderer, outputDir string) error {
-	for _, schemas := range eventSchemas {
-		for majorVersion, schema := range latestMajorVersions(schemas) {
+// generateTypes generates Go struct declarations (and types referenced in
+// those structs) for the latest version within each major version of each type.
+func generateTypes(schemaDefs map[string][]schemaDefinitionRenderer, outputDir string) error {
+	for _, defs := range schemaDefs {
+		for majorVersion, schema := range latestMajorVersions(defs) {
 			schemaFile, err := os.Open(schema.Filename())
 			if err != nil {
 				return err
@@ -81,7 +80,7 @@ func generateEventTypes(eventSchemas map[string][]schemaDefinitionRenderer, outp
 				return err
 			}
 
-			outputFile := filepath.Join(outputDir, fmt.Sprintf("%sV%d.go", schema.EventType(), majorVersion))
+			outputFile := filepath.Join(outputDir, fmt.Sprintf("%sV%d.go", schema.TypeName(), majorVersion))
 			if err = schema.Render(&jsonDef, outputFile); err != nil {
 				return err
 			}
@@ -90,10 +89,9 @@ func generateEventTypes(eventSchemas map[string][]schemaDefinitionRenderer, outp
 	return nil
 }
 
-// latestMajorVersions inspects a list of schemas for a single event type and
-// maps each encountered major version to the schemadiscovery.EventSchemaFile
-// that represents the most recent minor.patch version within that major
-// version.
+// latestMajorVersions inspects a list of schema definitions for a single type and
+// maps each encountered major version to the schemaDefinitionRenderer that
+// represents the most recent minor.patch version within that major version.
 func latestMajorVersions(schemas []schemaDefinitionRenderer) map[int64]schemaDefinitionRenderer {
 	majorVersions := map[int64]schemaDefinitionRenderer{}
 	for _, schema := range schemas {

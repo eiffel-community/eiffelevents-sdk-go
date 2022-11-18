@@ -30,7 +30,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("%s: %s", filepath.Base(os.Args[0]), err)
 	}
-	if err := generateEventTypes(schemas, "."); err != nil {
+	if err := generateTypes(schemas, "."); err != nil {
 		log.Fatalf("%s: %s", filepath.Base(os.Args[0]), err)
 	}
 	if err := generateEventTypeTable(schemas, "eventtypetable.go"); err != nil {

@@ -31,7 +31,7 @@ import (
 
 // schemaDefinitionRenderer renders a schema definition to a Go source file.
 type schemaDefinitionRenderer interface {
-	EventType() string
+	TypeName() string
 	Filename() string
 	Render(schema io.Reader, outputFile string) error
 	Version() *semver.Version
@@ -42,13 +42,13 @@ type schemaDefinitionRenderer interface {
 // be embedded in a new struct that implmements the Render method from
 // schemaDefinitionRenderer to get a working renderer.
 type definitionFile struct {
-	filename  string
-	eventType string
-	version   *semver.Version
+	filename string
+	typeName string
+	version  *semver.Version
 }
 
-func (edf *definitionFile) EventType() string {
-	return edf.eventType
+func (edf *definitionFile) TypeName() string {
+	return edf.typeName
 }
 
 func (edf *definitionFile) Filename() string {
@@ -109,9 +109,9 @@ func (edf *eventDefinitionFile) Render(schema io.Reader, outputFile string) erro
 		return err
 	}
 
-	eventTypeAbbrev := eventTypeAbbrevMap[edf.eventType]
+	eventTypeAbbrev := eventTypeAbbrevMap[edf.typeName]
 	if eventTypeAbbrev == "" {
-		return fmt.Errorf("the event type %q isn't supported (no known abbreviation)", edf.eventType)
+		return fmt.Errorf("the event type %q isn't supported (no known abbreviation)", edf.typeName)
 	}
 
 	// Gather some metadata about the event type. This struct is later
@@ -124,9 +124,9 @@ func (edf *eventDefinitionFile) Render(schema io.Reader, outputFile string) erro
 		MajorVersion      int64  // The event type's major version.
 		LinksGoType       string // The name of the Go type used for the "links" field.
 	}{
-		EventType:         edf.eventType,
+		EventType:         edf.typeName,
 		EventTypeAbbrev:   eventTypeAbbrev,
-		StructName:        eiffelevents.VersionedEventStructName(edf.eventType, edf.version),
+		StructName:        eiffelevents.VersionedEventStructName(edf.typeName, edf.version),
 		SubTypeNamePrefix: fmt.Sprintf("%sV%d", eventTypeAbbrev, edf.version.Major()),
 		MajorVersion:      edf.version.Major(),
 	}
@@ -179,7 +179,7 @@ func (sdf *structDefinitionFile) Render(schema io.Reader, outputFile string) err
 
 	// Gather some metadata about the event type. This struct is later
 	// supplied to the template that generates the event source file.
-	structName := eiffelevents.VersionedEventStructName(sdf.eventType, sdf.version)
+	structName := eiffelevents.VersionedEventStructName(sdf.typeName, sdf.version)
 	typeMeta := struct {
 		TypeName          string // The unversioned name of the schema type, e.g. EiffelEventLink.
 		BaseStructName    string // The unversioned name of the Go struct that represents the type, e.g. EventLink.
@@ -187,8 +187,8 @@ func (sdf *structDefinitionFile) Render(schema io.Reader, outputFile string) err
 		SubTypeNamePrefix string // The prefix that any subtypes of the event type struct gets to their names.
 		MajorVersion      int64  // The type's major version.
 	}{
-		TypeName:          sdf.eventType,
-		BaseStructName:    eiffelevents.EventStructName(sdf.eventType, sdf.version),
+		TypeName:          sdf.typeName,
+		BaseStructName:    eiffelevents.EventStructName(sdf.typeName, sdf.version),
 		StructName:        structName,
 		SubTypeNamePrefix: structName,
 		MajorVersion:      sdf.version.Major(),

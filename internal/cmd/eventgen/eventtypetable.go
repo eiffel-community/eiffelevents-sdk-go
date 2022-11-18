@@ -41,14 +41,14 @@ func generateEventTypeTable(schemas map[string][]schemaDefinitionRenderer, outpu
 	for _, eventSchemas := range schemas {
 		latestVersions := latestMajorVersions(eventSchemas)
 		for majorVersion, schema := range latestVersions {
-			if !strings.HasSuffix(schema.EventType(), "Event") {
+			if !strings.HasSuffix(schema.TypeName(), "Event") {
 				continue
 			}
-			if table[schema.EventType()] == nil {
-				table[schema.EventType()] = make(map[int]MajorEventVersion)
+			if table[schema.TypeName()] == nil {
+				table[schema.TypeName()] = make(map[int]MajorEventVersion)
 			}
-			table[schema.EventType()][int(majorVersion)] = MajorEventVersion{
-				eiffelevents.VersionedEventStructName(schema.EventType(), schema.Version()),
+			table[schema.TypeName()][int(majorVersion)] = MajorEventVersion{
+				eiffelevents.VersionedEventStructName(schema.TypeName(), schema.Version()),
 				schema.Version().String(),
 			}
 		}
