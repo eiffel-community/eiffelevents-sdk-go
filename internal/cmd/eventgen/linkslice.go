@@ -44,7 +44,7 @@ func newLinkSlice(parent *goStruct, name string, items *jsschema.ItemSpec) (*goL
 		return nil, fmt.Errorf("type %T of link array items was unexpected", predeclType)
 	}
 	return &goLinkSlice{
-		TypeName:   eiffelevents.VersionedEventStructName(pluralizeClient.Plural(predeclType.BaseName), predeclType.Version),
+		TypeName:   eiffelevents.VersionedStructName(pluralizeClient.Plural(predeclType.BaseName), predeclType.Version),
 		SlicedType: typ,
 	}, nil
 }

@@ -30,13 +30,13 @@ var trimmedTypeNameSuffixes = []string{
 	"Property",
 }
 
-// EventStructName returns the non-versioned name of the Go struct used to
+// StructName returns the non-versioned name of the Go struct used to
 // represent a type.
-func EventStructName(eventType string, eventVersion *semver.Version) string {
+func StructName(eventType string, eventVersion *semver.Version) string {
 	s := strings.TrimPrefix(eventType, "Eiffel")
 	for _, suffix := range trimmedTypeNameSuffixes {
 		// We want to break after the first removed suffix so we can't just
-		//  call strings.TrimSuffix.
+		// call strings.TrimSuffix.
 		if strings.HasSuffix(s, suffix) {
 			return strings.TrimSuffix(s, suffix)
 		}
@@ -44,8 +44,8 @@ func EventStructName(eventType string, eventVersion *semver.Version) string {
 	return s
 }
 
-// VersionedEventStructName returns the name of the Go struct used to represent
+// VersionedStructName returns the name of the Go struct used to represent
 // a particular version of a type.
-func VersionedEventStructName(eventType string, eventVersion *semver.Version) string {
-	return fmt.Sprintf("%sV%d", EventStructName(eventType, eventVersion), eventVersion.Major())
+func VersionedStructName(eventType string, eventVersion *semver.Version) string {
+	return fmt.Sprintf("%sV%d", StructName(eventType, eventVersion), eventVersion.Major())
 }

@@ -41,8 +41,8 @@ func newPredeclaredType(schemaRef string) (*goPredeclaredType, error) {
 		return nil, fmt.Errorf("error parsing version number from schema reference %q: %w", schemaRef, err)
 	}
 	return &goPredeclaredType{
-		BaseName: eiffelevents.EventStructName(name, version),
-		TypeName: eiffelevents.VersionedEventStructName(name, version),
+		BaseName: eiffelevents.StructName(name, version),
+		TypeName: eiffelevents.VersionedStructName(name, version),
 		Version:  version,
 	}, nil
 }

@@ -65,8 +65,8 @@ func createEditionDefinitions(packageName string, outputRootDir string, eventVer
 		events = append(events, eventTypeInfo{
 			EventType:           eventType,
 			Version:             version,
-			StructName:          eiffelevents.EventStructName(eventType, version),
-			VersionedStructName: eiffelevents.VersionedEventStructName(eventType, version),
+			StructName:          eiffelevents.StructName(eventType, version),
+			VersionedStructName: eiffelevents.VersionedStructName(eventType, version),
 		})
 	}
 	sort.Slice(events, func(i, j int) bool {
