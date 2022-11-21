@@ -122,7 +122,6 @@ func (edf *eventDefinitionFile) Render(schema io.Reader, outputFile string) erro
 		StructName        string // The name of the struct that represents the event type.
 		SubTypeNamePrefix string // The prefix that any subtypes of the event type struct gets to their names.
 		MajorVersion      int64  // The event type's major version.
-		LinksGoType       string // The name of the Go type used for the "links" field.
 	}{
 		EventType:         edf.typeName,
 		EventTypeAbbrev:   eventTypeAbbrev,
