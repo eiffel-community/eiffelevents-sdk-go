@@ -20,8 +20,9 @@ import (
 	_ "embed"
 	"fmt"
 
-	"github.com/eiffel-community/eiffelevents-sdk-go"
 	jsschema "github.com/lestrrat-go/jsschema"
+
+	"github.com/eiffel-community/eiffelevents-sdk-go"
 )
 
 // goLinkSlice represents the type of a slice of links. It's different from
