@@ -59,12 +59,12 @@ func (e *ArtifactReusedV1) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]ArtRV1Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
 		Data  *ArtRV1Data  `json:"data"`
-		Links []ArtRV1Link `json:"links"`
-		Meta  *ArtRV1Meta  `json:"meta"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV1      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e ArtifactReusedV1) DomainID() string {
 
 type ArtifactReusedV1 struct {
 	// Mandatory fields
-	Data  ArtRV1Data  `json:"data"`
-	Links ArtRV1Links `json:"links"`
-	Meta  ArtRV1Meta  `json:"meta"`
+	Data  ArtRV1Data   `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV1       `json:"meta"`
 
 	// Optional fields
 
@@ -131,112 +131,5 @@ type ArtRV1Data struct {
 	// Mandatory fields
 
 	// Optional fields
-	CustomData []ArtRV1DataCustomDatum `json:"customData,omitempty"`
-}
-
-type ArtRV1DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
-}
-
-// ArtRV1Links represents a slice of ArtRV1Link values with helper methods
-// for adding new links.
-type ArtRV1Links []ArtRV1Link
-
-var _ LinkFinder = &ArtRV1Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *ArtRV1Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, ArtRV1Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *ArtRV1Links) AddByID(linkType string, target string) {
-	*links = append(*links, ArtRV1Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links ArtRV1Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links ArtRV1Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type ArtRV1Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-
-}
-
-type ArtRV1Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security ArtRV1MetaSecurity `json:"security,omitempty"`
-	Source   ArtRV1MetaSource   `json:"source,omitempty"`
-	Tags     []string           `json:"tags,omitempty"`
-}
-
-type ArtRV1MetaSecurity struct {
-	// Mandatory fields
-
-	// Optional fields
-	SDM ArtRV1MetaSecuritySDM `json:"sdm,omitempty"`
-}
-
-type ArtRV1MetaSecuritySDM struct {
-	// Mandatory fields
-	AuthorIdentity  string `json:"authorIdentity"`
-	EncryptedDigest string `json:"encryptedDigest"`
-
-	// Optional fields
-
-}
-
-type ArtRV1MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string                     `json:"domainId,omitempty"`
-	Host       string                     `json:"host,omitempty"`
-	Name       string                     `json:"name,omitempty"`
-	Serializer ArtRV1MetaSourceSerializer `json:"serializer,omitempty"`
-	URI        string                     `json:"uri,omitempty"`
-}
-
-type ArtRV1MetaSourceSerializer struct {
-	// Mandatory fields
-	ArtifactID string `json:"artifactId"`
-	GroupID    string `json:"groupId"`
-	Version    string `json:"version"`
-
-	// Optional fields
-
+	CustomData []CustomDataV1 `json:"customData,omitempty"`
 }

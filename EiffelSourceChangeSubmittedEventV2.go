@@ -59,12 +59,12 @@ func (e *SourceChangeSubmittedV2) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]SCSV2Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *SCSV2Data  `json:"data"`
-		Links []SCSV2Link `json:"links"`
-		Meta  *SCSV2Meta  `json:"meta"`
+		Data  *SCSV2Data   `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV2      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e SourceChangeSubmittedV2) DomainID() string {
 
 type SourceChangeSubmittedV2 struct {
 	// Mandatory fields
-	Data  SCSV2Data  `json:"data"`
-	Links SCSV2Links `json:"links"`
-	Meta  SCSV2Meta  `json:"meta"`
+	Data  SCSV2Data    `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV2       `json:"meta"`
 
 	// Optional fields
 
@@ -132,7 +132,7 @@ type SCSV2Data struct {
 
 	// Optional fields
 	CcCompositeIdentifier SCSV2DataCcCompositeIdentifier `json:"ccCompositeIdentifier,omitempty"`
-	CustomData            []SCSV2DataCustomDatum         `json:"customData,omitempty"`
+	CustomData            []CustomDataV1                 `json:"customData,omitempty"`
 	GitIdentifier         SCSV2DataGitIdentifier         `json:"gitIdentifier,omitempty"`
 	HgIdentifier          SCSV2DataHgIdentifier          `json:"hgIdentifier,omitempty"`
 	Submitter             SCSV2DataSubmitter             `json:"submitter,omitempty"`
@@ -144,15 +144,6 @@ type SCSV2DataCcCompositeIdentifier struct {
 	Branch     string   `json:"branch"`
 	ConfigSpec string   `json:"configSpec"`
 	Vobs       []string `json:"vobs"`
-
-	// Optional fields
-
-}
-
-type SCSV2DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
 
 	// Optional fields
 
@@ -196,92 +187,4 @@ type SCSV2DataSvnIdentifier struct {
 
 	// Optional fields
 	RepoName string `json:"repoName,omitempty"`
-}
-
-// SCSV2Links represents a slice of SCSV2Link values with helper methods
-// for adding new links.
-type SCSV2Links []SCSV2Link
-
-var _ LinkFinder = &SCSV2Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *SCSV2Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, SCSV2Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *SCSV2Links) AddByID(linkType string, target string) {
-	*links = append(*links, SCSV2Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links SCSV2Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links SCSV2Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type SCSV2Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-
-}
-
-type SCSV2Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security SCSV2MetaSecurity `json:"security,omitempty"`
-	Source   SCSV2MetaSource   `json:"source,omitempty"`
-	Tags     []string          `json:"tags,omitempty"`
-}
-
-type SCSV2MetaSecurity struct {
-	// Mandatory fields
-
-	// Optional fields
-	SDM SCSV2MetaSecuritySDM `json:"sdm,omitempty"`
-}
-
-type SCSV2MetaSecuritySDM struct {
-	// Mandatory fields
-	AuthorIdentity  string `json:"authorIdentity"`
-	EncryptedDigest string `json:"encryptedDigest"`
-
-	// Optional fields
-
-}
-
-type SCSV2MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
 }

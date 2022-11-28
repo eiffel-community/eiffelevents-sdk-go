@@ -59,12 +59,12 @@ func (e *CompositionDefinedV2) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]CDV2Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *CDV2Data  `json:"data"`
-		Links []CDV2Link `json:"links"`
-		Meta  *CDV2Meta  `json:"meta"`
+		Data  *CDV2Data    `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV2      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e CompositionDefinedV2) DomainID() string {
 
 type CompositionDefinedV2 struct {
 	// Mandatory fields
-	Data  CDV2Data  `json:"data"`
-	Links CDV2Links `json:"links"`
-	Meta  CDV2Meta  `json:"meta"`
+	Data  CDV2Data     `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV2       `json:"meta"`
 
 	// Optional fields
 
@@ -132,103 +132,6 @@ type CDV2Data struct {
 	Name string `json:"name"`
 
 	// Optional fields
-	CustomData []CDV2DataCustomDatum `json:"customData,omitempty"`
-	Version    string                `json:"version,omitempty"`
-}
-
-type CDV2DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
-}
-
-// CDV2Links represents a slice of CDV2Link values with helper methods
-// for adding new links.
-type CDV2Links []CDV2Link
-
-var _ LinkFinder = &CDV2Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *CDV2Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, CDV2Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *CDV2Links) AddByID(linkType string, target string) {
-	*links = append(*links, CDV2Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links CDV2Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links CDV2Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type CDV2Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-
-}
-
-type CDV2Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security CDV2MetaSecurity `json:"security,omitempty"`
-	Source   CDV2MetaSource   `json:"source,omitempty"`
-	Tags     []string         `json:"tags,omitempty"`
-}
-
-type CDV2MetaSecurity struct {
-	// Mandatory fields
-
-	// Optional fields
-	SDM CDV2MetaSecuritySDM `json:"sdm,omitempty"`
-}
-
-type CDV2MetaSecuritySDM struct {
-	// Mandatory fields
-	AuthorIdentity  string `json:"authorIdentity"`
-	EncryptedDigest string `json:"encryptedDigest"`
-
-	// Optional fields
-
-}
-
-type CDV2MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
+	CustomData []CustomDataV1 `json:"customData,omitempty"`
+	Version    string         `json:"version,omitempty"`
 }

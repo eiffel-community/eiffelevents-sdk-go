@@ -59,12 +59,12 @@ func (e *TestCaseStartedV3) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]TCSV3Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *TCSV3Data  `json:"data"`
-		Links []TCSV3Link `json:"links"`
-		Meta  *TCSV3Meta  `json:"meta"`
+		Data  *TCSV3Data   `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV3      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e TestCaseStartedV3) DomainID() string {
 
 type TestCaseStartedV3 struct {
 	// Mandatory fields
-	Data  TCSV3Data  `json:"data"`
-	Links TCSV3Links `json:"links"`
-	Meta  TCSV3Meta  `json:"meta"`
+	Data  TCSV3Data    `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV3       `json:"meta"`
 
 	// Optional fields
 
@@ -131,18 +131,9 @@ type TCSV3Data struct {
 	// Mandatory fields
 
 	// Optional fields
-	CustomData []TCSV3DataCustomDatum `json:"customData,omitempty"`
-	Executor   string                 `json:"executor,omitempty"`
-	LiveLogs   []TCSV3DataLiveLog     `json:"liveLogs,omitempty"`
-}
-
-type TCSV3DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
+	CustomData []CustomDataV1     `json:"customData,omitempty"`
+	Executor   string             `json:"executor,omitempty"`
+	LiveLogs   []TCSV3DataLiveLog `json:"liveLogs,omitempty"`
 }
 
 type TCSV3DataLiveLog struct {
@@ -153,120 +144,4 @@ type TCSV3DataLiveLog struct {
 	// Optional fields
 	MediaType string   `json:"mediaType,omitempty"`
 	Tags      []string `json:"tags,omitempty"`
-}
-
-// TCSV3Links represents a slice of TCSV3Link values with helper methods
-// for adding new links.
-type TCSV3Links []TCSV3Link
-
-var _ LinkFinder = &TCSV3Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *TCSV3Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, TCSV3Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *TCSV3Links) AddByID(linkType string, target string) {
-	*links = append(*links, TCSV3Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links TCSV3Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links TCSV3Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type TCSV3Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-	DomainID string `json:"domainId,omitempty"`
-}
-
-type TCSV3Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security TCSV3MetaSecurity `json:"security,omitempty"`
-	Source   TCSV3MetaSource   `json:"source,omitempty"`
-	Tags     []string          `json:"tags,omitempty"`
-}
-
-type TCSV3MetaSecurity struct {
-	// Mandatory fields
-	AuthorIdentity string `json:"authorIdentity"`
-
-	// Optional fields
-	IntegrityProtection TCSV3MetaSecurityIntegrityProtection  `json:"integrityProtection,omitempty"`
-	SequenceProtection  []TCSV3MetaSecuritySequenceProtection `json:"sequenceProtection,omitempty"`
-}
-
-type TCSV3MetaSecurityIntegrityProtection struct {
-	// Mandatory fields
-	Alg       TCSV3MetaSecurityIntegrityProtectionAlg `json:"alg"`
-	Signature string                                  `json:"signature"`
-
-	// Optional fields
-	PublicKey string `json:"publicKey,omitempty"`
-}
-
-type TCSV3MetaSecurityIntegrityProtectionAlg string
-
-const (
-	TCSV3MetaSecurityIntegrityProtectionAlg_HS256 TCSV3MetaSecurityIntegrityProtectionAlg = "HS256"
-	TCSV3MetaSecurityIntegrityProtectionAlg_HS384 TCSV3MetaSecurityIntegrityProtectionAlg = "HS384"
-	TCSV3MetaSecurityIntegrityProtectionAlg_HS512 TCSV3MetaSecurityIntegrityProtectionAlg = "HS512"
-	TCSV3MetaSecurityIntegrityProtectionAlg_RS256 TCSV3MetaSecurityIntegrityProtectionAlg = "RS256"
-	TCSV3MetaSecurityIntegrityProtectionAlg_RS384 TCSV3MetaSecurityIntegrityProtectionAlg = "RS384"
-	TCSV3MetaSecurityIntegrityProtectionAlg_RS512 TCSV3MetaSecurityIntegrityProtectionAlg = "RS512"
-	TCSV3MetaSecurityIntegrityProtectionAlg_ES256 TCSV3MetaSecurityIntegrityProtectionAlg = "ES256"
-	TCSV3MetaSecurityIntegrityProtectionAlg_ES384 TCSV3MetaSecurityIntegrityProtectionAlg = "ES384"
-	TCSV3MetaSecurityIntegrityProtectionAlg_ES512 TCSV3MetaSecurityIntegrityProtectionAlg = "ES512"
-	TCSV3MetaSecurityIntegrityProtectionAlg_PS256 TCSV3MetaSecurityIntegrityProtectionAlg = "PS256"
-	TCSV3MetaSecurityIntegrityProtectionAlg_PS384 TCSV3MetaSecurityIntegrityProtectionAlg = "PS384"
-	TCSV3MetaSecurityIntegrityProtectionAlg_PS512 TCSV3MetaSecurityIntegrityProtectionAlg = "PS512"
-)
-
-type TCSV3MetaSecuritySequenceProtection struct {
-	// Mandatory fields
-	Position     int64  `json:"position"`
-	SequenceName string `json:"sequenceName"`
-
-	// Optional fields
-
-}
-
-type TCSV3MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
 }

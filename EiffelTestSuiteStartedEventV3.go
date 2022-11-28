@@ -59,12 +59,12 @@ func (e *TestSuiteStartedV3) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]TSSV3Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *TSSV3Data  `json:"data"`
-		Links []TSSV3Link `json:"links"`
-		Meta  *TSSV3Meta  `json:"meta"`
+		Data  *TSSV3Data   `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV3      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e TestSuiteStartedV3) DomainID() string {
 
 type TestSuiteStartedV3 struct {
 	// Mandatory fields
-	Data  TSSV3Data  `json:"data"`
-	Links TSSV3Links `json:"links"`
-	Meta  TSSV3Meta  `json:"meta"`
+	Data  TSSV3Data    `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV3       `json:"meta"`
 
 	// Optional fields
 
@@ -132,19 +132,10 @@ type TSSV3Data struct {
 	Name string `json:"name"`
 
 	// Optional fields
-	Categories []string               `json:"categories,omitempty"`
-	CustomData []TSSV3DataCustomDatum `json:"customData,omitempty"`
-	LiveLogs   []TSSV3DataLiveLog     `json:"liveLogs,omitempty"`
-	Types      []TSSV3DataType        `json:"types,omitempty"`
-}
-
-type TSSV3DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
+	Categories []string           `json:"categories,omitempty"`
+	CustomData []CustomDataV1     `json:"customData,omitempty"`
+	LiveLogs   []TSSV3DataLiveLog `json:"liveLogs,omitempty"`
+	Types      []TSSV3DataType    `json:"types,omitempty"`
 }
 
 type TSSV3DataLiveLog struct {
@@ -178,119 +169,3 @@ const (
 	TSSV3DataType_Stability        TSSV3DataType = "STABILITY"
 	TSSV3DataType_Usability        TSSV3DataType = "USABILITY"
 )
-
-// TSSV3Links represents a slice of TSSV3Link values with helper methods
-// for adding new links.
-type TSSV3Links []TSSV3Link
-
-var _ LinkFinder = &TSSV3Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *TSSV3Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, TSSV3Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *TSSV3Links) AddByID(linkType string, target string) {
-	*links = append(*links, TSSV3Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links TSSV3Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links TSSV3Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type TSSV3Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-	DomainID string `json:"domainId,omitempty"`
-}
-
-type TSSV3Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security TSSV3MetaSecurity `json:"security,omitempty"`
-	Source   TSSV3MetaSource   `json:"source,omitempty"`
-	Tags     []string          `json:"tags,omitempty"`
-}
-
-type TSSV3MetaSecurity struct {
-	// Mandatory fields
-	AuthorIdentity string `json:"authorIdentity"`
-
-	// Optional fields
-	IntegrityProtection TSSV3MetaSecurityIntegrityProtection  `json:"integrityProtection,omitempty"`
-	SequenceProtection  []TSSV3MetaSecuritySequenceProtection `json:"sequenceProtection,omitempty"`
-}
-
-type TSSV3MetaSecurityIntegrityProtection struct {
-	// Mandatory fields
-	Alg       TSSV3MetaSecurityIntegrityProtectionAlg `json:"alg"`
-	Signature string                                  `json:"signature"`
-
-	// Optional fields
-	PublicKey string `json:"publicKey,omitempty"`
-}
-
-type TSSV3MetaSecurityIntegrityProtectionAlg string
-
-const (
-	TSSV3MetaSecurityIntegrityProtectionAlg_HS256 TSSV3MetaSecurityIntegrityProtectionAlg = "HS256"
-	TSSV3MetaSecurityIntegrityProtectionAlg_HS384 TSSV3MetaSecurityIntegrityProtectionAlg = "HS384"
-	TSSV3MetaSecurityIntegrityProtectionAlg_HS512 TSSV3MetaSecurityIntegrityProtectionAlg = "HS512"
-	TSSV3MetaSecurityIntegrityProtectionAlg_RS256 TSSV3MetaSecurityIntegrityProtectionAlg = "RS256"
-	TSSV3MetaSecurityIntegrityProtectionAlg_RS384 TSSV3MetaSecurityIntegrityProtectionAlg = "RS384"
-	TSSV3MetaSecurityIntegrityProtectionAlg_RS512 TSSV3MetaSecurityIntegrityProtectionAlg = "RS512"
-	TSSV3MetaSecurityIntegrityProtectionAlg_ES256 TSSV3MetaSecurityIntegrityProtectionAlg = "ES256"
-	TSSV3MetaSecurityIntegrityProtectionAlg_ES384 TSSV3MetaSecurityIntegrityProtectionAlg = "ES384"
-	TSSV3MetaSecurityIntegrityProtectionAlg_ES512 TSSV3MetaSecurityIntegrityProtectionAlg = "ES512"
-	TSSV3MetaSecurityIntegrityProtectionAlg_PS256 TSSV3MetaSecurityIntegrityProtectionAlg = "PS256"
-	TSSV3MetaSecurityIntegrityProtectionAlg_PS384 TSSV3MetaSecurityIntegrityProtectionAlg = "PS384"
-	TSSV3MetaSecurityIntegrityProtectionAlg_PS512 TSSV3MetaSecurityIntegrityProtectionAlg = "PS512"
-)
-
-type TSSV3MetaSecuritySequenceProtection struct {
-	// Mandatory fields
-	Position     int64  `json:"position"`
-	SequenceName string `json:"sequenceName"`
-
-	// Optional fields
-
-}
-
-type TSSV3MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
-}

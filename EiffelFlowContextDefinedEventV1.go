@@ -59,12 +59,12 @@ func (e *FlowContextDefinedV1) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]FCDV1Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *FCDV1Data  `json:"data"`
-		Links []FCDV1Link `json:"links"`
-		Meta  *FCDV1Meta  `json:"meta"`
+		Data  *FCDV1Data   `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV1      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e FlowContextDefinedV1) DomainID() string {
 
 type FlowContextDefinedV1 struct {
 	// Mandatory fields
-	Data  FCDV1Data  `json:"data"`
-	Links FCDV1Links `json:"links"`
-	Meta  FCDV1Meta  `json:"meta"`
+	Data  FCDV1Data    `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV1       `json:"meta"`
 
 	// Optional fields
 
@@ -131,117 +131,10 @@ type FCDV1Data struct {
 	// Mandatory fields
 
 	// Optional fields
-	CustomData []FCDV1DataCustomDatum `json:"customData,omitempty"`
-	Product    string                 `json:"product,omitempty"`
-	Program    string                 `json:"program,omitempty"`
-	Project    string                 `json:"project,omitempty"`
-	Track      string                 `json:"track,omitempty"`
-	Version    string                 `json:"version,omitempty"`
-}
-
-type FCDV1DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
-}
-
-// FCDV1Links represents a slice of FCDV1Link values with helper methods
-// for adding new links.
-type FCDV1Links []FCDV1Link
-
-var _ LinkFinder = &FCDV1Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *FCDV1Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, FCDV1Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *FCDV1Links) AddByID(linkType string, target string) {
-	*links = append(*links, FCDV1Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links FCDV1Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links FCDV1Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type FCDV1Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-
-}
-
-type FCDV1Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security FCDV1MetaSecurity `json:"security,omitempty"`
-	Source   FCDV1MetaSource   `json:"source,omitempty"`
-	Tags     []string          `json:"tags,omitempty"`
-}
-
-type FCDV1MetaSecurity struct {
-	// Mandatory fields
-
-	// Optional fields
-	SDM FCDV1MetaSecuritySDM `json:"sdm,omitempty"`
-}
-
-type FCDV1MetaSecuritySDM struct {
-	// Mandatory fields
-	AuthorIdentity  string `json:"authorIdentity"`
-	EncryptedDigest string `json:"encryptedDigest"`
-
-	// Optional fields
-
-}
-
-type FCDV1MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string                    `json:"domainId,omitempty"`
-	Host       string                    `json:"host,omitempty"`
-	Name       string                    `json:"name,omitempty"`
-	Serializer FCDV1MetaSourceSerializer `json:"serializer,omitempty"`
-	URI        string                    `json:"uri,omitempty"`
-}
-
-type FCDV1MetaSourceSerializer struct {
-	// Mandatory fields
-	ArtifactID string `json:"artifactId"`
-	GroupID    string `json:"groupId"`
-	Version    string `json:"version"`
-
-	// Optional fields
-
+	CustomData []CustomDataV1 `json:"customData,omitempty"`
+	Product    string         `json:"product,omitempty"`
+	Program    string         `json:"program,omitempty"`
+	Project    string         `json:"project,omitempty"`
+	Track      string         `json:"track,omitempty"`
+	Version    string         `json:"version,omitempty"`
 }

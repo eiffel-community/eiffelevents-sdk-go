@@ -137,7 +137,7 @@ var eventTypeTable = map[string]map[int64]majorEventVersion{
 		1: majorEventVersion{reflect.TypeOf(TestExecutionRecipeCollectionCreatedV1{}), "1.0.0"},
 		2: majorEventVersion{reflect.TypeOf(TestExecutionRecipeCollectionCreatedV2{}), "2.1.0"},
 		3: majorEventVersion{reflect.TypeOf(TestExecutionRecipeCollectionCreatedV3{}), "3.0.0"},
-		4: majorEventVersion{reflect.TypeOf(TestExecutionRecipeCollectionCreatedV4{}), "4.1.1"},
+		4: majorEventVersion{reflect.TypeOf(TestExecutionRecipeCollectionCreatedV4{}), "4.2.0"},
 	},
 	"EiffelTestSuiteFinishedEvent": {
 		1: majorEventVersion{reflect.TypeOf(TestSuiteFinishedV1{}), "1.1.0"},

@@ -59,12 +59,12 @@ func (e *CompositionDefinedV3) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]CDV3Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *CDV3Data  `json:"data"`
-		Links []CDV3Link `json:"links"`
-		Meta  *CDV3Meta  `json:"meta"`
+		Data  *CDV3Data    `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV3      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e CompositionDefinedV3) DomainID() string {
 
 type CompositionDefinedV3 struct {
 	// Mandatory fields
-	Data  CDV3Data  `json:"data"`
-	Links CDV3Links `json:"links"`
-	Meta  CDV3Meta  `json:"meta"`
+	Data  CDV3Data     `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV3       `json:"meta"`
 
 	// Optional fields
 
@@ -132,131 +132,6 @@ type CDV3Data struct {
 	Name string `json:"name"`
 
 	// Optional fields
-	CustomData []CDV3DataCustomDatum `json:"customData,omitempty"`
-	Version    string                `json:"version,omitempty"`
-}
-
-type CDV3DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
-}
-
-// CDV3Links represents a slice of CDV3Link values with helper methods
-// for adding new links.
-type CDV3Links []CDV3Link
-
-var _ LinkFinder = &CDV3Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *CDV3Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, CDV3Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *CDV3Links) AddByID(linkType string, target string) {
-	*links = append(*links, CDV3Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links CDV3Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links CDV3Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type CDV3Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-	DomainID string `json:"domainId,omitempty"`
-}
-
-type CDV3Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security CDV3MetaSecurity `json:"security,omitempty"`
-	Source   CDV3MetaSource   `json:"source,omitempty"`
-	Tags     []string         `json:"tags,omitempty"`
-}
-
-type CDV3MetaSecurity struct {
-	// Mandatory fields
-	AuthorIdentity string `json:"authorIdentity"`
-
-	// Optional fields
-	IntegrityProtection CDV3MetaSecurityIntegrityProtection  `json:"integrityProtection,omitempty"`
-	SequenceProtection  []CDV3MetaSecuritySequenceProtection `json:"sequenceProtection,omitempty"`
-}
-
-type CDV3MetaSecurityIntegrityProtection struct {
-	// Mandatory fields
-	Alg       CDV3MetaSecurityIntegrityProtectionAlg `json:"alg"`
-	Signature string                                 `json:"signature"`
-
-	// Optional fields
-	PublicKey string `json:"publicKey,omitempty"`
-}
-
-type CDV3MetaSecurityIntegrityProtectionAlg string
-
-const (
-	CDV3MetaSecurityIntegrityProtectionAlg_HS256 CDV3MetaSecurityIntegrityProtectionAlg = "HS256"
-	CDV3MetaSecurityIntegrityProtectionAlg_HS384 CDV3MetaSecurityIntegrityProtectionAlg = "HS384"
-	CDV3MetaSecurityIntegrityProtectionAlg_HS512 CDV3MetaSecurityIntegrityProtectionAlg = "HS512"
-	CDV3MetaSecurityIntegrityProtectionAlg_RS256 CDV3MetaSecurityIntegrityProtectionAlg = "RS256"
-	CDV3MetaSecurityIntegrityProtectionAlg_RS384 CDV3MetaSecurityIntegrityProtectionAlg = "RS384"
-	CDV3MetaSecurityIntegrityProtectionAlg_RS512 CDV3MetaSecurityIntegrityProtectionAlg = "RS512"
-	CDV3MetaSecurityIntegrityProtectionAlg_ES256 CDV3MetaSecurityIntegrityProtectionAlg = "ES256"
-	CDV3MetaSecurityIntegrityProtectionAlg_ES384 CDV3MetaSecurityIntegrityProtectionAlg = "ES384"
-	CDV3MetaSecurityIntegrityProtectionAlg_ES512 CDV3MetaSecurityIntegrityProtectionAlg = "ES512"
-	CDV3MetaSecurityIntegrityProtectionAlg_PS256 CDV3MetaSecurityIntegrityProtectionAlg = "PS256"
-	CDV3MetaSecurityIntegrityProtectionAlg_PS384 CDV3MetaSecurityIntegrityProtectionAlg = "PS384"
-	CDV3MetaSecurityIntegrityProtectionAlg_PS512 CDV3MetaSecurityIntegrityProtectionAlg = "PS512"
-)
-
-type CDV3MetaSecuritySequenceProtection struct {
-	// Mandatory fields
-	Position     int64  `json:"position"`
-	SequenceName string `json:"sequenceName"`
-
-	// Optional fields
-
-}
-
-type CDV3MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
+	CustomData []CustomDataV1 `json:"customData,omitempty"`
+	Version    string         `json:"version,omitempty"`
 }

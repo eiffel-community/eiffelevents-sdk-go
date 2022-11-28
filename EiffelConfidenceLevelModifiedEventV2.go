@@ -59,12 +59,12 @@ func (e *ConfidenceLevelModifiedV2) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]CLMV2Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *CLMV2Data  `json:"data"`
-		Links []CLMV2Link `json:"links"`
-		Meta  *CLMV2Meta  `json:"meta"`
+		Data  *CLMV2Data   `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV2      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e ConfidenceLevelModifiedV2) DomainID() string {
 
 type ConfidenceLevelModifiedV2 struct {
 	// Mandatory fields
-	Data  CLMV2Data  `json:"data"`
-	Links CLMV2Links `json:"links"`
-	Meta  CLMV2Meta  `json:"meta"`
+	Data  CLMV2Data    `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV2       `json:"meta"`
 
 	// Optional fields
 
@@ -133,17 +133,8 @@ type CLMV2Data struct {
 	Value CLMV2DataValue `json:"value"`
 
 	// Optional fields
-	CustomData []CLMV2DataCustomDatum `json:"customData,omitempty"`
-	Issuer     CLMV2DataIssuer        `json:"issuer,omitempty"`
-}
-
-type CLMV2DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
+	CustomData []CustomDataV1  `json:"customData,omitempty"`
+	Issuer     CLMV2DataIssuer `json:"issuer,omitempty"`
 }
 
 type CLMV2DataIssuer struct {
@@ -163,91 +154,3 @@ const (
 	CLMV2DataValue_Failure      CLMV2DataValue = "FAILURE"
 	CLMV2DataValue_Inconclusive CLMV2DataValue = "INCONCLUSIVE"
 )
-
-// CLMV2Links represents a slice of CLMV2Link values with helper methods
-// for adding new links.
-type CLMV2Links []CLMV2Link
-
-var _ LinkFinder = &CLMV2Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *CLMV2Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, CLMV2Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *CLMV2Links) AddByID(linkType string, target string) {
-	*links = append(*links, CLMV2Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links CLMV2Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links CLMV2Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type CLMV2Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-
-}
-
-type CLMV2Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security CLMV2MetaSecurity `json:"security,omitempty"`
-	Source   CLMV2MetaSource   `json:"source,omitempty"`
-	Tags     []string          `json:"tags,omitempty"`
-}
-
-type CLMV2MetaSecurity struct {
-	// Mandatory fields
-
-	// Optional fields
-	SDM CLMV2MetaSecuritySDM `json:"sdm,omitempty"`
-}
-
-type CLMV2MetaSecuritySDM struct {
-	// Mandatory fields
-	AuthorIdentity  string `json:"authorIdentity"`
-	EncryptedDigest string `json:"encryptedDigest"`
-
-	// Optional fields
-
-}
-
-type CLMV2MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
-}

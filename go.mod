@@ -14,6 +14,7 @@ require (
 	github.com/package-url/packageurl-go v0.1.0
 	github.com/stretchr/testify v1.8.1
 	github.com/tidwall/gjson v1.14.4
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -44,5 +45,4 @@ require (
 	golang.org/x/net v0.0.0-20210326060303-6b1517762897 // indirect
 	golang.org/x/sys v0.0.0-20210502180810-71e4cd670f79 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

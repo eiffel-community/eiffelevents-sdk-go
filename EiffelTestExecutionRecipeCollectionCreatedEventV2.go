@@ -59,12 +59,12 @@ func (e *TestExecutionRecipeCollectionCreatedV2) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]TERCCV2Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *TERCCV2Data  `json:"data"`
-		Links []TERCCV2Link `json:"links"`
-		Meta  *TERCCV2Meta  `json:"meta"`
+		Data  *TERCCV2Data `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV1      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -120,8 +120,8 @@ func (e TestExecutionRecipeCollectionCreatedV2) DomainID() string {
 type TestExecutionRecipeCollectionCreatedV2 struct {
 	// Mandatory fields
 	Data  TERCCV2Data  `json:"data"`
-	Links TERCCV2Links `json:"links"`
-	Meta  TERCCV2Meta  `json:"meta"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV1       `json:"meta"`
 
 	// Optional fields
 
@@ -132,9 +132,9 @@ type TERCCV2Data struct {
 	SelectionStrategy TERCCV2DataSelectionStrategy `json:"selectionStrategy"`
 
 	// Optional fields
-	Batches    []TERCCV2DataBatch       `json:"batches,omitempty"`
-	BatchesURI string                   `json:"batchesUri,omitempty"`
-	CustomData []TERCCV2DataCustomDatum `json:"customData,omitempty"`
+	Batches    []TERCCV2DataBatch `json:"batches,omitempty"`
+	BatchesURI string             `json:"batchesUri,omitempty"`
+	CustomData []CustomDataV1     `json:"customData,omitempty"`
 }
 
 type TERCCV2DataBatch struct {
@@ -183,15 +183,6 @@ type TERCCV2DataBatchRecipeTestCase struct {
 	URI     string `json:"uri,omitempty"`
 }
 
-type TERCCV2DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
-}
-
 type TERCCV2DataSelectionStrategy struct {
 	// Mandatory fields
 	ID string `json:"id"`
@@ -199,102 +190,4 @@ type TERCCV2DataSelectionStrategy struct {
 	// Optional fields
 	Tracker string `json:"tracker,omitempty"`
 	URI     string `json:"uri,omitempty"`
-}
-
-// TERCCV2Links represents a slice of TERCCV2Link values with helper methods
-// for adding new links.
-type TERCCV2Links []TERCCV2Link
-
-var _ LinkFinder = &TERCCV2Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *TERCCV2Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, TERCCV2Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *TERCCV2Links) AddByID(linkType string, target string) {
-	*links = append(*links, TERCCV2Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links TERCCV2Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links TERCCV2Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type TERCCV2Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-
-}
-
-type TERCCV2Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security TERCCV2MetaSecurity `json:"security,omitempty"`
-	Source   TERCCV2MetaSource   `json:"source,omitempty"`
-	Tags     []string            `json:"tags,omitempty"`
-}
-
-type TERCCV2MetaSecurity struct {
-	// Mandatory fields
-
-	// Optional fields
-	SDM TERCCV2MetaSecuritySDM `json:"sdm,omitempty"`
-}
-
-type TERCCV2MetaSecuritySDM struct {
-	// Mandatory fields
-	AuthorIdentity  string `json:"authorIdentity"`
-	EncryptedDigest string `json:"encryptedDigest"`
-
-	// Optional fields
-
-}
-
-type TERCCV2MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string                      `json:"domainId,omitempty"`
-	Host       string                      `json:"host,omitempty"`
-	Name       string                      `json:"name,omitempty"`
-	Serializer TERCCV2MetaSourceSerializer `json:"serializer,omitempty"`
-	URI        string                      `json:"uri,omitempty"`
-}
-
-type TERCCV2MetaSourceSerializer struct {
-	// Mandatory fields
-	ArtifactID string `json:"artifactId"`
-	GroupID    string `json:"groupId"`
-	Version    string `json:"version"`
-
-	// Optional fields
-
 }

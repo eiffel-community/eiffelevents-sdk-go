@@ -59,12 +59,12 @@ func (e *TestSuiteStartedV2) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]TSSV2Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *TSSV2Data  `json:"data"`
-		Links []TSSV2Link `json:"links"`
-		Meta  *TSSV2Meta  `json:"meta"`
+		Data  *TSSV2Data   `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV2      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e TestSuiteStartedV2) DomainID() string {
 
 type TestSuiteStartedV2 struct {
 	// Mandatory fields
-	Data  TSSV2Data  `json:"data"`
-	Links TSSV2Links `json:"links"`
-	Meta  TSSV2Meta  `json:"meta"`
+	Data  TSSV2Data    `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV2       `json:"meta"`
 
 	// Optional fields
 
@@ -132,19 +132,10 @@ type TSSV2Data struct {
 	Name string `json:"name"`
 
 	// Optional fields
-	Categories []string               `json:"categories,omitempty"`
-	CustomData []TSSV2DataCustomDatum `json:"customData,omitempty"`
-	LiveLogs   []TSSV2DataLiveLog     `json:"liveLogs,omitempty"`
-	Types      []TSSV2DataType        `json:"types,omitempty"`
-}
-
-type TSSV2DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
+	Categories []string           `json:"categories,omitempty"`
+	CustomData []CustomDataV1     `json:"customData,omitempty"`
+	LiveLogs   []TSSV2DataLiveLog `json:"liveLogs,omitempty"`
+	Types      []TSSV2DataType    `json:"types,omitempty"`
 }
 
 type TSSV2DataLiveLog struct {
@@ -177,91 +168,3 @@ const (
 	TSSV2DataType_Stability        TSSV2DataType = "STABILITY"
 	TSSV2DataType_Usability        TSSV2DataType = "USABILITY"
 )
-
-// TSSV2Links represents a slice of TSSV2Link values with helper methods
-// for adding new links.
-type TSSV2Links []TSSV2Link
-
-var _ LinkFinder = &TSSV2Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *TSSV2Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, TSSV2Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *TSSV2Links) AddByID(linkType string, target string) {
-	*links = append(*links, TSSV2Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links TSSV2Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links TSSV2Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type TSSV2Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-
-}
-
-type TSSV2Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security TSSV2MetaSecurity `json:"security,omitempty"`
-	Source   TSSV2MetaSource   `json:"source,omitempty"`
-	Tags     []string          `json:"tags,omitempty"`
-}
-
-type TSSV2MetaSecurity struct {
-	// Mandatory fields
-
-	// Optional fields
-	SDM TSSV2MetaSecuritySDM `json:"sdm,omitempty"`
-}
-
-type TSSV2MetaSecuritySDM struct {
-	// Mandatory fields
-	AuthorIdentity  string `json:"authorIdentity"`
-	EncryptedDigest string `json:"encryptedDigest"`
-
-	// Optional fields
-
-}
-
-type TSSV2MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
-}

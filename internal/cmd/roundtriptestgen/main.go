@@ -23,6 +23,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"text/template"
 
 	"github.com/Masterminds/semver"
 	"github.com/tidwall/gjson"
@@ -72,10 +73,10 @@ func generateExampleTable(exampleDir string, output *codetemplate.OutputFile) er
 		if err != nil {
 			return fmt.Errorf("error parsing %q version: %w", metaVersion, err)
 		}
-		table = append(table, tableEntry{filename, eiffelevents.VersionedEventStructName(metaType, v)})
+		table = append(table, tableEntry{filename, eiffelevents.VersionedStructName(metaType, v)})
 	}
 
-	return output.ExpandTemplate(tableFileTemplate, table)
+	return output.ExpandTemplate(tableFileTemplate, table, template.FuncMap{})
 }
 
 func main() {

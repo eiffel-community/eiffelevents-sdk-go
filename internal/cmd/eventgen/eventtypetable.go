@@ -18,6 +18,8 @@ package main
 
 import (
 	_ "embed"
+	"strings"
+	"text/template"
 
 	"github.com/eiffel-community/eiffelevents-sdk-go"
 	"github.com/eiffel-community/eiffelevents-sdk-go/internal/codetemplate"
@@ -34,22 +36,25 @@ var eventTableFileTemplate string
 // generateEventTypeTable generates a small Go source file containing
 // a variable that maps the major version of each event to a type
 // reference to the Go type used to represent the event.
-func generateEventTypeTable(schemas map[string][]eventSchemaFile, outputFile string) error {
+func generateEventTypeTable(schemas map[string][]schemaDefinitionRenderer, outputFile string) error {
 	table := make(map[string]map[int]MajorEventVersion)
 	for _, eventSchemas := range schemas {
 		latestVersions := latestMajorVersions(eventSchemas)
 		for majorVersion, schema := range latestVersions {
-			if table[schema.EventType] == nil {
-				table[schema.EventType] = make(map[int]MajorEventVersion)
+			if !strings.HasSuffix(schema.TypeName(), "Event") {
+				continue
 			}
-			table[schema.EventType][int(majorVersion)] = MajorEventVersion{
-				eiffelevents.VersionedEventStructName(schema.EventType, schema.Version),
-				schema.Version.String(),
+			if table[schema.TypeName()] == nil {
+				table[schema.TypeName()] = make(map[int]MajorEventVersion)
+			}
+			table[schema.TypeName()][int(majorVersion)] = MajorEventVersion{
+				eiffelevents.VersionedStructName(schema.TypeName(), schema.Version()),
+				schema.Version().String(),
 			}
 		}
 	}
 	output := codetemplate.New(outputFile)
-	if err := output.ExpandTemplate(eventTableFileTemplate, table); err != nil {
+	if err := output.ExpandTemplate(eventTableFileTemplate, table, template.FuncMap{}); err != nil {
 		return err
 	}
 	return output.Close()

@@ -59,12 +59,12 @@ func (e *IssueDefinedV1) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]IDV1Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *IDV1Data  `json:"data"`
-		Links []IDV1Link `json:"links"`
-		Meta  *IDV1Meta  `json:"meta"`
+		Data  *IDV1Data    `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV1      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -121,9 +121,9 @@ type IssueDefinedV1 struct {
 	// Mandatory fields
 
 	// Optional fields
-	Data  IDV1Data  `json:"data,omitempty"`
-	Links IDV1Links `json:"links,omitempty"`
-	Meta  IDV1Meta  `json:"meta,omitempty"`
+	Data  IDV1Data     `json:"data,omitempty"`
+	Links EventLinksV1 `json:"links,omitempty"`
+	Meta  MetaV1       `json:"meta,omitempty"`
 }
 
 type IDV1Data struct {
@@ -134,17 +134,8 @@ type IDV1Data struct {
 	URI     string       `json:"uri"`
 
 	// Optional fields
-	CustomData []IDV1DataCustomDatum `json:"customData,omitempty"`
-	Title      string                `json:"title,omitempty"`
-}
-
-type IDV1DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
+	CustomData []CustomDataV1 `json:"customData,omitempty"`
+	Title      string         `json:"title,omitempty"`
 }
 
 type IDV1DataType string
@@ -157,101 +148,3 @@ const (
 	IDV1DataType_Requirement IDV1DataType = "REQUIREMENT"
 	IDV1DataType_Other       IDV1DataType = "OTHER"
 )
-
-// IDV1Links represents a slice of IDV1Link values with helper methods
-// for adding new links.
-type IDV1Links []IDV1Link
-
-var _ LinkFinder = &IDV1Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *IDV1Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, IDV1Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *IDV1Links) AddByID(linkType string, target string) {
-	*links = append(*links, IDV1Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links IDV1Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links IDV1Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type IDV1Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-
-}
-
-type IDV1Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security IDV1MetaSecurity `json:"security,omitempty"`
-	Source   IDV1MetaSource   `json:"source,omitempty"`
-	Tags     []string         `json:"tags,omitempty"`
-}
-
-type IDV1MetaSecurity struct {
-	// Mandatory fields
-
-	// Optional fields
-	SDM IDV1MetaSecuritySDM `json:"sdm,omitempty"`
-}
-
-type IDV1MetaSecuritySDM struct {
-	// Mandatory fields
-	AuthorIdentity  string `json:"authorIdentity"`
-	EncryptedDigest string `json:"encryptedDigest"`
-
-	// Optional fields
-
-}
-
-type IDV1MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string                   `json:"domainId,omitempty"`
-	Host       string                   `json:"host,omitempty"`
-	Name       string                   `json:"name,omitempty"`
-	Serializer IDV1MetaSourceSerializer `json:"serializer,omitempty"`
-	URI        string                   `json:"uri,omitempty"`
-}
-
-type IDV1MetaSourceSerializer struct {
-	// Mandatory fields
-	ArtifactID string `json:"artifactId"`
-	GroupID    string `json:"groupId"`
-	Version    string `json:"version"`
-
-	// Optional fields
-
-}

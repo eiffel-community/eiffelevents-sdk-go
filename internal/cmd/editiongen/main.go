@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"text/template"
 
 	"github.com/Masterminds/semver"
 	"github.com/go-git/go-git/v5"
@@ -64,8 +65,8 @@ func createEditionDefinitions(packageName string, outputRootDir string, eventVer
 		events = append(events, eventTypeInfo{
 			EventType:           eventType,
 			Version:             version,
-			StructName:          eiffelevents.EventStructName(eventType, version),
-			VersionedStructName: eiffelevents.VersionedEventStructName(eventType, version),
+			StructName:          eiffelevents.StructName(eventType, version),
+			VersionedStructName: eiffelevents.VersionedStructName(eventType, version),
 		})
 	}
 	sort.Slice(events, func(i, j int) bool {
@@ -77,7 +78,7 @@ func createEditionDefinitions(packageName string, outputRootDir string, eventVer
 		return err
 	}
 	ct := codetemplate.New(filepath.Join(outputDir, "events.go"))
-	if err := ct.ExpandTemplate(eventFileTemplate, events); err != nil {
+	if err := ct.ExpandTemplate(eventFileTemplate, events, template.FuncMap{}); err != nil {
 		return err
 	}
 	return ct.Close()

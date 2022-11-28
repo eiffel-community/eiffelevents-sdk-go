@@ -59,12 +59,12 @@ func (e *ActivityTriggeredV3) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]ActTV3Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
 		Data  *ActTV3Data  `json:"data"`
-		Links []ActTV3Link `json:"links"`
-		Meta  *ActTV3Meta  `json:"meta"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV2      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e ActivityTriggeredV3) DomainID() string {
 
 type ActivityTriggeredV3 struct {
 	// Mandatory fields
-	Data  ActTV3Data  `json:"data"`
-	Links ActTV3Links `json:"links"`
-	Meta  ActTV3Meta  `json:"meta"`
+	Data  ActTV3Data   `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV2       `json:"meta"`
 
 	// Optional fields
 
@@ -133,18 +133,9 @@ type ActTV3Data struct {
 
 	// Optional fields
 	Categories    []string                `json:"categories,omitempty"`
-	CustomData    []ActTV3DataCustomDatum `json:"customData,omitempty"`
+	CustomData    []CustomDataV1          `json:"customData,omitempty"`
 	ExecutionType ActTV3DataExecutionType `json:"executionType,omitempty"`
 	Triggers      []ActTV3DataTrigger     `json:"triggers,omitempty"`
-}
-
-type ActTV3DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
 }
 
 type ActTV3DataExecutionType string
@@ -173,91 +164,3 @@ const (
 	ActTV3DataTriggerType_Timer        ActTV3DataTriggerType = "TIMER"
 	ActTV3DataTriggerType_Other        ActTV3DataTriggerType = "OTHER"
 )
-
-// ActTV3Links represents a slice of ActTV3Link values with helper methods
-// for adding new links.
-type ActTV3Links []ActTV3Link
-
-var _ LinkFinder = &ActTV3Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *ActTV3Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, ActTV3Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *ActTV3Links) AddByID(linkType string, target string) {
-	*links = append(*links, ActTV3Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links ActTV3Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links ActTV3Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type ActTV3Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-
-}
-
-type ActTV3Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security ActTV3MetaSecurity `json:"security,omitempty"`
-	Source   ActTV3MetaSource   `json:"source,omitempty"`
-	Tags     []string           `json:"tags,omitempty"`
-}
-
-type ActTV3MetaSecurity struct {
-	// Mandatory fields
-
-	// Optional fields
-	SDM ActTV3MetaSecuritySDM `json:"sdm,omitempty"`
-}
-
-type ActTV3MetaSecuritySDM struct {
-	// Mandatory fields
-	AuthorIdentity  string `json:"authorIdentity"`
-	EncryptedDigest string `json:"encryptedDigest"`
-
-	// Optional fields
-
-}
-
-type ActTV3MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
-}

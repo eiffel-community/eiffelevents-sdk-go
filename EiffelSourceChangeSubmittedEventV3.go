@@ -59,12 +59,12 @@ func (e *SourceChangeSubmittedV3) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]SCSV3Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *SCSV3Data  `json:"data"`
-		Links []SCSV3Link `json:"links"`
-		Meta  *SCSV3Meta  `json:"meta"`
+		Data  *SCSV3Data   `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV3      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e SourceChangeSubmittedV3) DomainID() string {
 
 type SourceChangeSubmittedV3 struct {
 	// Mandatory fields
-	Data  SCSV3Data  `json:"data"`
-	Links SCSV3Links `json:"links"`
-	Meta  SCSV3Meta  `json:"meta"`
+	Data  SCSV3Data    `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV3       `json:"meta"`
 
 	// Optional fields
 
@@ -132,7 +132,7 @@ type SCSV3Data struct {
 
 	// Optional fields
 	CcCompositeIdentifier SCSV3DataCcCompositeIdentifier `json:"ccCompositeIdentifier,omitempty"`
-	CustomData            []SCSV3DataCustomDatum         `json:"customData,omitempty"`
+	CustomData            []CustomDataV1                 `json:"customData,omitempty"`
 	GitIdentifier         SCSV3DataGitIdentifier         `json:"gitIdentifier,omitempty"`
 	HgIdentifier          SCSV3DataHgIdentifier          `json:"hgIdentifier,omitempty"`
 	Submitter             SCSV3DataSubmitter             `json:"submitter,omitempty"`
@@ -144,15 +144,6 @@ type SCSV3DataCcCompositeIdentifier struct {
 	Branch     string   `json:"branch"`
 	ConfigSpec string   `json:"configSpec"`
 	Vobs       []string `json:"vobs"`
-
-	// Optional fields
-
-}
-
-type SCSV3DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
 
 	// Optional fields
 
@@ -196,120 +187,4 @@ type SCSV3DataSvnIdentifier struct {
 
 	// Optional fields
 	RepoName string `json:"repoName,omitempty"`
-}
-
-// SCSV3Links represents a slice of SCSV3Link values with helper methods
-// for adding new links.
-type SCSV3Links []SCSV3Link
-
-var _ LinkFinder = &SCSV3Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *SCSV3Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, SCSV3Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *SCSV3Links) AddByID(linkType string, target string) {
-	*links = append(*links, SCSV3Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links SCSV3Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links SCSV3Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type SCSV3Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-	DomainID string `json:"domainId,omitempty"`
-}
-
-type SCSV3Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security SCSV3MetaSecurity `json:"security,omitempty"`
-	Source   SCSV3MetaSource   `json:"source,omitempty"`
-	Tags     []string          `json:"tags,omitempty"`
-}
-
-type SCSV3MetaSecurity struct {
-	// Mandatory fields
-	AuthorIdentity string `json:"authorIdentity"`
-
-	// Optional fields
-	IntegrityProtection SCSV3MetaSecurityIntegrityProtection  `json:"integrityProtection,omitempty"`
-	SequenceProtection  []SCSV3MetaSecuritySequenceProtection `json:"sequenceProtection,omitempty"`
-}
-
-type SCSV3MetaSecurityIntegrityProtection struct {
-	// Mandatory fields
-	Alg       SCSV3MetaSecurityIntegrityProtectionAlg `json:"alg"`
-	Signature string                                  `json:"signature"`
-
-	// Optional fields
-	PublicKey string `json:"publicKey,omitempty"`
-}
-
-type SCSV3MetaSecurityIntegrityProtectionAlg string
-
-const (
-	SCSV3MetaSecurityIntegrityProtectionAlg_HS256 SCSV3MetaSecurityIntegrityProtectionAlg = "HS256"
-	SCSV3MetaSecurityIntegrityProtectionAlg_HS384 SCSV3MetaSecurityIntegrityProtectionAlg = "HS384"
-	SCSV3MetaSecurityIntegrityProtectionAlg_HS512 SCSV3MetaSecurityIntegrityProtectionAlg = "HS512"
-	SCSV3MetaSecurityIntegrityProtectionAlg_RS256 SCSV3MetaSecurityIntegrityProtectionAlg = "RS256"
-	SCSV3MetaSecurityIntegrityProtectionAlg_RS384 SCSV3MetaSecurityIntegrityProtectionAlg = "RS384"
-	SCSV3MetaSecurityIntegrityProtectionAlg_RS512 SCSV3MetaSecurityIntegrityProtectionAlg = "RS512"
-	SCSV3MetaSecurityIntegrityProtectionAlg_ES256 SCSV3MetaSecurityIntegrityProtectionAlg = "ES256"
-	SCSV3MetaSecurityIntegrityProtectionAlg_ES384 SCSV3MetaSecurityIntegrityProtectionAlg = "ES384"
-	SCSV3MetaSecurityIntegrityProtectionAlg_ES512 SCSV3MetaSecurityIntegrityProtectionAlg = "ES512"
-	SCSV3MetaSecurityIntegrityProtectionAlg_PS256 SCSV3MetaSecurityIntegrityProtectionAlg = "PS256"
-	SCSV3MetaSecurityIntegrityProtectionAlg_PS384 SCSV3MetaSecurityIntegrityProtectionAlg = "PS384"
-	SCSV3MetaSecurityIntegrityProtectionAlg_PS512 SCSV3MetaSecurityIntegrityProtectionAlg = "PS512"
-)
-
-type SCSV3MetaSecuritySequenceProtection struct {
-	// Mandatory fields
-	Position     int64  `json:"position"`
-	SequenceName string `json:"sequenceName"`
-
-	// Optional fields
-
-}
-
-type SCSV3MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
 }

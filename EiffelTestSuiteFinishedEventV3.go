@@ -59,12 +59,12 @@ func (e *TestSuiteFinishedV3) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]TSFV3Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *TSFV3Data  `json:"data"`
-		Links []TSFV3Link `json:"links"`
-		Meta  *TSFV3Meta  `json:"meta"`
+		Data  *TSFV3Data   `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV3      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e TestSuiteFinishedV3) DomainID() string {
 
 type TestSuiteFinishedV3 struct {
 	// Mandatory fields
-	Data  TSFV3Data  `json:"data"`
-	Links TSFV3Links `json:"links"`
-	Meta  TSFV3Meta  `json:"meta"`
+	Data  TSFV3Data    `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV3       `json:"meta"`
 
 	// Optional fields
 
@@ -131,18 +131,9 @@ type TSFV3Data struct {
 	// Mandatory fields
 
 	// Optional fields
-	CustomData     []TSFV3DataCustomDatum   `json:"customData,omitempty"`
+	CustomData     []CustomDataV1           `json:"customData,omitempty"`
 	Outcome        TSFV3DataOutcome         `json:"outcome,omitempty"`
 	PersistentLogs []TSFV3DataPersistentLog `json:"persistentLogs,omitempty"`
-}
-
-type TSFV3DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
 }
 
 type TSFV3DataOutcome struct {
@@ -180,120 +171,4 @@ type TSFV3DataPersistentLog struct {
 	// Optional fields
 	MediaType string   `json:"mediaType,omitempty"`
 	Tags      []string `json:"tags,omitempty"`
-}
-
-// TSFV3Links represents a slice of TSFV3Link values with helper methods
-// for adding new links.
-type TSFV3Links []TSFV3Link
-
-var _ LinkFinder = &TSFV3Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *TSFV3Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, TSFV3Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *TSFV3Links) AddByID(linkType string, target string) {
-	*links = append(*links, TSFV3Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links TSFV3Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links TSFV3Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type TSFV3Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-	DomainID string `json:"domainId,omitempty"`
-}
-
-type TSFV3Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security TSFV3MetaSecurity `json:"security,omitempty"`
-	Source   TSFV3MetaSource   `json:"source,omitempty"`
-	Tags     []string          `json:"tags,omitempty"`
-}
-
-type TSFV3MetaSecurity struct {
-	// Mandatory fields
-	AuthorIdentity string `json:"authorIdentity"`
-
-	// Optional fields
-	IntegrityProtection TSFV3MetaSecurityIntegrityProtection  `json:"integrityProtection,omitempty"`
-	SequenceProtection  []TSFV3MetaSecuritySequenceProtection `json:"sequenceProtection,omitempty"`
-}
-
-type TSFV3MetaSecurityIntegrityProtection struct {
-	// Mandatory fields
-	Alg       TSFV3MetaSecurityIntegrityProtectionAlg `json:"alg"`
-	Signature string                                  `json:"signature"`
-
-	// Optional fields
-	PublicKey string `json:"publicKey,omitempty"`
-}
-
-type TSFV3MetaSecurityIntegrityProtectionAlg string
-
-const (
-	TSFV3MetaSecurityIntegrityProtectionAlg_HS256 TSFV3MetaSecurityIntegrityProtectionAlg = "HS256"
-	TSFV3MetaSecurityIntegrityProtectionAlg_HS384 TSFV3MetaSecurityIntegrityProtectionAlg = "HS384"
-	TSFV3MetaSecurityIntegrityProtectionAlg_HS512 TSFV3MetaSecurityIntegrityProtectionAlg = "HS512"
-	TSFV3MetaSecurityIntegrityProtectionAlg_RS256 TSFV3MetaSecurityIntegrityProtectionAlg = "RS256"
-	TSFV3MetaSecurityIntegrityProtectionAlg_RS384 TSFV3MetaSecurityIntegrityProtectionAlg = "RS384"
-	TSFV3MetaSecurityIntegrityProtectionAlg_RS512 TSFV3MetaSecurityIntegrityProtectionAlg = "RS512"
-	TSFV3MetaSecurityIntegrityProtectionAlg_ES256 TSFV3MetaSecurityIntegrityProtectionAlg = "ES256"
-	TSFV3MetaSecurityIntegrityProtectionAlg_ES384 TSFV3MetaSecurityIntegrityProtectionAlg = "ES384"
-	TSFV3MetaSecurityIntegrityProtectionAlg_ES512 TSFV3MetaSecurityIntegrityProtectionAlg = "ES512"
-	TSFV3MetaSecurityIntegrityProtectionAlg_PS256 TSFV3MetaSecurityIntegrityProtectionAlg = "PS256"
-	TSFV3MetaSecurityIntegrityProtectionAlg_PS384 TSFV3MetaSecurityIntegrityProtectionAlg = "PS384"
-	TSFV3MetaSecurityIntegrityProtectionAlg_PS512 TSFV3MetaSecurityIntegrityProtectionAlg = "PS512"
-)
-
-type TSFV3MetaSecuritySequenceProtection struct {
-	// Mandatory fields
-	Position     int64  `json:"position"`
-	SequenceName string `json:"sequenceName"`
-
-	// Optional fields
-
-}
-
-type TSFV3MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
 }

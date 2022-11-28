@@ -19,5 +19,5 @@ package eiffelevents
 // This file is just used as the natural place for go:generate directives
 // for generating all files with event structs and associated types.
 
-//go:generate go run ./internal/cmd/eventgen protocol/schemas .
+//go:generate go run ./internal/cmd/eventgen protocol/definitions .
 //go:generate go run ./internal/cmd/editiongen protocol .

@@ -59,12 +59,12 @@ func (e *TestCaseTriggeredV3) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]TCTV3Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *TCTV3Data  `json:"data"`
-		Links []TCTV3Link `json:"links"`
-		Meta  *TCTV3Meta  `json:"meta"`
+		Data  *TCTV3Data   `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV3      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e TestCaseTriggeredV3) DomainID() string {
 
 type TestCaseTriggeredV3 struct {
 	// Mandatory fields
-	Data  TCTV3Data  `json:"data"`
-	Links TCTV3Links `json:"links"`
-	Meta  TCTV3Meta  `json:"meta"`
+	Data  TCTV3Data    `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV3       `json:"meta"`
 
 	// Optional fields
 
@@ -132,20 +132,11 @@ type TCTV3Data struct {
 	TestCase TCTV3DataTestCase `json:"testCase"`
 
 	// Optional fields
-	CustomData    []TCTV3DataCustomDatum `json:"customData,omitempty"`
+	CustomData    []CustomDataV1         `json:"customData,omitempty"`
 	ExecutionType TCTV3DataExecutionType `json:"executionType,omitempty"`
 	Parameters    []TCTV3DataParameter   `json:"parameters,omitempty"`
 	RecipeID      string                 `json:"recipeId,omitempty"`
 	Triggers      []TCTV3DataTrigger     `json:"triggers,omitempty"`
-}
-
-type TCTV3DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
 }
 
 type TCTV3DataExecutionType string
@@ -193,119 +184,3 @@ const (
 	TCTV3DataTriggerType_Timer        TCTV3DataTriggerType = "TIMER"
 	TCTV3DataTriggerType_Other        TCTV3DataTriggerType = "OTHER"
 )
-
-// TCTV3Links represents a slice of TCTV3Link values with helper methods
-// for adding new links.
-type TCTV3Links []TCTV3Link
-
-var _ LinkFinder = &TCTV3Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *TCTV3Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, TCTV3Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *TCTV3Links) AddByID(linkType string, target string) {
-	*links = append(*links, TCTV3Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links TCTV3Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links TCTV3Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type TCTV3Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-	DomainID string `json:"domainId,omitempty"`
-}
-
-type TCTV3Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security TCTV3MetaSecurity `json:"security,omitempty"`
-	Source   TCTV3MetaSource   `json:"source,omitempty"`
-	Tags     []string          `json:"tags,omitempty"`
-}
-
-type TCTV3MetaSecurity struct {
-	// Mandatory fields
-	AuthorIdentity string `json:"authorIdentity"`
-
-	// Optional fields
-	IntegrityProtection TCTV3MetaSecurityIntegrityProtection  `json:"integrityProtection,omitempty"`
-	SequenceProtection  []TCTV3MetaSecuritySequenceProtection `json:"sequenceProtection,omitempty"`
-}
-
-type TCTV3MetaSecurityIntegrityProtection struct {
-	// Mandatory fields
-	Alg       TCTV3MetaSecurityIntegrityProtectionAlg `json:"alg"`
-	Signature string                                  `json:"signature"`
-
-	// Optional fields
-	PublicKey string `json:"publicKey,omitempty"`
-}
-
-type TCTV3MetaSecurityIntegrityProtectionAlg string
-
-const (
-	TCTV3MetaSecurityIntegrityProtectionAlg_HS256 TCTV3MetaSecurityIntegrityProtectionAlg = "HS256"
-	TCTV3MetaSecurityIntegrityProtectionAlg_HS384 TCTV3MetaSecurityIntegrityProtectionAlg = "HS384"
-	TCTV3MetaSecurityIntegrityProtectionAlg_HS512 TCTV3MetaSecurityIntegrityProtectionAlg = "HS512"
-	TCTV3MetaSecurityIntegrityProtectionAlg_RS256 TCTV3MetaSecurityIntegrityProtectionAlg = "RS256"
-	TCTV3MetaSecurityIntegrityProtectionAlg_RS384 TCTV3MetaSecurityIntegrityProtectionAlg = "RS384"
-	TCTV3MetaSecurityIntegrityProtectionAlg_RS512 TCTV3MetaSecurityIntegrityProtectionAlg = "RS512"
-	TCTV3MetaSecurityIntegrityProtectionAlg_ES256 TCTV3MetaSecurityIntegrityProtectionAlg = "ES256"
-	TCTV3MetaSecurityIntegrityProtectionAlg_ES384 TCTV3MetaSecurityIntegrityProtectionAlg = "ES384"
-	TCTV3MetaSecurityIntegrityProtectionAlg_ES512 TCTV3MetaSecurityIntegrityProtectionAlg = "ES512"
-	TCTV3MetaSecurityIntegrityProtectionAlg_PS256 TCTV3MetaSecurityIntegrityProtectionAlg = "PS256"
-	TCTV3MetaSecurityIntegrityProtectionAlg_PS384 TCTV3MetaSecurityIntegrityProtectionAlg = "PS384"
-	TCTV3MetaSecurityIntegrityProtectionAlg_PS512 TCTV3MetaSecurityIntegrityProtectionAlg = "PS512"
-)
-
-type TCTV3MetaSecuritySequenceProtection struct {
-	// Mandatory fields
-	Position     int64  `json:"position"`
-	SequenceName string `json:"sequenceName"`
-
-	// Optional fields
-
-}
-
-type TCTV3MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
-}

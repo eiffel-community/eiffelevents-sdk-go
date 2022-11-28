@@ -59,12 +59,12 @@ func (e *SourceChangeCreatedV4) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]SCCV4Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *SCCV4Data  `json:"data"`
-		Links []SCCV4Link `json:"links"`
-		Meta  *SCCV4Meta  `json:"meta"`
+		Data  *SCCV4Data   `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV3      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e SourceChangeCreatedV4) DomainID() string {
 
 type SourceChangeCreatedV4 struct {
 	// Mandatory fields
-	Data  SCCV4Data  `json:"data"`
-	Links SCCV4Links `json:"links"`
-	Meta  SCCV4Meta  `json:"meta"`
+	Data  SCCV4Data    `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV3       `json:"meta"`
 
 	// Optional fields
 
@@ -134,7 +134,7 @@ type SCCV4Data struct {
 	Author                SCCV4DataAuthor                `json:"author,omitempty"`
 	CcCompositeIdentifier SCCV4DataCcCompositeIdentifier `json:"ccCompositeIdentifier,omitempty"`
 	Change                SCCV4DataChange                `json:"change,omitempty"`
-	CustomData            []SCCV4DataCustomDatum         `json:"customData,omitempty"`
+	CustomData            []CustomDataV1                 `json:"customData,omitempty"`
 	GitIdentifier         SCCV4DataGitIdentifier         `json:"gitIdentifier,omitempty"`
 	HgIdentifier          SCCV4DataHgIdentifier          `json:"hgIdentifier,omitempty"`
 	SvnIdentifier         SCCV4DataSvnIdentifier         `json:"svnIdentifier,omitempty"`
@@ -172,15 +172,6 @@ type SCCV4DataChange struct {
 	Tracker    string `json:"tracker,omitempty"`
 }
 
-type SCCV4DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
-}
-
 type SCCV4DataGitIdentifier struct {
 	// Mandatory fields
 	CommitID string `json:"commitId"`
@@ -209,120 +200,4 @@ type SCCV4DataSvnIdentifier struct {
 
 	// Optional fields
 	RepoName string `json:"repoName,omitempty"`
-}
-
-// SCCV4Links represents a slice of SCCV4Link values with helper methods
-// for adding new links.
-type SCCV4Links []SCCV4Link
-
-var _ LinkFinder = &SCCV4Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *SCCV4Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, SCCV4Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *SCCV4Links) AddByID(linkType string, target string) {
-	*links = append(*links, SCCV4Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links SCCV4Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links SCCV4Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type SCCV4Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-	DomainID string `json:"domainId,omitempty"`
-}
-
-type SCCV4Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security SCCV4MetaSecurity `json:"security,omitempty"`
-	Source   SCCV4MetaSource   `json:"source,omitempty"`
-	Tags     []string          `json:"tags,omitempty"`
-}
-
-type SCCV4MetaSecurity struct {
-	// Mandatory fields
-	AuthorIdentity string `json:"authorIdentity"`
-
-	// Optional fields
-	IntegrityProtection SCCV4MetaSecurityIntegrityProtection  `json:"integrityProtection,omitempty"`
-	SequenceProtection  []SCCV4MetaSecuritySequenceProtection `json:"sequenceProtection,omitempty"`
-}
-
-type SCCV4MetaSecurityIntegrityProtection struct {
-	// Mandatory fields
-	Alg       SCCV4MetaSecurityIntegrityProtectionAlg `json:"alg"`
-	Signature string                                  `json:"signature"`
-
-	// Optional fields
-	PublicKey string `json:"publicKey,omitempty"`
-}
-
-type SCCV4MetaSecurityIntegrityProtectionAlg string
-
-const (
-	SCCV4MetaSecurityIntegrityProtectionAlg_HS256 SCCV4MetaSecurityIntegrityProtectionAlg = "HS256"
-	SCCV4MetaSecurityIntegrityProtectionAlg_HS384 SCCV4MetaSecurityIntegrityProtectionAlg = "HS384"
-	SCCV4MetaSecurityIntegrityProtectionAlg_HS512 SCCV4MetaSecurityIntegrityProtectionAlg = "HS512"
-	SCCV4MetaSecurityIntegrityProtectionAlg_RS256 SCCV4MetaSecurityIntegrityProtectionAlg = "RS256"
-	SCCV4MetaSecurityIntegrityProtectionAlg_RS384 SCCV4MetaSecurityIntegrityProtectionAlg = "RS384"
-	SCCV4MetaSecurityIntegrityProtectionAlg_RS512 SCCV4MetaSecurityIntegrityProtectionAlg = "RS512"
-	SCCV4MetaSecurityIntegrityProtectionAlg_ES256 SCCV4MetaSecurityIntegrityProtectionAlg = "ES256"
-	SCCV4MetaSecurityIntegrityProtectionAlg_ES384 SCCV4MetaSecurityIntegrityProtectionAlg = "ES384"
-	SCCV4MetaSecurityIntegrityProtectionAlg_ES512 SCCV4MetaSecurityIntegrityProtectionAlg = "ES512"
-	SCCV4MetaSecurityIntegrityProtectionAlg_PS256 SCCV4MetaSecurityIntegrityProtectionAlg = "PS256"
-	SCCV4MetaSecurityIntegrityProtectionAlg_PS384 SCCV4MetaSecurityIntegrityProtectionAlg = "PS384"
-	SCCV4MetaSecurityIntegrityProtectionAlg_PS512 SCCV4MetaSecurityIntegrityProtectionAlg = "PS512"
-)
-
-type SCCV4MetaSecuritySequenceProtection struct {
-	// Mandatory fields
-	Position     int64  `json:"position"`
-	SequenceName string `json:"sequenceName"`
-
-	// Optional fields
-
-}
-
-type SCCV4MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
 }

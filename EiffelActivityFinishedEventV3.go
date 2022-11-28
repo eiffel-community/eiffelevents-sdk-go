@@ -59,12 +59,12 @@ func (e *ActivityFinishedV3) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]ActFV3Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
 		Data  *ActFV3Data  `json:"data"`
-		Links []ActFV3Link `json:"links"`
-		Meta  *ActFV3Meta  `json:"meta"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV3      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e ActivityFinishedV3) DomainID() string {
 
 type ActivityFinishedV3 struct {
 	// Mandatory fields
-	Data  ActFV3Data  `json:"data"`
-	Links ActFV3Links `json:"links"`
-	Meta  ActFV3Meta  `json:"meta"`
+	Data  ActFV3Data   `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV3       `json:"meta"`
 
 	// Optional fields
 
@@ -132,17 +132,8 @@ type ActFV3Data struct {
 	Outcome ActFV3DataOutcome `json:"outcome"`
 
 	// Optional fields
-	CustomData     []ActFV3DataCustomDatum   `json:"customData,omitempty"`
+	CustomData     []CustomDataV1            `json:"customData,omitempty"`
 	PersistentLogs []ActFV3DataPersistentLog `json:"persistentLogs,omitempty"`
-}
-
-type ActFV3DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
 }
 
 type ActFV3DataOutcome struct {
@@ -172,120 +163,4 @@ type ActFV3DataPersistentLog struct {
 	// Optional fields
 	MediaType string   `json:"mediaType,omitempty"`
 	Tags      []string `json:"tags,omitempty"`
-}
-
-// ActFV3Links represents a slice of ActFV3Link values with helper methods
-// for adding new links.
-type ActFV3Links []ActFV3Link
-
-var _ LinkFinder = &ActFV3Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *ActFV3Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, ActFV3Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *ActFV3Links) AddByID(linkType string, target string) {
-	*links = append(*links, ActFV3Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links ActFV3Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links ActFV3Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type ActFV3Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-	DomainID string `json:"domainId,omitempty"`
-}
-
-type ActFV3Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security ActFV3MetaSecurity `json:"security,omitempty"`
-	Source   ActFV3MetaSource   `json:"source,omitempty"`
-	Tags     []string           `json:"tags,omitempty"`
-}
-
-type ActFV3MetaSecurity struct {
-	// Mandatory fields
-	AuthorIdentity string `json:"authorIdentity"`
-
-	// Optional fields
-	IntegrityProtection ActFV3MetaSecurityIntegrityProtection  `json:"integrityProtection,omitempty"`
-	SequenceProtection  []ActFV3MetaSecuritySequenceProtection `json:"sequenceProtection,omitempty"`
-}
-
-type ActFV3MetaSecurityIntegrityProtection struct {
-	// Mandatory fields
-	Alg       ActFV3MetaSecurityIntegrityProtectionAlg `json:"alg"`
-	Signature string                                   `json:"signature"`
-
-	// Optional fields
-	PublicKey string `json:"publicKey,omitempty"`
-}
-
-type ActFV3MetaSecurityIntegrityProtectionAlg string
-
-const (
-	ActFV3MetaSecurityIntegrityProtectionAlg_HS256 ActFV3MetaSecurityIntegrityProtectionAlg = "HS256"
-	ActFV3MetaSecurityIntegrityProtectionAlg_HS384 ActFV3MetaSecurityIntegrityProtectionAlg = "HS384"
-	ActFV3MetaSecurityIntegrityProtectionAlg_HS512 ActFV3MetaSecurityIntegrityProtectionAlg = "HS512"
-	ActFV3MetaSecurityIntegrityProtectionAlg_RS256 ActFV3MetaSecurityIntegrityProtectionAlg = "RS256"
-	ActFV3MetaSecurityIntegrityProtectionAlg_RS384 ActFV3MetaSecurityIntegrityProtectionAlg = "RS384"
-	ActFV3MetaSecurityIntegrityProtectionAlg_RS512 ActFV3MetaSecurityIntegrityProtectionAlg = "RS512"
-	ActFV3MetaSecurityIntegrityProtectionAlg_ES256 ActFV3MetaSecurityIntegrityProtectionAlg = "ES256"
-	ActFV3MetaSecurityIntegrityProtectionAlg_ES384 ActFV3MetaSecurityIntegrityProtectionAlg = "ES384"
-	ActFV3MetaSecurityIntegrityProtectionAlg_ES512 ActFV3MetaSecurityIntegrityProtectionAlg = "ES512"
-	ActFV3MetaSecurityIntegrityProtectionAlg_PS256 ActFV3MetaSecurityIntegrityProtectionAlg = "PS256"
-	ActFV3MetaSecurityIntegrityProtectionAlg_PS384 ActFV3MetaSecurityIntegrityProtectionAlg = "PS384"
-	ActFV3MetaSecurityIntegrityProtectionAlg_PS512 ActFV3MetaSecurityIntegrityProtectionAlg = "PS512"
-)
-
-type ActFV3MetaSecuritySequenceProtection struct {
-	// Mandatory fields
-	Position     int64  `json:"position"`
-	SequenceName string `json:"sequenceName"`
-
-	// Optional fields
-
-}
-
-type ActFV3MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
 }

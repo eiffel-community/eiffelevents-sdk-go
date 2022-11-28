@@ -59,12 +59,12 @@ func (e *EnvironmentDefinedV3) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]EDV3Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *EDV3Data  `json:"data"`
-		Links []EDV3Link `json:"links"`
-		Meta  *EDV3Meta  `json:"meta"`
+		Data  *EDV3Data    `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV3      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e EnvironmentDefinedV3) DomainID() string {
 
 type EnvironmentDefinedV3 struct {
 	// Mandatory fields
-	Data  EDV3Data  `json:"data"`
-	Links EDV3Links `json:"links"`
-	Meta  EDV3Meta  `json:"meta"`
+	Data  EDV3Data     `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV3       `json:"meta"`
 
 	// Optional fields
 
@@ -132,20 +132,11 @@ type EDV3Data struct {
 	Name string `json:"name"`
 
 	// Optional fields
-	CustomData []EDV3DataCustomDatum `json:"customData,omitempty"`
-	Host       EDV3DataHost          `json:"host,omitempty"`
-	Image      string                `json:"image,omitempty"`
-	URI        string                `json:"uri,omitempty"`
-	Version    string                `json:"version,omitempty"`
-}
-
-type EDV3DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
+	CustomData []CustomDataV1 `json:"customData,omitempty"`
+	Host       EDV3DataHost   `json:"host,omitempty"`
+	Image      string         `json:"image,omitempty"`
+	URI        string         `json:"uri,omitempty"`
+	Version    string         `json:"version,omitempty"`
 }
 
 type EDV3DataHost struct {
@@ -155,120 +146,4 @@ type EDV3DataHost struct {
 
 	// Optional fields
 
-}
-
-// EDV3Links represents a slice of EDV3Link values with helper methods
-// for adding new links.
-type EDV3Links []EDV3Link
-
-var _ LinkFinder = &EDV3Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *EDV3Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, EDV3Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *EDV3Links) AddByID(linkType string, target string) {
-	*links = append(*links, EDV3Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links EDV3Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links EDV3Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type EDV3Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-	DomainID string `json:"domainId,omitempty"`
-}
-
-type EDV3Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security EDV3MetaSecurity `json:"security,omitempty"`
-	Source   EDV3MetaSource   `json:"source,omitempty"`
-	Tags     []string         `json:"tags,omitempty"`
-}
-
-type EDV3MetaSecurity struct {
-	// Mandatory fields
-	AuthorIdentity string `json:"authorIdentity"`
-
-	// Optional fields
-	IntegrityProtection EDV3MetaSecurityIntegrityProtection  `json:"integrityProtection,omitempty"`
-	SequenceProtection  []EDV3MetaSecuritySequenceProtection `json:"sequenceProtection,omitempty"`
-}
-
-type EDV3MetaSecurityIntegrityProtection struct {
-	// Mandatory fields
-	Alg       EDV3MetaSecurityIntegrityProtectionAlg `json:"alg"`
-	Signature string                                 `json:"signature"`
-
-	// Optional fields
-	PublicKey string `json:"publicKey,omitempty"`
-}
-
-type EDV3MetaSecurityIntegrityProtectionAlg string
-
-const (
-	EDV3MetaSecurityIntegrityProtectionAlg_HS256 EDV3MetaSecurityIntegrityProtectionAlg = "HS256"
-	EDV3MetaSecurityIntegrityProtectionAlg_HS384 EDV3MetaSecurityIntegrityProtectionAlg = "HS384"
-	EDV3MetaSecurityIntegrityProtectionAlg_HS512 EDV3MetaSecurityIntegrityProtectionAlg = "HS512"
-	EDV3MetaSecurityIntegrityProtectionAlg_RS256 EDV3MetaSecurityIntegrityProtectionAlg = "RS256"
-	EDV3MetaSecurityIntegrityProtectionAlg_RS384 EDV3MetaSecurityIntegrityProtectionAlg = "RS384"
-	EDV3MetaSecurityIntegrityProtectionAlg_RS512 EDV3MetaSecurityIntegrityProtectionAlg = "RS512"
-	EDV3MetaSecurityIntegrityProtectionAlg_ES256 EDV3MetaSecurityIntegrityProtectionAlg = "ES256"
-	EDV3MetaSecurityIntegrityProtectionAlg_ES384 EDV3MetaSecurityIntegrityProtectionAlg = "ES384"
-	EDV3MetaSecurityIntegrityProtectionAlg_ES512 EDV3MetaSecurityIntegrityProtectionAlg = "ES512"
-	EDV3MetaSecurityIntegrityProtectionAlg_PS256 EDV3MetaSecurityIntegrityProtectionAlg = "PS256"
-	EDV3MetaSecurityIntegrityProtectionAlg_PS384 EDV3MetaSecurityIntegrityProtectionAlg = "PS384"
-	EDV3MetaSecurityIntegrityProtectionAlg_PS512 EDV3MetaSecurityIntegrityProtectionAlg = "PS512"
-)
-
-type EDV3MetaSecuritySequenceProtection struct {
-	// Mandatory fields
-	Position     int64  `json:"position"`
-	SequenceName string `json:"sequenceName"`
-
-	// Optional fields
-
-}
-
-type EDV3MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
 }

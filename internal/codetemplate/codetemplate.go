@@ -42,8 +42,8 @@ func New(filename string) *OutputFile {
 }
 
 // ExpandTemplate parses a text/template and executes it with the provided input data.
-func (of *OutputFile) ExpandTemplate(text string, data interface{}) error {
-	templ, err := template.New("(template name unused)").Parse(text)
+func (of *OutputFile) ExpandTemplate(text string, data interface{}, funcs template.FuncMap) error {
+	templ, err := template.New("(template name unused)").Funcs(funcs).Parse(text)
 	if err != nil {
 		return fmt.Errorf("parse error: %w", err)
 	}

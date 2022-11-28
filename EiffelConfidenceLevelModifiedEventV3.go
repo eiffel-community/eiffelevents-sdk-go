@@ -59,12 +59,12 @@ func (e *ConfidenceLevelModifiedV3) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make([]CLMV3Link, 0)
+		links = make(EventLinksV1, 0)
 	}
 	s := struct {
-		Data  *CLMV3Data  `json:"data"`
-		Links []CLMV3Link `json:"links"`
-		Meta  *CLMV3Meta  `json:"meta"`
+		Data  *CLMV3Data   `json:"data"`
+		Links EventLinksV1 `json:"links"`
+		Meta  *MetaV3      `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -119,9 +119,9 @@ func (e ConfidenceLevelModifiedV3) DomainID() string {
 
 type ConfidenceLevelModifiedV3 struct {
 	// Mandatory fields
-	Data  CLMV3Data  `json:"data"`
-	Links CLMV3Links `json:"links"`
-	Meta  CLMV3Meta  `json:"meta"`
+	Data  CLMV3Data    `json:"data"`
+	Links EventLinksV1 `json:"links"`
+	Meta  MetaV3       `json:"meta"`
 
 	// Optional fields
 
@@ -133,17 +133,8 @@ type CLMV3Data struct {
 	Value CLMV3DataValue `json:"value"`
 
 	// Optional fields
-	CustomData []CLMV3DataCustomDatum `json:"customData,omitempty"`
-	Issuer     CLMV3DataIssuer        `json:"issuer,omitempty"`
-}
-
-type CLMV3DataCustomDatum struct {
-	// Mandatory fields
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
-
-	// Optional fields
-
+	CustomData []CustomDataV1  `json:"customData,omitempty"`
+	Issuer     CLMV3DataIssuer `json:"issuer,omitempty"`
 }
 
 type CLMV3DataIssuer struct {
@@ -163,119 +154,3 @@ const (
 	CLMV3DataValue_Failure      CLMV3DataValue = "FAILURE"
 	CLMV3DataValue_Inconclusive CLMV3DataValue = "INCONCLUSIVE"
 )
-
-// CLMV3Links represents a slice of CLMV3Link values with helper methods
-// for adding new links.
-type CLMV3Links []CLMV3Link
-
-var _ LinkFinder = &CLMV3Links{}
-
-// Add adds a new link of the specified type to a target event.
-func (links *CLMV3Links) Add(linkType string, target MetaTeller) {
-	*links = append(*links, CLMV3Link{Target: target.ID(), Type: linkType})
-}
-
-// Add adds a new link of the specified type to a target event identified by an ID.
-func (links *CLMV3Links) AddByID(linkType string, target string) {
-	*links = append(*links, CLMV3Link{Target: target, Type: linkType})
-}
-
-// FindAll returns the IDs of all links of the specified type, or an empty
-// slice if no such links are found.
-func (links CLMV3Links) FindAll(linkType string) []string {
-	result := make([]string, 0, len(links))
-	for _, link := range links {
-		if link.Type == linkType {
-			result = append(result, link.Target)
-		}
-	}
-	return result
-}
-
-// FindFirst returns the ID of the first encountered link of the specified
-// type, or an empty string if no such link is found.
-func (links CLMV3Links) FindFirst(linkType string) string {
-	for _, link := range links {
-		if link.Type == linkType {
-			return link.Target
-		}
-	}
-	return ""
-}
-
-type CLMV3Link struct {
-	// Mandatory fields
-	Target string `json:"target"`
-	Type   string `json:"type"`
-
-	// Optional fields
-	DomainID string `json:"domainId,omitempty"`
-}
-
-type CLMV3Meta struct {
-	// Mandatory fields
-	ID      string `json:"id"`
-	Time    int64  `json:"time"`
-	Type    string `json:"type"`
-	Version string `json:"version"`
-
-	// Optional fields
-	Security CLMV3MetaSecurity `json:"security,omitempty"`
-	Source   CLMV3MetaSource   `json:"source,omitempty"`
-	Tags     []string          `json:"tags,omitempty"`
-}
-
-type CLMV3MetaSecurity struct {
-	// Mandatory fields
-	AuthorIdentity string `json:"authorIdentity"`
-
-	// Optional fields
-	IntegrityProtection CLMV3MetaSecurityIntegrityProtection  `json:"integrityProtection,omitempty"`
-	SequenceProtection  []CLMV3MetaSecuritySequenceProtection `json:"sequenceProtection,omitempty"`
-}
-
-type CLMV3MetaSecurityIntegrityProtection struct {
-	// Mandatory fields
-	Alg       CLMV3MetaSecurityIntegrityProtectionAlg `json:"alg"`
-	Signature string                                  `json:"signature"`
-
-	// Optional fields
-	PublicKey string `json:"publicKey,omitempty"`
-}
-
-type CLMV3MetaSecurityIntegrityProtectionAlg string
-
-const (
-	CLMV3MetaSecurityIntegrityProtectionAlg_HS256 CLMV3MetaSecurityIntegrityProtectionAlg = "HS256"
-	CLMV3MetaSecurityIntegrityProtectionAlg_HS384 CLMV3MetaSecurityIntegrityProtectionAlg = "HS384"
-	CLMV3MetaSecurityIntegrityProtectionAlg_HS512 CLMV3MetaSecurityIntegrityProtectionAlg = "HS512"
-	CLMV3MetaSecurityIntegrityProtectionAlg_RS256 CLMV3MetaSecurityIntegrityProtectionAlg = "RS256"
-	CLMV3MetaSecurityIntegrityProtectionAlg_RS384 CLMV3MetaSecurityIntegrityProtectionAlg = "RS384"
-	CLMV3MetaSecurityIntegrityProtectionAlg_RS512 CLMV3MetaSecurityIntegrityProtectionAlg = "RS512"
-	CLMV3MetaSecurityIntegrityProtectionAlg_ES256 CLMV3MetaSecurityIntegrityProtectionAlg = "ES256"
-	CLMV3MetaSecurityIntegrityProtectionAlg_ES384 CLMV3MetaSecurityIntegrityProtectionAlg = "ES384"
-	CLMV3MetaSecurityIntegrityProtectionAlg_ES512 CLMV3MetaSecurityIntegrityProtectionAlg = "ES512"
-	CLMV3MetaSecurityIntegrityProtectionAlg_PS256 CLMV3MetaSecurityIntegrityProtectionAlg = "PS256"
-	CLMV3MetaSecurityIntegrityProtectionAlg_PS384 CLMV3MetaSecurityIntegrityProtectionAlg = "PS384"
-	CLMV3MetaSecurityIntegrityProtectionAlg_PS512 CLMV3MetaSecurityIntegrityProtectionAlg = "PS512"
-)
-
-type CLMV3MetaSecuritySequenceProtection struct {
-	// Mandatory fields
-	Position     int64  `json:"position"`
-	SequenceName string `json:"sequenceName"`
-
-	// Optional fields
-
-}
-
-type CLMV3MetaSource struct {
-	// Mandatory fields
-
-	// Optional fields
-	DomainID   string `json:"domainId,omitempty"`
-	Host       string `json:"host,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Serializer string `json:"serializer,omitempty"`
-	URI        string `json:"uri,omitempty"`
-}
