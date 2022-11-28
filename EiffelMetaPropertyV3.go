@@ -26,9 +26,10 @@ type MetaV3 struct {
 	Version string `json:"version"`
 
 	// Optional fields
-	Security MetaV3Security `json:"security,omitempty"`
-	Source   MetaV3Source   `json:"source,omitempty"`
-	Tags     []string       `json:"tags,omitempty"`
+	SchemaURI string         `json:"schemaUri,omitempty"`
+	Security  MetaV3Security `json:"security,omitempty"`
+	Source    MetaV3Source   `json:"source,omitempty"`
+	Tags      []string       `json:"tags,omitempty"`
 }
 
 type MetaV3Security struct {

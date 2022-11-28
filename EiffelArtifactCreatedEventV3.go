@@ -146,8 +146,29 @@ type ArtCV3DataFileInformation struct {
 	Name string `json:"name"`
 
 	// Optional fields
-	Tags []string `json:"tags,omitempty"`
+	IntegrityProtection ArtCV3DataFileInformationIntegrityProtection `json:"integrityProtection,omitempty"`
+	Tags                []string                                     `json:"tags,omitempty"`
 }
+
+type ArtCV3DataFileInformationIntegrityProtection struct {
+	// Mandatory fields
+	Alg    ArtCV3DataFileInformationIntegrityProtectionAlg `json:"alg"`
+	Digest string                                          `json:"digest"`
+
+	// Optional fields
+
+}
+
+type ArtCV3DataFileInformationIntegrityProtectionAlg string
+
+const (
+	ArtCV3DataFileInformationIntegrityProtectionAlg_SHA_224     ArtCV3DataFileInformationIntegrityProtectionAlg = "SHA-224"
+	ArtCV3DataFileInformationIntegrityProtectionAlg_SHA_256     ArtCV3DataFileInformationIntegrityProtectionAlg = "SHA-256"
+	ArtCV3DataFileInformationIntegrityProtectionAlg_SHA_384     ArtCV3DataFileInformationIntegrityProtectionAlg = "SHA-384"
+	ArtCV3DataFileInformationIntegrityProtectionAlg_SHA_512     ArtCV3DataFileInformationIntegrityProtectionAlg = "SHA-512"
+	ArtCV3DataFileInformationIntegrityProtectionAlg_SHA_512_224 ArtCV3DataFileInformationIntegrityProtectionAlg = "SHA-512/224"
+	ArtCV3DataFileInformationIntegrityProtectionAlg_SHA_512_256 ArtCV3DataFileInformationIntegrityProtectionAlg = "SHA-512/256"
+)
 
 type ArtCV3DataRequiresImplementation string
 

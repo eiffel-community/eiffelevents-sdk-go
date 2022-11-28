@@ -14,6 +14,7 @@ require (
 	github.com/package-url/packageurl-go v0.1.0
 	github.com/stretchr/testify v1.8.1
 	github.com/tidwall/gjson v1.14.4
+	golang.org/x/text v0.4.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 

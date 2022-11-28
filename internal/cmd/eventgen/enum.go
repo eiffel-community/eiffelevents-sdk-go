@@ -23,6 +23,9 @@ import (
 	"strings"
 	"text/template"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
 	"github.com/eiffel-community/eiffelevents-sdk-go/internal/codetemplate"
 )
 
@@ -73,11 +76,6 @@ func (t *goEnum) String() string {
 	return t.Name
 }
 
-// Regexp used to check if an enum value looks like an abbreviation,
-// in which case a different capitalization algorithm applies.
-// Abbreviations are notably used for names of crypographic algorithms.
-var isConstAbbrevExpr = regexp.MustCompile(`^[A-Z]+\d+$`)
-
 // goEnumValue represents a single valid value for an enum.
 type goEnumValue struct {
 	ConstName string
@@ -91,17 +89,35 @@ func newEnumValue(typeName string, value interface{}) (goEnumValue, error) {
 		return goEnumValue{}, fmt.Errorf("enum value for type %s not a string type: %#v", typeName, value)
 	}
 
-	// Use the value as-is if it's an abbreviation. Otherwise use a series of
-	// string transforms to turn all-caps snake case strings (ONE_TWO) into
-	// Go-style strings (OneTwo).
-	constantSuffix := strValue
-	if !isConstAbbrevExpr.MatchString(strValue) {
-		constantSuffix = strings.Replace(strings.Title(strings.ToLower(strings.Replace(strValue, "_", " ", -1))), " ", "", -1)
-	}
-
 	return goEnumValue{
-		ConstName: fmt.Sprintf("%s_%s", typeName, constantSuffix),
+		ConstName: fmt.Sprintf("%s_%s", typeName, stringToEnum(strValue)),
 		TypeName:  typeName,
 		Value:     strValue,
 	}, nil
+}
+
+var (
+	// Regexp used to check if an enum value looks like an abbreviation,
+	// in which case a different capitalization algorithm applies.
+	// Abbreviations are notably used for names of crypographic algorithms.
+	isConstAbbrevExpr = regexp.MustCompile(`^[A-Z\-/0-9]+\d+$`)
+
+	// Regexp selecting characters that aren't acceptable in a Go identifier name.
+	goNonIdentifierCharsExpr = regexp.MustCompile(`[^A-Za-z0-9]`)
+)
+
+func stringToEnum(s string) string {
+	// Use the value as-is if it's an abbreviation. Otherwise use a series of
+	// string transforms to turn all-caps snake case strings (ONE_TWO) into
+	// Go-style strings (OneTwo).
+	result := s
+	if !isConstAbbrevExpr.MatchString(s) {
+		result = strings.Replace( // One Two -> OneTwo
+			cases.Title(language.English).String( // one two -> One Two
+				strings.ToLower( // ONE TWO -> one two
+					strings.Replace(result, "_", " ", -1)), /// ONE_TWO -> ONE TWO
+			),
+			" ", "", -1)
+	}
+	return goNonIdentifierCharsExpr.ReplaceAllString(result, "_")
 }

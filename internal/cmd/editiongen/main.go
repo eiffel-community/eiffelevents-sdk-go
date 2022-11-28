@@ -28,6 +28,7 @@ import (
 
 	"github.com/Masterminds/semver"
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 
 	"github.com/eiffel-community/eiffelevents-sdk-go"
@@ -39,6 +40,7 @@ import (
 var editionTags = map[string]string{
 	"agen":     "edition-agen",
 	"agen1":    "edition-agen-1",
+	"arica":    "edition-arica",
 	"bordeaux": "edition-bordeaux",
 	"lyon":     "edition-lyon",
 	"paris":    "edition-paris",
@@ -88,12 +90,26 @@ func createEditionDefinitions(packageName string, outputRootDir string, eventVer
 // at the commit pointed to by the given tag and returns a map with the most
 // recent version of each encountered event.
 func getLatestEvents(repo *git.Repository, tagName string) (map[string]*semver.Version, error) {
-	tag, err := repo.Tag(tagName)
+	tagRef, err := repo.Tag(tagName)
 	if err != nil {
 		return nil, err
 	}
-	commit, err := repo.CommitObject(tag.Hash())
-	if err != nil {
+
+	// The tag reference could point either directly to a commit object or to a tag object.
+	var commit *object.Commit
+	tag, err := repo.TagObject(tagRef.Hash())
+	switch err {
+	case nil:
+		commit, err = tag.Commit()
+		if err != nil {
+			return nil, err
+		}
+	case plumbing.ErrObjectNotFound:
+		commit, err = repo.CommitObject(tagRef.Hash())
+		if err != nil {
+			return nil, err
+		}
+	default:
 		return nil, err
 	}
 	files, err := commit.Files()
