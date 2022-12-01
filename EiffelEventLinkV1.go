@@ -29,7 +29,7 @@ func (links *EventLinksV1) Add(linkType string, target MetaTeller) {
 	*links = append(*links, EventLinkV1{Target: target.ID(), Type: linkType})
 }
 
-// Add adds a new link of the specified type to a target event identified by an ID.
+// AddByID adds a new link of the specified type to a target event identified by an ID.
 func (links *EventLinksV1) AddByID(linkType string, target string) {
 	*links = append(*links, EventLinkV1{Target: target, Type: linkType})
 }
