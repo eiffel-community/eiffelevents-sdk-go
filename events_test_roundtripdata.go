@@ -29,6 +29,7 @@ var eventRoundTripTestTable = []struct {
 	{"protocol/examples/events/EiffelActivityTriggeredEvent/simple.json", &ActivityTriggeredV3{}},
 	{"protocol/examples/events/EiffelAnnouncementPublishedEvent/simple.json", &AnnouncementPublishedV3{}},
 	{"protocol/examples/events/EiffelArtifactCreatedEvent/backend.json", &ArtifactCreatedV3{}},
+	{"protocol/examples/events/EiffelArtifactCreatedEvent/checksum.json", &ArtifactCreatedV3{}},
 	{"protocol/examples/events/EiffelArtifactCreatedEvent/dependent.json", &ArtifactCreatedV3{}},
 	{"protocol/examples/events/EiffelArtifactCreatedEvent/interface.json", &ArtifactCreatedV3{}},
 	{"protocol/examples/events/EiffelArtifactCreatedEvent/simple.json", &ArtifactCreatedV3{}},
