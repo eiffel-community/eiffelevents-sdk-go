@@ -17,19 +17,21 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
+	"context"
 	_ "embed"
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"text/template"
+	"time"
 
 	"github.com/Masterminds/semver"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/object"
 
 	"github.com/eiffel-community/eiffelevents-sdk-go"
 	"github.com/eiffel-community/eiffelevents-sdk-go/internal/codetemplate"
@@ -89,56 +91,40 @@ func createEditionDefinitions(packageName string, outputRootDir string, eventVer
 // getLatestEvents scans an Eiffel protocol Git repository for event schemas
 // at the commit pointed to by the given tag and returns a map with the most
 // recent version of each encountered event.
-func getLatestEvents(repo *git.Repository, tagName string) (map[string]*semver.Version, error) {
-	tagRef, err := repo.Tag(tagName)
+func getLatestEvents(ctx context.Context, dir string, tagName string) (map[string]*semver.Version, error) {
+	gitCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(gitCtx, "git", "ls-tree", "-r", "--name-only", tagName, "schemas")
+	cmd.Dir = dir
+	cmd.Stderr = os.Stderr
+	output, err := cmd.Output()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error running %q to list available schemas: %w", cmd.String(), err)
 	}
 
-	// The tag reference could point either directly to a commit object or to a tag object.
-	var commit *object.Commit
-	tag, err := repo.TagObject(tagRef.Hash())
-	switch err {
-	case nil:
-		commit, err = tag.Commit()
-		if err != nil {
-			return nil, err
-		}
-	case plumbing.ErrObjectNotFound:
-		commit, err = repo.CommitObject(tagRef.Hash())
-		if err != nil {
-			return nil, err
-		}
-	default:
-		return nil, err
-	}
-	files, err := commit.Files()
-	if err != nil {
-		return nil, err
-	}
 	latestEventVersions := make(map[string]*semver.Version)
 	schemaFileRegexp := regexp.MustCompile(`^schemas/(Eiffel[^/]+Event)/([^/]+)\.json$`)
-	err = files.ForEach(func(f *object.File) error {
+	scanner := bufio.NewScanner(bytes.NewReader(output))
+	for scanner.Scan() {
 		// Listing all files in the git and matching their paths against
 		// a regexp obviously isn't very efficient, but it's fast enough
 		// for this use case.
-		matches := schemaFileRegexp.FindStringSubmatch(f.Name)
+		matches := schemaFileRegexp.FindStringSubmatch(scanner.Text())
 		if matches == nil {
-			return nil
+			continue
 		}
 		eventType := matches[1]
 		versionString := matches[2]
 		version, err := semver.NewVersion(versionString)
 		if err != nil {
-			return fmt.Errorf("%s: Error parsing version %q: %s", f.Name, versionString, err)
+			return nil, fmt.Errorf("%s: Error parsing version %q: %s", scanner.Text(), versionString, err)
 		}
 		if currentLatest, exists := latestEventVersions[eventType]; !exists || version.GreaterThan(currentLatest) {
 			latestEventVersions[eventType] = version
 		}
-		return nil
-	})
-	if err != nil {
-		return nil, err
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("error reading output from %q: %w", cmd.String(), err)
 	}
 	return latestEventVersions, nil
 }
@@ -148,12 +134,8 @@ func main() {
 		log.Fatalf("Usage: %s SCHEMA_REPO ROOT_OUTPUT_DIR", filepath.Base(os.Args[0]))
 	}
 
-	repo, err := git.PlainOpen(os.Args[1])
-	if err != nil {
-		log.Fatalf("%s: %s", filepath.Base(os.Args[0]), err)
-	}
 	for editionName, editionTag := range editionTags {
-		latestEventVersions, err := getLatestEvents(repo, editionTag)
+		latestEventVersions, err := getLatestEvents(context.Background(), os.Args[1], editionTag)
 		if err != nil {
 			log.Fatalf("%s: %s", filepath.Base(os.Args[0]), err)
 		}
