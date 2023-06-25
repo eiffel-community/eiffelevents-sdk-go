@@ -61,6 +61,9 @@ var eventTypeTable = map[string]map[int64]majorEventVersion{
 		2: majorEventVersion{reflect.TypeOf(ArtifactCreatedV2{}), "2.0.0"},
 		3: majorEventVersion{reflect.TypeOf(ArtifactCreatedV3{}), "3.3.0"},
 	},
+	"EiffelArtifactDeployedEvent": {
+		0: majorEventVersion{reflect.TypeOf(ArtifactDeployedV0_1_0{}), "0.1.0"},
+	},
 	"EiffelArtifactPublishedEvent": {
 		1: majorEventVersion{reflect.TypeOf(ArtifactPublishedV1{}), "1.1.0"},
 		2: majorEventVersion{reflect.TypeOf(ArtifactPublishedV2{}), "2.0.0"},
@@ -79,7 +82,7 @@ var eventTypeTable = map[string]map[int64]majorEventVersion{
 	"EiffelConfidenceLevelModifiedEvent": {
 		1: majorEventVersion{reflect.TypeOf(ConfidenceLevelModifiedV1{}), "1.1.0"},
 		2: majorEventVersion{reflect.TypeOf(ConfidenceLevelModifiedV2{}), "2.0.0"},
-		3: majorEventVersion{reflect.TypeOf(ConfidenceLevelModifiedV3{}), "3.2.0"},
+		3: majorEventVersion{reflect.TypeOf(ConfidenceLevelModifiedV3{}), "3.3.0"},
 	},
 	"EiffelEnvironmentDefinedEvent": {
 		1: majorEventVersion{reflect.TypeOf(EnvironmentDefinedV1{}), "1.1.0"},
@@ -100,7 +103,7 @@ var eventTypeTable = map[string]map[int64]majorEventVersion{
 		1: majorEventVersion{reflect.TypeOf(IssueVerifiedV1{}), "1.1.0"},
 		2: majorEventVersion{reflect.TypeOf(IssueVerifiedV2{}), "2.0.0"},
 		3: majorEventVersion{reflect.TypeOf(IssueVerifiedV3{}), "3.0.0"},
-		4: majorEventVersion{reflect.TypeOf(IssueVerifiedV4{}), "4.2.0"},
+		4: majorEventVersion{reflect.TypeOf(IssueVerifiedV4{}), "4.3.0"},
 	},
 	"EiffelSourceChangeCreatedEvent": {
 		1: majorEventVersion{reflect.TypeOf(SourceChangeCreatedV1{}), "1.1.0"},
@@ -131,7 +134,7 @@ var eventTypeTable = map[string]map[int64]majorEventVersion{
 	"EiffelTestCaseTriggeredEvent": {
 		1: majorEventVersion{reflect.TypeOf(TestCaseTriggeredV1{}), "1.1.0"},
 		2: majorEventVersion{reflect.TypeOf(TestCaseTriggeredV2{}), "2.0.0"},
-		3: majorEventVersion{reflect.TypeOf(TestCaseTriggeredV3{}), "3.2.0"},
+		3: majorEventVersion{reflect.TypeOf(TestCaseTriggeredV3{}), "3.4.0"},
 	},
 	"EiffelTestExecutionRecipeCollectionCreatedEvent": {
 		1: majorEventVersion{reflect.TypeOf(TestExecutionRecipeCollectionCreatedV1{}), "1.0.0"},

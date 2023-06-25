@@ -33,6 +33,7 @@ var eventRoundTripTestTable = []struct {
 	{"protocol/examples/events/EiffelArtifactCreatedEvent/dependent.json", &ArtifactCreatedV3{}},
 	{"protocol/examples/events/EiffelArtifactCreatedEvent/interface.json", &ArtifactCreatedV3{}},
 	{"protocol/examples/events/EiffelArtifactCreatedEvent/simple.json", &ArtifactCreatedV3{}},
+	{"protocol/examples/events/EiffelArtifactDeployedEvent/simple.json", &ArtifactDeployedV0_1_0{}},
 	{"protocol/examples/events/EiffelArtifactPublishedEvent/multifile.json", &ArtifactPublishedV3{}},
 	{"protocol/examples/events/EiffelArtifactPublishedEvent/simple.json", &ArtifactPublishedV3{}},
 	{"protocol/examples/events/EiffelArtifactReusedEvent/simple.json", &ArtifactReusedV3{}},

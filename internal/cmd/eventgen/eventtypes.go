@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 
 	jsschema "github.com/lestrrat-go/jsschema"
 	"gopkg.in/yaml.v3"
@@ -63,7 +65,7 @@ func (t *goInterface) String() string {
 // those structs) for the latest version within each major version of each type.
 func generateTypes(schemaDefs map[string][]schemaDefinitionRenderer, outputDir string) error {
 	for _, defs := range schemaDefs {
-		for majorVersion, schema := range latestMajorVersions(defs) {
+		for significantVersion, schema := range significantVersions(defs) {
 			schemaFile, err := os.Open(schema.Filename())
 			if err != nil {
 				return err
@@ -80,7 +82,7 @@ func generateTypes(schemaDefs map[string][]schemaDefinitionRenderer, outputDir s
 				return err
 			}
 
-			outputFile := filepath.Join(outputDir, fmt.Sprintf("%sV%d.go", schema.TypeName(), majorVersion))
+			outputFile := filepath.Join(outputDir, fmt.Sprintf("%sV%s.go", schema.TypeName(), strings.ReplaceAll(significantVersion, ".", "_")))
 			if err = schema.Render(&jsonDef, outputFile); err != nil {
 				return err
 			}
@@ -89,17 +91,30 @@ func generateTypes(schemaDefs map[string][]schemaDefinitionRenderer, outputDir s
 	return nil
 }
 
-// latestMajorVersions inspects a list of schema definitions for a single type and
-// maps each encountered major version to the schemaDefinitionRenderer that
-// represents the most recent minor.patch version within that major version.
-func latestMajorVersions(schemas []schemaDefinitionRenderer) map[int64]schemaDefinitionRenderer {
-	majorVersions := map[int64]schemaDefinitionRenderer{}
+// significantVersions inspects a list of schema definitions for a single type and maps the type
+// versions to generate to the corresponding schemaDefinitionRenderers. For non-experimental
+// event versions, the type version will be the major version of the most recent major.minor.patch
+// version within each major version will be returned, while all experimental event versions will
+// be returned with the type version set to the full major.minor.patch version.
+//
+// For example, given the versions (0.1.0, 0.2.0, 1.0.0, 1.1.0, 2.0.0) a map with the keys
+// (0.1.0, 0.2.0, 1, 2) will be returned.
+func significantVersions(schemas []schemaDefinitionRenderer) map[string]schemaDefinitionRenderer {
+	versions := map[string]schemaDefinitionRenderer{}
 	for _, schema := range schemas {
-		if current, exists := majorVersions[schema.Version().Major()]; !exists || current.Version().LessThan(schema.Version()) {
-			majorVersions[schema.Version().Major()] = schema
+		// Keep all schemas for experimental versions.
+		if schema.Version().Major() == 0 {
+			versions[schema.Version().String()] = schema
+			continue
+		}
+
+		// Only keep the latest non-experimental version.
+		majorStr := strconv.Itoa(int(schema.Version().Major()))
+		if current, exists := versions[majorStr]; !exists || current.Version().LessThan(schema.Version()) {
+			versions[majorStr] = schema
 		}
 	}
-	return majorVersions
+	return versions
 }
 
 // goTypeFromSchema returns a goType that represents a node in a JSON schema.

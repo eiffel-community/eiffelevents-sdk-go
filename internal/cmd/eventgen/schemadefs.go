@@ -20,6 +20,7 @@ import (
 	_ "embed"
 	"fmt"
 	"io"
+	"strings"
 	"text/template"
 
 	"github.com/Masterminds/semver"
@@ -77,6 +78,7 @@ var eventTypeAbbrevMap = map[string]string{
 	"EiffelActivityTriggeredEvent":                    "ActT",
 	"EiffelAnnouncementPublishedEvent":                "AnnP",
 	"EiffelArtifactCreatedEvent":                      "ArtC",
+	"EiffelArtifactDeployedEvent":                     "ArtD",
 	"EiffelArtifactPublishedEvent":                    "ArtP",
 	"EiffelArtifactReusedEvent":                       "ArtR",
 	"EiffelCompositionDefinedEvent":                   "CD",
@@ -116,6 +118,12 @@ func (edf *eventDefinitionFile) Render(schema io.Reader, outputFile string) erro
 
 	// Gather some metadata about the event type. This struct is later
 	// supplied to the template that generates the event source file.
+	var subTypeNamePrefix string
+	if edf.version.Major() == 0 {
+		subTypeNamePrefix = fmt.Sprintf("%sV%s", eventTypeAbbrev, strings.ReplaceAll(edf.version.String(), ".", "_"))
+	} else {
+		subTypeNamePrefix = fmt.Sprintf("%sV%d", eventTypeAbbrev, edf.version.Major())
+	}
 	eventMeta := struct {
 		EventType         string // The name of the event type, e.g. EiffelActivityTriggeredEvent.
 		EventTypeAbbrev   string // The abbreviated event type name, e.g. ActT.
@@ -126,7 +134,7 @@ func (edf *eventDefinitionFile) Render(schema io.Reader, outputFile string) erro
 		EventType:         edf.typeName,
 		EventTypeAbbrev:   eventTypeAbbrev,
 		StructName:        eiffelevents.VersionedStructName(edf.typeName, edf.version),
-		SubTypeNamePrefix: fmt.Sprintf("%sV%d", eventTypeAbbrev, edf.version.Major()),
+		SubTypeNamePrefix: subTypeNamePrefix,
 		MajorVersion:      edf.version.Major(),
 	}
 

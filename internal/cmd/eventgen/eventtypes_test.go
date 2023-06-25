@@ -27,12 +27,12 @@ func TestLatestMajorVersions(t *testing.T) {
 	testcases := []struct {
 		name     string
 		input    []schemaDefinitionRenderer
-		expected map[int64]schemaDefinitionRenderer
+		expected map[string]schemaDefinitionRenderer
 	}{
 		{
 			name:     "Empty input map",
 			input:    []schemaDefinitionRenderer{},
-			expected: map[int64]schemaDefinitionRenderer{},
+			expected: map[string]schemaDefinitionRenderer{},
 		},
 		{
 			name: "Multiple major versions",
@@ -59,25 +59,44 @@ func TestLatestMajorVersions(t *testing.T) {
 					definitionFile: definitionFile{"/path/to/EiffelActivityStartedEvent/4.2.0.json", "EiffelActivityStartedEvent", semver.MustParse("4.2.0")},
 				},
 			},
-			expected: map[int64]schemaDefinitionRenderer{
-				1: &eventDefinitionFile{
+			expected: map[string]schemaDefinitionRenderer{
+				"1": &eventDefinitionFile{
 					definitionFile: definitionFile{"/path/to/EiffelActivityStartedEvent/1.1.0.json", "EiffelActivityStartedEvent", semver.MustParse("1.1.0")},
 				},
-				2: &eventDefinitionFile{
+				"2": &eventDefinitionFile{
 					definitionFile: definitionFile{"/path/to/EiffelActivityStartedEvent/2.0.0.json", "EiffelActivityStartedEvent", semver.MustParse("2.0.0")},
 				},
-				3: &eventDefinitionFile{
+				"3": &eventDefinitionFile{
 					definitionFile: definitionFile{"/path/to/EiffelActivityStartedEvent/3.0.0.json", "EiffelActivityStartedEvent", semver.MustParse("3.0.0")},
 				},
-				4: &eventDefinitionFile{
+				"4": &eventDefinitionFile{
 					definitionFile: definitionFile{"/path/to/EiffelActivityStartedEvent/4.2.0.json", "EiffelActivityStartedEvent", semver.MustParse("4.2.0")},
+				},
+			},
+		},
+		{
+			name: "Experimental versions",
+			input: []schemaDefinitionRenderer{
+				&eventDefinitionFile{
+					definitionFile: definitionFile{"/path/to/EiffelArtifactDeployedEvent/0.1.0.json", "EiffelArtifactDeployedEvent", semver.MustParse("0.1.0")},
+				},
+				&eventDefinitionFile{
+					definitionFile: definitionFile{"/path/to/EiffelArtifactDeployedEvent/0.2.0.json", "EiffelArtifactDeployedEvent", semver.MustParse("0.2.0")},
+				},
+			},
+			expected: map[string]schemaDefinitionRenderer{
+				"0.1.0": &eventDefinitionFile{
+					definitionFile: definitionFile{"/path/to/EiffelArtifactDeployedEvent/0.1.0.json", "EiffelArtifactDeployedEvent", semver.MustParse("0.1.0")},
+				},
+				"0.2.0": &eventDefinitionFile{
+					definitionFile: definitionFile{"/path/to/EiffelArtifactDeployedEvent/0.2.0.json", "EiffelArtifactDeployedEvent", semver.MustParse("0.2.0")},
 				},
 			},
 		},
 	}
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
-			actual := latestMajorVersions(tc.input)
+			actual := significantVersions(tc.input)
 			assert.Equal(t, tc.expected, actual)
 		})
 	}
