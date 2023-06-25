@@ -32,8 +32,8 @@ github.com/lestrrat-go/pdebug v0.0.0-20210111095411-35b07dbf089b h1:2v0K4PeWeccG
 github.com/lestrrat-go/pdebug v0.0.0-20210111095411-35b07dbf089b/go.mod h1:RbVbom7RDVgpH5IqUPbhJ425z9iRIRH0tRWp+uxEjCE=
 github.com/lestrrat-go/structinfo v0.0.0-20210312050401-7f8bd69d6acb h1:DDg5u5lk2v8O8qxs8ecQkMUBj3tLW6wkSLzxxOyi1Ig=
 github.com/lestrrat-go/structinfo v0.0.0-20210312050401-7f8bd69d6acb/go.mod h1:i+E8Uf04vf2QjOWyJdGY75vmG+4rxiZW2kIj1lTB5mo=
-github.com/package-url/packageurl-go v0.1.0 h1:efWBc98O/dBZRg1pw2xiDzovnlMjCa9NPnfaiBduh8I=
-github.com/package-url/packageurl-go v0.1.0/go.mod h1:C/ApiuWpmbpni4DIOECf6WCjFUZV7O1Fx7VAzrZHgBw=
+github.com/package-url/packageurl-go v0.1.1 h1:KTRE0bK3sKbFKAk3yy63DpeskU7Cvs/x/Da5l+RtzyU=
+github.com/package-url/packageurl-go v0.1.1/go.mod h1:uQd4a7Rh3ZsVg5j0lNyAfyxIeGde9yrlhjF78GzeW0c=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
