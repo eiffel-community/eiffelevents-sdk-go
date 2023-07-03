@@ -32,7 +32,7 @@ type {{.StructName}} = eiffeleventsroot.{{.VersionedStructName}}
 func New{{.StructName}}(modifiers ...eiffeleventsroot.Modifier) (*{{.StructName}}, error) {
 {{- /* For 0.x.y events there's one type per version so no need to set the version explicitly with a modifier. */ -}}
 {{if eq .Version.Major 0}}
-	return eiffeleventsroot.New{{.VersionedStructName}}(modifiers)
+	return eiffeleventsroot.New{{.VersionedStructName}}(modifiers...)
 {{- else -}}
 	return eiffeleventsroot.New{{.VersionedStructName}}(append(modifiers, eiffeleventsroot.WithVersion({{printf "%q" .Version}}))...)
 {{- end }}

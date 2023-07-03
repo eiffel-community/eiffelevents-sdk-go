@@ -49,7 +49,7 @@ var eventTypeTable = map[string]map[int64]majorEventVersion{
 		1: majorEventVersion{reflect.TypeOf(ActivityTriggeredV1{}), "1.1.0"},
 		2: majorEventVersion{reflect.TypeOf(ActivityTriggeredV2{}), "2.0.0"},
 		3: majorEventVersion{reflect.TypeOf(ActivityTriggeredV3{}), "3.0.0"},
-		4: majorEventVersion{reflect.TypeOf(ActivityTriggeredV4{}), "4.2.0"},
+		4: majorEventVersion{reflect.TypeOf(ActivityTriggeredV4{}), "4.3.0"},
 	},
 	"EiffelAnnouncementPublishedEvent": {
 		1: majorEventVersion{reflect.TypeOf(AnnouncementPublishedV1{}), "1.1.0"},
@@ -134,7 +134,7 @@ var eventTypeTable = map[string]map[int64]majorEventVersion{
 	"EiffelTestCaseTriggeredEvent": {
 		1: majorEventVersion{reflect.TypeOf(TestCaseTriggeredV1{}), "1.1.0"},
 		2: majorEventVersion{reflect.TypeOf(TestCaseTriggeredV2{}), "2.0.0"},
-		3: majorEventVersion{reflect.TypeOf(TestCaseTriggeredV3{}), "3.4.0"},
+		3: majorEventVersion{reflect.TypeOf(TestCaseTriggeredV3{}), "3.5.0"},
 	},
 	"EiffelTestExecutionRecipeCollectionCreatedEvent": {
 		1: majorEventVersion{reflect.TypeOf(TestExecutionRecipeCollectionCreatedV1{}), "1.0.0"},
@@ -150,6 +150,6 @@ var eventTypeTable = map[string]map[int64]majorEventVersion{
 	"EiffelTestSuiteStartedEvent": {
 		1: majorEventVersion{reflect.TypeOf(TestSuiteStartedV1{}), "1.1.0"},
 		2: majorEventVersion{reflect.TypeOf(TestSuiteStartedV2{}), "2.0.0"},
-		3: majorEventVersion{reflect.TypeOf(TestSuiteStartedV3{}), "3.3.0"},
+		3: majorEventVersion{reflect.TypeOf(TestSuiteStartedV3{}), "3.4.0"},
 	},
 }
