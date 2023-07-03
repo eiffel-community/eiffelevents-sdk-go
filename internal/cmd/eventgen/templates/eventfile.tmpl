@@ -27,16 +27,22 @@ import (
 	"github.com/google/uuid"
 )
 
+{{if eq .Version.Major 0}}
+// New{{.StructName}} creates a new struct pointer that represents version
+// {{.Version}} of {{.EventType}}. The returned struct has all required
+// meta members populated.
+{{- else}}
 // New{{.StructName}} creates a new struct pointer that represents
-// major version {{.MajorVersion}} of {{.EventType}}.
+// major version {{.Version.Major}} of {{.EventType}}.
 // The returned struct has all required meta members populated.
-// The event version is set to the most recent {{.MajorVersion}}.x.x
+// The event version is set to the most recent {{.Version.Major}}.x.x
 // currently known by this SDK.
+{{- end }}
 func New{{.StructName}}(modifiers ...Modifier) (*{{.StructName}}, error) {
 	var event {{.StructName}}
 	event.Meta.Type = {{ printf "%q" .EventType }}
 	event.Meta.ID = uuid.NewString()
-	event.Meta.Version = eventTypeTable[event.Meta.Type][{{.MajorVersion}}].latestVersion
+	event.Meta.Version = eventTypeTable[event.Meta.Type][{{.Version.Major}}].latestVersion
 	event.Meta.Time = time.Now().UnixMilli()
 	for _, modifier := range modifiers {
 		if err := modifier(&event); err != nil {

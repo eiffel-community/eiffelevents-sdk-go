@@ -125,17 +125,17 @@ func (edf *eventDefinitionFile) Render(schema io.Reader, outputFile string) erro
 		subTypeNamePrefix = fmt.Sprintf("%sV%d", eventTypeAbbrev, edf.version.Major())
 	}
 	eventMeta := struct {
-		EventType         string // The name of the event type, e.g. EiffelActivityTriggeredEvent.
-		EventTypeAbbrev   string // The abbreviated event type name, e.g. ActT.
-		StructName        string // The name of the struct that represents the event type.
-		SubTypeNamePrefix string // The prefix that any subtypes of the event type struct gets to their names.
-		MajorVersion      int64  // The event type's major version.
+		EventType         string          // The name of the event type, e.g. EiffelActivityTriggeredEvent.
+		EventTypeAbbrev   string          // The abbreviated event type name, e.g. ActT.
+		StructName        string          // The name of the struct that represents the event type.
+		SubTypeNamePrefix string          // The prefix that any subtypes of the event type struct gets to their names.
+		Version           *semver.Version // The event version.
 	}{
 		EventType:         edf.typeName,
 		EventTypeAbbrev:   eventTypeAbbrev,
 		StructName:        eiffelevents.VersionedStructName(edf.typeName, edf.version),
 		SubTypeNamePrefix: subTypeNamePrefix,
-		MajorVersion:      edf.version.Major(),
+		Version:           edf.version,
 	}
 
 	rootStruct, err := newEventStruct(eventMeta.SubTypeNamePrefix, eventMeta.StructName, s)

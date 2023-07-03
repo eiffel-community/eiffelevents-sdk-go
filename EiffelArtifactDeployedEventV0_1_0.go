@@ -27,11 +27,9 @@ import (
 	"github.com/google/uuid"
 )
 
-// NewArtifactDeployedV0_1_0 creates a new struct pointer that represents
-// major version 0 of EiffelArtifactDeployedEvent.
-// The returned struct has all required meta members populated.
-// The event version is set to the most recent 0.x.x
-// currently known by this SDK.
+// NewArtifactDeployedV0_1_0 creates a new struct pointer that represents version
+// 0.1.0 of EiffelArtifactDeployedEvent. The returned struct has all required
+// meta members populated.
 func NewArtifactDeployedV0_1_0(modifiers ...Modifier) (*ArtifactDeployedV0_1_0, error) {
 	var event ArtifactDeployedV0_1_0
 	event.Meta.Type = "EiffelArtifactDeployedEvent"
