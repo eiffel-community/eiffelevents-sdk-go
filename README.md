@@ -30,8 +30,11 @@ below.
 ## Creating new events
 
 The struct types used to represent Eiffel events are named after the event
-types without the "Eiffel" prefix and "Event" suffix, and the event's major
-version as a suffix. Hence, each event's major version gets its own struct.
+types without the "Eiffel" prefix and "Event" suffix, and with a version suffix.
+For non-experimental event versions (1.0.0 and up) the version suffix is the
+event's major version (i.e. each major version gets its own struct) while for
+experimental event versions (0.x.y) every single version gets its own struct
+(because every version is allowed to contain backwards incompatible changes).
 
 The following example shows two methods of creating events, with and without
 a factory.

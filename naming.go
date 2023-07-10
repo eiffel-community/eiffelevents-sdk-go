@@ -47,5 +47,8 @@ func StructName(eventType string, eventVersion *semver.Version) string {
 // VersionedStructName returns the name of the Go struct used to represent
 // a particular version of a type.
 func VersionedStructName(eventType string, eventVersion *semver.Version) string {
+	if eventVersion.Major() == 0 {
+		return fmt.Sprintf("%sV%s", StructName(eventType, eventVersion), strings.ReplaceAll(eventVersion.String(), ".", "_"))
+	}
 	return fmt.Sprintf("%sV%d", StructName(eventType, eventVersion), eventVersion.Major())
 }

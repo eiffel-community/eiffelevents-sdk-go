@@ -21,6 +21,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/Masterminds/semver"
 	"github.com/eiffel-community/eiffelevents-sdk-go"
 	"github.com/eiffel-community/eiffelevents-sdk-go/internal/codetemplate"
 )
@@ -28,6 +29,7 @@ import (
 type MajorEventVersion struct {
 	StructName    string
 	LatestVersion string
+	latest        *semver.Version
 }
 
 //go:embed templates/eventtypetable.tmpl
@@ -39,17 +41,25 @@ var eventTableFileTemplate string
 func generateEventTypeTable(schemas map[string][]schemaDefinitionRenderer, outputFile string) error {
 	table := make(map[string]map[int]MajorEventVersion)
 	for _, eventSchemas := range schemas {
-		latestVersions := latestMajorVersions(eventSchemas)
-		for majorVersion, schema := range latestVersions {
+		latestVersions := significantVersions(eventSchemas)
+		for _, schema := range latestVersions {
 			if !strings.HasSuffix(schema.TypeName(), "Event") {
 				continue
 			}
 			if table[schema.TypeName()] == nil {
 				table[schema.TypeName()] = make(map[int]MajorEventVersion)
 			}
-			table[schema.TypeName()][int(majorVersion)] = MajorEventVersion{
-				eiffelevents.VersionedStructName(schema.TypeName(), schema.Version()),
-				schema.Version().String(),
+
+			// For non-experimental event versions this conditional is unnecessary since significantVersions()
+			// has already weeded out non-latest versions, but for experimental versions we need to make sure
+			// we fill the table with the latest one (and the latest one only).
+			major := int(schema.Version().Major())
+			if current, exists := table[schema.TypeName()][major]; !exists || current.latest.LessThan(schema.Version()) {
+				table[schema.TypeName()][major] = MajorEventVersion{
+					eiffelevents.VersionedStructName(schema.TypeName(), schema.Version()),
+					schema.Version().String(),
+					schema.Version(),
+				}
 			}
 		}
 	}

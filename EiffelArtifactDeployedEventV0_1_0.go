@@ -27,33 +27,25 @@ import (
 	"github.com/google/uuid"
 )
 
-{{if eq .Version.Major 0}}
-// New{{.StructName}} creates a new struct pointer that represents version
-// {{.Version}} of {{.EventType}}. The returned struct has all required
+// NewArtifactDeployedV0_1_0 creates a new struct pointer that represents version
+// 0.1.0 of EiffelArtifactDeployedEvent. The returned struct has all required
 // meta members populated.
-{{- else}}
-// New{{.StructName}} creates a new struct pointer that represents
-// major version {{.Version.Major}} of {{.EventType}}.
-// The returned struct has all required meta members populated.
-// The event version is set to the most recent {{.Version.Major}}.x.x
-// currently known by this SDK.
-{{- end }}
-func New{{.StructName}}(modifiers ...Modifier) (*{{.StructName}}, error) {
-	var event {{.StructName}}
-	event.Meta.Type = {{ printf "%q" .EventType }}
+func NewArtifactDeployedV0_1_0(modifiers ...Modifier) (*ArtifactDeployedV0_1_0, error) {
+	var event ArtifactDeployedV0_1_0
+	event.Meta.Type = "EiffelArtifactDeployedEvent"
 	event.Meta.ID = uuid.NewString()
-	event.Meta.Version = eventTypeTable[event.Meta.Type][{{.Version.Major}}].latestVersion
+	event.Meta.Version = eventTypeTable[event.Meta.Type][0].latestVersion
 	event.Meta.Time = time.Now().UnixMilli()
 	for _, modifier := range modifiers {
 		if err := modifier(&event); err != nil {
-			return nil, fmt.Errorf("error applying modifier to new {{.StructName}}: %w", err)
+			return nil, fmt.Errorf("error applying modifier to new ArtifactDeployedV0_1_0: %w", err)
 		}
 	}
 	return &event, nil
 }
 
 // MarshalJSON returns the JSON encoding of the event.
-func (e *{{.StructName}}) MarshalJSON() ([]byte, error) {
+func (e *ArtifactDeployedV0_1_0) MarshalJSON() ([]byte, error) {
 	// The standard encoding/json package doesn't honor omitempty for
 	// non-pointer structs (it doesn't recurse into values, only examines
 	// the immediate value). This is a not terribly elegant way of making
@@ -65,12 +57,12 @@ func (e *{{.StructName}}) MarshalJSON() ([]byte, error) {
 	// get serialized as "[]" instead of "null".
 	links := e.Links
 	if links == nil {
-		links = make({{FieldType "links"}}, 0)
+		links = make(EventLinksV1, 0)
 	}
-	s := struct{
-		Data  *{{FieldType "data"}} `json:"data"`
-		Links {{FieldType "links"}} `json:"links"`
-		Meta  *{{FieldType "meta"}} `json:"meta"`
+	s := struct {
+		Data  *ArtDV0_1_0Data `json:"data"`
+		Links EventLinksV1    `json:"links"`
+		Meta  *MetaV3         `json:"meta"`
 	}{
 		Data:  &e.Data,
 		Links: links,
@@ -79,12 +71,12 @@ func (e *{{.StructName}}) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s)
 }
 
-func (e *{{.StructName}}) SetField(fieldName string, value interface{}) error {
+func (e *ArtifactDeployedV0_1_0) SetField(fieldName string, value interface{}) error {
 	return setField(reflect.ValueOf(e), fieldName, value)
 }
 
 // String returns the JSON encoding of the event.
-func (e *{{.StructName}}) String() string {
+func (e *ArtifactDeployedV0_1_0) String() string {
 	b, err := e.MarshalJSON()
 	if err != nil {
 		// This should never happen, and if it does happen it's not clear that
@@ -95,30 +87,49 @@ func (e *{{.StructName}}) String() string {
 	return string(b)
 }
 
-var _ FieldSetter = &{{.StructName}}{}
-var _ MetaTeller = &{{.StructName}}{}
+var _ FieldSetter = &ArtifactDeployedV0_1_0{}
+var _ MetaTeller = &ArtifactDeployedV0_1_0{}
 
 // ID returns the value of the meta.id field.
-func (e {{.StructName}}) ID() string {
+func (e ArtifactDeployedV0_1_0) ID() string {
 	return e.Meta.ID
 }
 
 // Type returns the value of the meta.type field.
-func (e {{.StructName}}) Type() string {
+func (e ArtifactDeployedV0_1_0) Type() string {
 	return e.Meta.Type
 }
 
 // Version returns the value of the meta.version field.
-func (e {{.StructName}}) Version() string {
+func (e ArtifactDeployedV0_1_0) Version() string {
 	return e.Meta.Version
 }
 
 // Time returns the value of the meta.time field.
-func (e {{.StructName}}) Time() int64 {
+func (e ArtifactDeployedV0_1_0) Time() int64 {
 	return e.Meta.Time
 }
 
 // DomainID returns the value of the meta.source.domainId field.
-func (e {{.StructName}}) DomainID() string {
+func (e ArtifactDeployedV0_1_0) DomainID() string {
 	return e.Meta.Source.DomainID
+}
+
+type ArtifactDeployedV0_1_0 struct {
+	// Mandatory fields
+	Data  ArtDV0_1_0Data `json:"data"`
+	Links EventLinksV1   `json:"links"`
+	Meta  MetaV3         `json:"meta"`
+
+	// Optional fields
+
+}
+
+type ArtDV0_1_0Data struct {
+	// Mandatory fields
+
+	// Optional fields
+	CustomData  []CustomDataV1 `json:"customData,omitempty"`
+	Description string         `json:"description,omitempty"`
+	URI         string         `json:"uri,omitempty"`
 }
