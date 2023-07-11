@@ -45,6 +45,7 @@ var editionTags = map[string]string{
 	"arica":    "edition-arica",
 	"bordeaux": "edition-bordeaux",
 	"lyon":     "edition-lyon",
+	"orizaba":  "edition-orizaba",
 	"paris":    "edition-paris",
 	"toulouse": "edition-toulouse",
 }
