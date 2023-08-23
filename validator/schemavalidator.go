@@ -30,11 +30,13 @@ import (
 
 var ErrSchemaMissing = errors.New("no schema found by any of the configured schema locators")
 
-// SchemaLocator attempts to find the schema for a particular event based
-// on the event's type, its version, and (if available) the schema URI from
-// the meta.schemaURI member. Returns (nil, nil) if no schema could be found
-// (and no error occurred while reaching that conclusion).
+// SchemaLocator defines a method that attempts to find the schema
+// for a particular event based on the event's type, its version,
+// and (if available) the schema URI from the meta.schemaURI member.
 type SchemaLocator interface {
+	// GetSchema attempts to find and return a JSON schema that matches the given
+	// input attributes. Returns (nil, nil) if no schema could be found and no
+	// error occurred while reaching that conclusion.
 	GetSchema(ctx context.Context, eventType string, version string, schemaURI string) (io.ReadCloser, error)
 }
 
