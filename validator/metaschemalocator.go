@@ -44,7 +44,7 @@ func NewMetaSchemaLocator(getter HTTPGetter) *MetaSchemaLocator {
 // GetSchema downloads the event's schema via HTTP(S) if schemaURI is non-empty.
 // Returns (nil, nil) if schemaURI is empty or if the URI scheme isn't "http"
 // or "https".
-func (bss *MetaSchemaLocator) GetSchema(ctx context.Context, eventType string, version string, schemaURI string) (io.ReadCloser, error) {
+func (msl *MetaSchemaLocator) GetSchema(ctx context.Context, eventType string, version string, schemaURI string) (io.ReadCloser, error) {
 	if schemaURI == "" {
 		return nil, nil
 	}
@@ -62,7 +62,7 @@ func (bss *MetaSchemaLocator) GetSchema(ctx context.Context, eventType string, v
 	if err != nil {
 		return nil, fmt.Errorf("error creating HTTP request: %w", err)
 	}
-	resp, err := bss.getter.Do(req)
+	resp, err := msl.getter.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching schema: %w", err)
 	}

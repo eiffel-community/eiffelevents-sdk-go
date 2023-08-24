@@ -40,8 +40,8 @@ func NewBundledSchemaLocator() *BundledSchemaLocator {
 }
 
 // GetSchema returns the event's schema from the built-in official set of schemas.
-// Returns (nil, nil) no schema was found for the provided event type and version.
-func (bss *BundledSchemaLocator) GetSchema(ctx context.Context, eventType string, version string, schemaURI string) (io.ReadCloser, error) {
+// Returns (nil, nil) if no schema was found for the provided event type and version.
+func (bsl *BundledSchemaLocator) GetSchema(ctx context.Context, eventType string, version string, schemaURI string) (io.ReadCloser, error) {
 	schema, err := schemas.ReadFile(filepath.Join("schemas", eventType, version+".json"))
 	if errors.Is(err, fs.ErrNotExist) {
 		return nil, nil
