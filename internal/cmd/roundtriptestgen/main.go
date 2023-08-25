@@ -19,7 +19,6 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -48,13 +47,7 @@ func generateExampleTable(exampleDir string, output *codetemplate.OutputFile) er
 
 	var table []tableEntry
 	for _, filename := range filenames {
-		f, err := os.Open(filename)
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-
-		eventExample, err := io.ReadAll(f)
+		eventExample, err := os.ReadFile(filename)
 		if err != nil {
 			return err
 		}
