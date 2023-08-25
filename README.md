@@ -229,6 +229,17 @@ func main() {
 }
 ```
 
+## Validating events
+
+Eiffel events are defined by their schemas, and publishers are expected to
+send events that conform to those schemas. The validator subpackage can assist
+with that task as well as other user-defined validation tasks. Validation is
+done via a validator.Set instance, where one or more implementations of
+validator.Validator inspect an event in the configured order. To ease the
+configuration burden, validator.DefaultSet returns a reasonably configured
+validator.Set instance that's ready to be used. See the documentation of
+the validator subpackage for details.
+
 ## Code of Conduct and Contributing
 To get involved, please see [Code of Conduct](https://github.com/eiffel-community/.github/blob/master/CODE_OF_CONDUCT.md) and [contribution guidelines](https://github.com/eiffel-community/.github/blob/master/CONTRIBUTING.md).
 
