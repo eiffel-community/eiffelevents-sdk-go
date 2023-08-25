@@ -19,13 +19,13 @@ package eiffelevents
 import (
 	"encoding/json"
 	"errors"
-	"io"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 //go:generate go run ./internal/cmd/roundtriptestgen protocol/examples/events events_test_roundtripdata.go
@@ -37,22 +37,15 @@ import (
 func TestRoundtrip(t *testing.T) {
 	for _, tc := range eventRoundTripTestTable {
 		t.Run(tc.Filename, func(t *testing.T) {
-			f, err := os.Open(tc.Filename)
-			if err != nil {
-				t.Fatal(err.Error())
-			}
-			defer f.Close()
-			input, err := io.ReadAll(f)
-			if err != nil {
-				t.Fatal(err.Error())
-			}
+			input, err := os.ReadFile(tc.Filename)
+			require.NoError(t, err)
 
 			event, err := UnmarshalAny(input)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.IsType(t, tc.ExpectedType, event)
 
 			output, err := json.Marshal(event)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.JSONEq(t, string(input), string(output))
 		})
 	}
