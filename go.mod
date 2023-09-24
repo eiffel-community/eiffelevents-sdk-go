@@ -12,7 +12,7 @@ require (
 	github.com/lestrrat-go/jsschema v0.0.0-20181205002244-5c81c58ffcc3
 	github.com/package-url/packageurl-go v0.1.0
 	github.com/stretchr/testify v1.8.3
-	github.com/tidwall/gjson v1.14.4
+	github.com/tidwall/gjson v1.17.0
 	github.com/xeipuuv/gojsonschema v1.2.0
 	golang.org/x/text v0.11.0
 	gopkg.in/yaml.v3 v3.0.1
