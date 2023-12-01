@@ -48,7 +48,7 @@ type goEnum struct {
 }
 
 func newEnum(parent *goStruct, name string, typ goType, values []interface{}) (*goEnum, error) {
-	enumTypeName := parent.SubTypeNamePrefix + strings.Title(name)
+	enumTypeName := parent.SubTypeNamePrefix + initialCapital(name)
 
 	var enumValues []goEnumValue
 	for _, value := range values {
