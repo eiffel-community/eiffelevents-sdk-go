@@ -8,7 +8,7 @@ require (
 	github.com/clarketm/json v1.17.1
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/google/renameio v1.0.1
-	github.com/google/uuid v1.3.0
+	github.com/google/uuid v1.6.0
 	github.com/lestrrat-go/jsschema v0.0.0-20181205002244-5c81c58ffcc3
 	github.com/package-url/packageurl-go v0.1.0
 	github.com/stretchr/testify v1.8.3
