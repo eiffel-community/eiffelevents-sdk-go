@@ -23,6 +23,7 @@ import (
 
 	"github.com/Masterminds/semver"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFindSchemas(t *testing.T) {
@@ -163,7 +164,7 @@ func TestFindSchemas(t *testing.T) {
 			if tc.expectedError != nil {
 				assert.ErrorIs(t, err, tc.expectedError)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, tc.expected, schemas)
 			}
 		})

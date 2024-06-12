@@ -134,7 +134,7 @@ func goTypeFromSchema(parent *goStruct, name string, schema *jsschema.Schema) (g
 
 	fullName := parent.qualifiedFieldName(name)
 
-	switch schema.Type[0] {
+	switch schema.Type[0] { // nolint:exhaustive
 	case jsschema.StringType:
 		typ = &goPrimitiveType{name: "string"}
 	case jsschema.IntegerType:
