@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type setFieldLevel1TestStruct struct {
@@ -95,11 +96,11 @@ func TestSetField(t *testing.T) {
 	}
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
-			err := setField(reflect.ValueOf(&tc.input), tc.field, tc.value)
+			err := setField(reflect.ValueOf(&tc.input), tc.field, tc.value) // nolint:gosec
 			if tc.expectedErr != "" {
 				assert.Contains(t, err.Error(), tc.expectedErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 			assert.Equal(t, tc.expected, tc.input)
 		})

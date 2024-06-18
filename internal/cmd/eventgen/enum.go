@@ -31,12 +31,12 @@ import (
 
 // goEnum represents a Go type that acts as an enumeration. This type has the following form:
 //
-//     type EnumName UnderlyingType
+//	type EnumName UnderlyingType
 //
-//     const (
-//	       EnumName_Value1 EnumName = "VALUE1"
-//	       EnumName_Value2 EnumName = "VALUE2"
-//	   )
+//	const (
+//	        EnumName_Value1 EnumName = "VALUE1"
+//	        EnumName_Value2 EnumName = "VALUE2"
+//	)
 //
 // It currently assumes that the underlying type is a string and that the
 // string (with limited mangling) can be appended to the name of the enum type

@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func ExampleModifier() {
@@ -60,46 +61,46 @@ func TestPurlFromBuildInfo(t *testing.T) {
 	}
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
-			assert.Equal(t, tc.expected, purlFromBuildInfo(&tc.input).String())
+			assert.Equal(t, tc.expected, purlFromBuildInfo(&tc.input).String()) // nolint:gosec
 		})
 	}
 }
 
 func TestWithSourceDomainID(t *testing.T) {
 	event, err := NewCompositionDefinedV3(WithSourceDomainID("example.com"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "example.com", event.Meta.Source.DomainID)
 }
 
 func TestWithSourceHost(t *testing.T) {
 	event, err := NewCompositionDefinedV3(WithSourceHost("hostname.example.com"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "hostname.example.com", event.Meta.Source.Host)
 }
 
 func TestWithSourceName(t *testing.T) {
 	event, err := NewCompositionDefinedV3(WithSourceName("My Application"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "My Application", event.Meta.Source.Name)
 }
 
 func TestWithSourceSerializer(t *testing.T) {
 	event, err := NewCompositionDefinedV3(WithSourceSerializer("pkg:golang/github.com/foo/bar"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "pkg:golang/github.com/foo/bar", event.Meta.Source.Serializer)
 }
 
 func TestWithSourceURI(t *testing.T) {
 	event, err := NewCompositionDefinedV3(WithSourceURI("http://www.example.com"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "http://www.example.com", event.Meta.Source.URI)
 }
 
 func TestWithVersion(t *testing.T) {
 	newestEventVersion, err := NewCompositionDefinedV3()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	customEventVersion, err := NewCompositionDefinedV3(WithVersion("3.1.0"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// Make sure we're not accidentally getting a pass because the default
 	// version happens to coincide with the one we're request (which shouldn't

@@ -74,25 +74,25 @@ func (a *Any) UnmarshalJSON(b []byte) error {
 
 // ID returns the value of the meta.id field.
 func (a Any) ID() string {
-	return a.event.(MetaTeller).ID()
+	return a.event.(MetaTeller).ID() // nolint:forcetypeassert
 }
 
 // Type returns the value of the meta.type field.
 func (a Any) Type() string {
-	return a.event.(MetaTeller).Type()
+	return a.event.(MetaTeller).Type() // nolint:forcetypeassert
 }
 
 // Version returns the value of the meta.version field.
 func (a Any) Version() string {
-	return a.event.(MetaTeller).Version()
+	return a.event.(MetaTeller).Version() // nolint:forcetypeassert
 }
 
 // Time returns the value of the meta.time field.
 func (a Any) Time() int64 {
-	return a.event.(MetaTeller).Time()
+	return a.event.(MetaTeller).Time() // nolint:forcetypeassert
 }
 
 // DomainID returns the value of the meta.source.domainId field.
 func (a Any) DomainID() string {
-	return a.event.(MetaTeller).DomainID()
+	return a.event.(MetaTeller).DomainID() // nolint:forcetypeassert
 }

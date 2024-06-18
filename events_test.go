@@ -59,11 +59,11 @@ func TestMajorVersionFactory(t *testing.T) {
 	// We're deliberately avoiding the most recent major version to avoid having
 	// to update this test if there's another minor version of the event.
 	event, err := NewActivityTriggeredV3()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	assert.Equal(t, "EiffelActivityTriggeredEvent", event.Meta.Type)
 	_, err = uuid.Parse(event.Meta.ID)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "3.0.0", event.Meta.Version)
 
 	// Sanity check that meta.time is within two minutes of the current time.
@@ -77,17 +77,17 @@ func TestMajorVersionFactory(t *testing.T) {
 func TestFactoriesWithModifiers(t *testing.T) {
 	// Single modifier
 	event, err := NewActivityTriggeredV3(WithSourceName("name"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "name", event.Meta.Source.Name)
 
 	// Modifiers are applied in order
 	event, err = NewActivityTriggeredV3(WithSourceName("name1"), WithSourceName("name2"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "name2", event.Meta.Source.Name)
 
 	// Different kinds of modifiers
 	event, err = NewActivityTriggeredV3(WithSourceHost("host"), WithSourceName("name"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "host", event.Meta.Source.Host)
 	assert.Equal(t, "name", event.Meta.Source.Name)
 

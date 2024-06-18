@@ -2,24 +2,50 @@
 linters:
   disable-all: true
   enable:
+    - bidichk
     - bodyclose
-    - deadcode
+    - canonicalheader
+    - contextcheck
+    - dupword
+    - durationcheck
     - errcheck
+    - errchkjson
+    - exhaustive
     - exportloopref
+    - fatcontext
+    - forcetypeassert
     - gocyclo
     - godot
     - gofmt
     - gosec
     - gosimple
     - govet
+    - inamedparam
     - ineffassign
+    - makezero
+    - mirror
     - misspell
+    - noctx
+    - nosprintfhostport
+    - predeclared
+    - reassign
+    - spancheck
     - staticcheck
+    - tagalign
+    - tenv
+    - testableexamples
+    - testifylint
     - typecheck
     - unconvert
+    - unparam
     - unused
-    - varcheck
     - whitespace
 linters-settings:
   misspell:
     locale: US
+  usestdlibvars:
+    crypto-hash: true
+    http-method: false
+    sql-isolation-level: true
+    time-layout: true
+    tls-signature-scheme: true
