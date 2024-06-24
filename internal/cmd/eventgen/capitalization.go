@@ -21,5 +21,8 @@ import "strings"
 // initialCapital converts the first letter of a string into uppercase,
 // similar to the deprecated strings.Title.
 func initialCapital(s string) string {
+	if s == "" {
+		return s
+	}
 	return strings.ToUpper(s[0:1]) + s[1:]
 }

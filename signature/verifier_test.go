@@ -44,19 +44,19 @@ func TestSignAndVerify(t *testing.T) {
 		expectedError    error
 	}{
 		{
-			name:             "Happy path",
+			name:             "Happy path with RS256",
 			alg:              RS256,
 			key:              rsaKey,
 			lookupPublicKeys: []crypto.PublicKey{rsaKey.Public()},
 		},
 		{
-			name:             "Happy path",
+			name:             "Happy path with RS384",
 			alg:              RS384,
 			key:              rsaKey,
 			lookupPublicKeys: []crypto.PublicKey{rsaKey.Public()},
 		},
 		{
-			name:             "Happy path",
+			name:             "Happy path with RS512",
 			alg:              RS512,
 			key:              rsaKey,
 			lookupPublicKeys: []crypto.PublicKey{rsaKey.Public()},
@@ -92,7 +92,7 @@ func TestSignAndVerify(t *testing.T) {
 			lookupPublicKeys: []crypto.PublicKey{rsaKey.Public()},
 		},
 		{
-			name:             "Happy path with PS384",
+			name:             "Happy path with PS512",
 			alg:              PS512,
 			key:              rsaKey,
 			lookupPublicKeys: []crypto.PublicKey{rsaKey.Public()},

@@ -160,7 +160,7 @@ func (s *Signer) Sign(event json.Marshaler) ([]byte, error) {
 func signECDSA(priv crypto.PrivateKey, hash crypto.Hash, digest []byte) ([]byte, error) {
 	privECDSA, ok := priv.(*ecdsa.PrivateKey)
 	if !ok {
-		return nil, fmt.Errorf("private key had the wrong type; expected *ecdsa.PrivateKey, got %T", priv)
+		return nil, fmt.Errorf("%w; expected *ecdsa.PrivateKey, got %T", ErrKeyTypeMismatch, priv)
 	}
 	return ecdsa.SignASN1(rand.Reader, privECDSA, digest)
 }
@@ -168,7 +168,7 @@ func signECDSA(priv crypto.PrivateKey, hash crypto.Hash, digest []byte) ([]byte,
 func signPKCS1v15(priv crypto.PrivateKey, hash crypto.Hash, digest []byte) ([]byte, error) {
 	privRSA, ok := priv.(*rsa.PrivateKey)
 	if !ok {
-		return nil, fmt.Errorf("private key had the wrong type; expected *rsa.PrivateKey, got %T", priv)
+		return nil, fmt.Errorf("%w; expected *rsa.PrivateKey, got %T", ErrKeyTypeMismatch, priv)
 	}
 	return rsa.SignPKCS1v15(rand.Reader, privRSA, hash, digest)
 }
@@ -176,7 +176,7 @@ func signPKCS1v15(priv crypto.PrivateKey, hash crypto.Hash, digest []byte) ([]by
 func signPSS(priv crypto.PrivateKey, hash crypto.Hash, digest []byte) ([]byte, error) {
 	privRSA, ok := priv.(*rsa.PrivateKey)
 	if !ok {
-		return nil, fmt.Errorf("private key had the wrong type; expected *rsa.PrivateKey, got %T", priv)
+		return nil, fmt.Errorf("%w; expected *rsa.PrivateKey, got %T", ErrKeyTypeMismatch, priv)
 	}
 	return rsa.SignPSS(rand.Reader, privRSA, hash, digest, nil)
 }

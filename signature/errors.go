@@ -19,8 +19,8 @@ package signature
 import "errors"
 
 var (
+	ErrKeyTypeMismatch      = errors.New("key is of the wrong type")
 	ErrMarshaling           = errors.New("the marshaling of the event was unsuccessful")
-	ErrPublicKeyInvalid     = errors.New("public key had the wrong type")
 	ErrPublicKeyLookup      = errors.New("an error occurred looking up the public key for this identity")
 	ErrPublicKeyNotFound    = errors.New("no public key for verifying events signed by this identify was found")
 	ErrSignatureMismatch    = errors.New("the signature couldn't be verified")

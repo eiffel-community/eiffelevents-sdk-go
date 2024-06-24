@@ -25,10 +25,11 @@ import (
 	"encoding/json"
 	"testing"
 
-	rooteiffelevents "github.com/eiffel-community/eiffelevents-sdk-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
+
+	rooteiffelevents "github.com/eiffel-community/eiffelevents-sdk-go"
 )
 
 func generateRSAKey(t *testing.T) crypto.Signer {

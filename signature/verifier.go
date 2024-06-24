@@ -96,7 +96,7 @@ func NewVerifier(keyLocator PublicKeyLocator) *Verifier {
 //   - If no public key that matches the event sender's identity was found,
 //     ErrPublicKeyNotFound is returned.
 //   - If the public key that was found doesn't match the algorithm in
-//     the event payload, ErrPublicKeyInvalid is returned.
+//     the event payload, ErrKeyTypeMismatch is returned.
 //   - If something goes wrong while modifying the event in preparation of
 //     the verification, ErrMarshaling is returned.
 //   - If the verification itself fails for all of the public keys,
@@ -237,7 +237,7 @@ func hashSHA512(data []byte) []byte {
 func verifyECDSA(pub crypto.PublicKey, hash crypto.Hash, digest []byte, sig []byte) error {
 	pubECDSA, ok := pub.(*ecdsa.PublicKey)
 	if !ok {
-		return fmt.Errorf("%w; expected *ecdsa.PublicKey, got %T", ErrPublicKeyInvalid, pub)
+		return fmt.Errorf("%w; expected *ecdsa.PublicKey, got %T", ErrKeyTypeMismatch, pub)
 	}
 	if ecdsa.VerifyASN1(pubECDSA, digest, sig) {
 		return nil
@@ -249,7 +249,7 @@ func verifyECDSA(pub crypto.PublicKey, hash crypto.Hash, digest []byte, sig []by
 func verifyPKCS1v15(pub crypto.PublicKey, hash crypto.Hash, digest []byte, sig []byte) error {
 	pubRSA, ok := pub.(*rsa.PublicKey)
 	if !ok {
-		return fmt.Errorf("%w; expected *rsa.PublicKey, got %T", ErrPublicKeyInvalid, pub)
+		return fmt.Errorf("%w; expected *rsa.PublicKey, got %T", ErrKeyTypeMismatch, pub)
 	}
 	if err := rsa.VerifyPKCS1v15(pubRSA, hash, digest, sig); err != nil {
 		return errors.Join(ErrSignatureMismatch, err)
@@ -260,7 +260,7 @@ func verifyPKCS1v15(pub crypto.PublicKey, hash crypto.Hash, digest []byte, sig [
 func verifyPSS(pub crypto.PublicKey, hash crypto.Hash, digest []byte, sig []byte) error {
 	pubRSA, ok := pub.(*rsa.PublicKey)
 	if !ok {
-		return fmt.Errorf("%w; expected *rsa.PublicKey, got %T", ErrPublicKeyInvalid, pub)
+		return fmt.Errorf("%w; expected *rsa.PublicKey, got %T", ErrKeyTypeMismatch, pub)
 	}
 	if err := rsa.VerifyPSS(pubRSA, hash, digest, sig, nil); err != nil {
 		return errors.Join(ErrSignatureMismatch, err)
