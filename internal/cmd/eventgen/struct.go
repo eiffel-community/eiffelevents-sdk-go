@@ -150,12 +150,12 @@ func fieldTitle(propertyName string) string {
 	if result, overridden := capitalizationExceptions[propertyName]; overridden {
 		return result
 	}
-	result := strings.Title(propertyName)
+	result := initialCapital(propertyName)
 
 	// Also apply overrides when the member ends with the titlecased string,
 	// i.e. we want "GroupId" to become "GroupID".
 	for orig, repl := range capitalizationExceptions {
-		if strings.HasSuffix(result, strings.Title(orig)) {
+		if strings.HasSuffix(result, initialCapital(orig)) {
 			result = result[0:len(result)-len(orig)] + repl
 		}
 	}

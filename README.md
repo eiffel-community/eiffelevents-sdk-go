@@ -240,6 +240,14 @@ configuration burden, validator.DefaultSet returns a reasonably configured
 validator.Set instance that's ready to be used. See the documentation of
 the validator subpackage for details.
 
+## Signing events and verifying signatures
+
+The SDK supports cryptographic signing of (typically) outbound events as
+well as verification of the signature of inbound events. The signing is
+done according to the standard method, with the signature and metadata under
+the `meta.security` field. See the documentation of the signature subpackage
+for details and code examples.
+
 ## Code of Conduct and Contributing
 To get involved, please see [Code of Conduct](https://github.com/eiffel-community/.github/blob/master/CODE_OF_CONDUCT.md) and [contribution guidelines](https://github.com/eiffel-community/.github/blob/master/CONTRIBUTING.md).
 
