@@ -76,12 +76,14 @@ func (ai *AuthorIdentity) String() string {
 // Verifier can verify whether the signature of a given Eiffel event matches
 // any of the keys known by the associated PublicKeyLocator.
 type Verifier struct {
-	keyLocator PublicKeyLocator
+	keyLocator    PublicKeyLocator
+	identityCache map[string]*AuthorIdentity
 }
 
 func NewVerifier(keyLocator PublicKeyLocator) *Verifier {
 	return &Verifier{
-		keyLocator: keyLocator,
+		keyLocator:    keyLocator,
+		identityCache: make(map[string]*AuthorIdentity),
 	}
 }
 
@@ -190,11 +192,13 @@ func (v *Verifier) Verify(ctx context.Context, event []byte) error {
 	}
 	sigBytes = sigBytes[:n]
 
-	// TODO: Implement a cache that maps the identity strings to their
-	// *AuthorIdentity equivalents.
-	dn, err := NewAuthorIdentity(identity)
-	if err != nil {
-		return errors.Join(ErrMarshaling, err)
+	// Use the identity cache to avoid having to reparse the same DN string over and over.
+	dn, found := v.identityCache[identity]
+	if !found {
+		if dn, err = NewAuthorIdentity(identity); err != nil {
+			return errors.Join(ErrMarshaling, err)
+		}
+		v.identityCache[identity] = dn
 	}
 
 	keys, err := v.keyLocator.Locate(ctx, dn)
