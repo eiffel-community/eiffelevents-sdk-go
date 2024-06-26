@@ -28,7 +28,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/go-ldap/ldap"
 	"github.com/gowebpki/jcs"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
@@ -43,35 +42,6 @@ type PublicKeyLocator interface {
 	// or an empty or nil slice if no public keys were found. An error return indicates
 	// that the lookup itself failed.
 	Locate(ctx context.Context, identity *AuthorIdentity) ([]crypto.PublicKey, error)
-}
-
-// AuthorIdentity is a representation of the distinguished name
-// in the meta.security.authorIdentity field of an Eiffel event.
-// It can be compared to other values of the same type.
-type AuthorIdentity struct {
-	dn       *ldap.DN
-	original string
-}
-
-func NewAuthorIdentity(s string) (*AuthorIdentity, error) {
-	dn, err := ldap.ParseDN(s)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing author identity %q: %w", s, err)
-	}
-	return &AuthorIdentity{
-		dn:       dn,
-		original: s,
-	}, nil
-}
-
-// Equal returns true if the provided *AuthorIdentity is equal to this one,
-// igoring differences in whitespace etc.
-func (ai *AuthorIdentity) Equal(other *AuthorIdentity) bool {
-	return ai.dn.Equal(other.dn)
-}
-
-func (ai *AuthorIdentity) String() string {
-	return ai.original
 }
 
 // Verifier can verify whether the signature of a given Eiffel event matches
