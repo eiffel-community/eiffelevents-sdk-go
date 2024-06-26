@@ -25,6 +25,7 @@ var (
 	ErrPublicKeyNotFound    = errors.New("no public key for verifying events signed by this identify was found")
 	ErrSignatureMismatch    = errors.New("the signature couldn't be verified")
 	ErrSigningFailed        = errors.New("signing of the event failed")
+	ErrSigningUnavailable   = errors.New("signing of this event type and version isn't supported")
 	ErrUnsupportedAlgorithm = errors.New("unsupported algorithm")
 	ErrUnverifiableEvent    = errors.New("event cannot be verified because an essential field is unset or empty")
 	ErrVerificationFailed   = errors.New("the signature couldn't be verified by any of the available public keys")

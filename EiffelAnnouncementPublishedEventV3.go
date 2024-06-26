@@ -89,8 +89,11 @@ func (e *AnnouncementPublishedV3) String() string {
 	return string(b)
 }
 
-var _ FieldSetter = &AnnouncementPublishedV3{}
-var _ MetaTeller = &AnnouncementPublishedV3{}
+var (
+	_ CapabilityTeller = &AnnouncementPublishedV3{}
+	_ FieldSetter      = &AnnouncementPublishedV3{}
+	_ MetaTeller       = &AnnouncementPublishedV3{}
+)
 
 // ID returns the value of the meta.id field.
 func (e AnnouncementPublishedV3) ID() string {
@@ -115,6 +118,13 @@ func (e AnnouncementPublishedV3) Time() int64 {
 // DomainID returns the value of the meta.source.domainId field.
 func (e AnnouncementPublishedV3) DomainID() string {
 	return e.Meta.Source.DomainID
+}
+
+// SupportsSigning returns true if the event supports signatures according
+// to V3 of the meta field, i.e. events where the signature is found under
+// meta.security.integrityProtection.
+func (e AnnouncementPublishedV3) SupportsSigning() bool {
+	return true
 }
 
 type AnnouncementPublishedV3 struct {

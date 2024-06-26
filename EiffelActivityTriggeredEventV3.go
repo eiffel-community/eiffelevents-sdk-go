@@ -89,8 +89,11 @@ func (e *ActivityTriggeredV3) String() string {
 	return string(b)
 }
 
-var _ FieldSetter = &ActivityTriggeredV3{}
-var _ MetaTeller = &ActivityTriggeredV3{}
+var (
+	_ CapabilityTeller = &ActivityTriggeredV3{}
+	_ FieldSetter      = &ActivityTriggeredV3{}
+	_ MetaTeller       = &ActivityTriggeredV3{}
+)
 
 // ID returns the value of the meta.id field.
 func (e ActivityTriggeredV3) ID() string {
@@ -115,6 +118,13 @@ func (e ActivityTriggeredV3) Time() int64 {
 // DomainID returns the value of the meta.source.domainId field.
 func (e ActivityTriggeredV3) DomainID() string {
 	return e.Meta.Source.DomainID
+}
+
+// SupportsSigning returns true if the event supports signatures according
+// to V3 of the meta field, i.e. events where the signature is found under
+// meta.security.integrityProtection.
+func (e ActivityTriggeredV3) SupportsSigning() bool {
+	return false
 }
 
 type ActivityTriggeredV3 struct {
