@@ -26,6 +26,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/gowebpki/jcs"
 	"github.com/tidwall/gjson"
@@ -46,12 +47,15 @@ type PublicKeyLocator interface {
 // Verifier can verify whether the signature of a given Eiffel event matches
 // any of the keys known by the associated PublicKeyLocator.
 type Verifier struct {
-	keyLocator PublicKeyLocator
+	keyLocator      PublicKeyLocator
+	identityCache   map[string]*AuthorIdentity
+	identityCacheMu sync.Mutex
 }
 
 func NewVerifier(keyLocator PublicKeyLocator) *Verifier {
 	return &Verifier{
-		keyLocator: keyLocator,
+		keyLocator:    keyLocator,
+		identityCache: make(map[string]*AuthorIdentity),
 	}
 }
 
@@ -160,9 +164,7 @@ func (v *Verifier) Verify(ctx context.Context, event []byte) error {
 	}
 	sigBytes = sigBytes[:n]
 
-	// TODO: Implement a cache that maps the identity strings to their
-	// *AuthorIdentity equivalents.
-	dn, err := NewAuthorIdentity(identity)
+	dn, err := v.lookupIdentity(identity)
 	if err != nil {
 		return errors.Join(ErrMarshaling, err)
 	}
@@ -187,6 +189,21 @@ func (v *Verifier) Verify(ctx context.Context, event []byte) error {
 		errs = append(errs, err)
 	}
 	return errors.Join(errs...)
+}
+
+func (v *Verifier) lookupIdentity(identity string) (*AuthorIdentity, error) {
+	v.identityCacheMu.Lock()
+	defer v.identityCacheMu.Unlock()
+
+	dn, found := v.identityCache[identity]
+	if !found {
+		var err error
+		if dn, err = NewAuthorIdentity(identity); err != nil {
+			return nil, err
+		}
+		v.identityCache[identity] = dn
+	}
+	return dn, nil
 }
 
 func hashSHA256(data []byte) []byte {
