@@ -89,8 +89,11 @@ func (e *CompositionDefinedV3) String() string {
 	return string(b)
 }
 
-var _ FieldSetter = &CompositionDefinedV3{}
-var _ MetaTeller = &CompositionDefinedV3{}
+var (
+	_ CapabilityTeller = &CompositionDefinedV3{}
+	_ FieldSetter      = &CompositionDefinedV3{}
+	_ MetaTeller       = &CompositionDefinedV3{}
+)
 
 // ID returns the value of the meta.id field.
 func (e CompositionDefinedV3) ID() string {
@@ -115,6 +118,13 @@ func (e CompositionDefinedV3) Time() int64 {
 // DomainID returns the value of the meta.source.domainId field.
 func (e CompositionDefinedV3) DomainID() string {
 	return e.Meta.Source.DomainID
+}
+
+// SupportsSigning returns true if the event supports signatures according
+// to V3 of the meta field, i.e. events where the signature is found under
+// meta.security.integrityProtection.
+func (e CompositionDefinedV3) SupportsSigning() bool {
+	return true
 }
 
 type CompositionDefinedV3 struct {

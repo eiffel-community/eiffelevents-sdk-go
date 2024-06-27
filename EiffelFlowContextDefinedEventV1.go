@@ -89,8 +89,11 @@ func (e *FlowContextDefinedV1) String() string {
 	return string(b)
 }
 
-var _ FieldSetter = &FlowContextDefinedV1{}
-var _ MetaTeller = &FlowContextDefinedV1{}
+var (
+	_ CapabilityTeller = &FlowContextDefinedV1{}
+	_ FieldSetter      = &FlowContextDefinedV1{}
+	_ MetaTeller       = &FlowContextDefinedV1{}
+)
 
 // ID returns the value of the meta.id field.
 func (e FlowContextDefinedV1) ID() string {
@@ -115,6 +118,13 @@ func (e FlowContextDefinedV1) Time() int64 {
 // DomainID returns the value of the meta.source.domainId field.
 func (e FlowContextDefinedV1) DomainID() string {
 	return e.Meta.Source.DomainID
+}
+
+// SupportsSigning returns true if the event supports signatures according
+// to V3 of the meta field, i.e. events where the signature is found under
+// meta.security.integrityProtection.
+func (e FlowContextDefinedV1) SupportsSigning() bool {
+	return false
 }
 
 type FlowContextDefinedV1 struct {

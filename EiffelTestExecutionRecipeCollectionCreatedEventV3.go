@@ -89,8 +89,11 @@ func (e *TestExecutionRecipeCollectionCreatedV3) String() string {
 	return string(b)
 }
 
-var _ FieldSetter = &TestExecutionRecipeCollectionCreatedV3{}
-var _ MetaTeller = &TestExecutionRecipeCollectionCreatedV3{}
+var (
+	_ CapabilityTeller = &TestExecutionRecipeCollectionCreatedV3{}
+	_ FieldSetter      = &TestExecutionRecipeCollectionCreatedV3{}
+	_ MetaTeller       = &TestExecutionRecipeCollectionCreatedV3{}
+)
 
 // ID returns the value of the meta.id field.
 func (e TestExecutionRecipeCollectionCreatedV3) ID() string {
@@ -115,6 +118,13 @@ func (e TestExecutionRecipeCollectionCreatedV3) Time() int64 {
 // DomainID returns the value of the meta.source.domainId field.
 func (e TestExecutionRecipeCollectionCreatedV3) DomainID() string {
 	return e.Meta.Source.DomainID
+}
+
+// SupportsSigning returns true if the event supports signatures according
+// to V3 of the meta field, i.e. events where the signature is found under
+// meta.security.integrityProtection.
+func (e TestExecutionRecipeCollectionCreatedV3) SupportsSigning() bool {
+	return false
 }
 
 type TestExecutionRecipeCollectionCreatedV3 struct {

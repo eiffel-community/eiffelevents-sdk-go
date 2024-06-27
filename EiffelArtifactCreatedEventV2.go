@@ -89,8 +89,11 @@ func (e *ArtifactCreatedV2) String() string {
 	return string(b)
 }
 
-var _ FieldSetter = &ArtifactCreatedV2{}
-var _ MetaTeller = &ArtifactCreatedV2{}
+var (
+	_ CapabilityTeller = &ArtifactCreatedV2{}
+	_ FieldSetter      = &ArtifactCreatedV2{}
+	_ MetaTeller       = &ArtifactCreatedV2{}
+)
 
 // ID returns the value of the meta.id field.
 func (e ArtifactCreatedV2) ID() string {
@@ -115,6 +118,13 @@ func (e ArtifactCreatedV2) Time() int64 {
 // DomainID returns the value of the meta.source.domainId field.
 func (e ArtifactCreatedV2) DomainID() string {
 	return e.Meta.Source.DomainID
+}
+
+// SupportsSigning returns true if the event supports signatures according
+// to V3 of the meta field, i.e. events where the signature is found under
+// meta.security.integrityProtection.
+func (e ArtifactCreatedV2) SupportsSigning() bool {
+	return false
 }
 
 type ArtifactCreatedV2 struct {

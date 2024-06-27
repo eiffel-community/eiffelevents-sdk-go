@@ -55,6 +55,13 @@ const (
 	signatureField      = "meta.security.integrityProtection.signature"
 )
 
+// SigningSubject is a representation of an event that potentially could be signed.
+type SigningSubject interface {
+	json.Marshaler
+	eiffelevents.CapabilityTeller
+	eiffelevents.MetaTeller
+}
+
 // Signer signs Eiffel event payloads in the standard way.
 type Signer struct {
 	identity   string
@@ -118,14 +125,18 @@ func NewKeySigner(identity string, alg Algorithm, pk crypto.PrivateKey) (*Signer
 // Sign signs the provided event and returns it as a byte slice that includes
 // the signature itself and the details needed to verify the signature.
 //
+//   - If the event isn't recent enough to support signing,
+//     ErrSigningUnavailable is returned.
 //   - If something goes wrong while modifying the event in preparation of
 //     the signing, ErrMarshaling is returned.
 //   - If the signing itself fails, ErrSigningFailed is returned.
 //
 // Errors will be returned in wrapped form so make sure you use errors.Is
 // rather than direct comparisons.
-func (s *Signer) Sign(event json.Marshaler) ([]byte, error) {
-	// TODO: Check if meta.security is supported in this event version.
+func (s *Signer) Sign(event SigningSubject) ([]byte, error) {
+	if !event.SupportsSigning() {
+		return nil, fmt.Errorf("%w: %s %s", ErrSigningUnavailable, event.Type(), event.Version())
+	}
 
 	eventBytes, err := event.MarshalJSON()
 	if err != nil {

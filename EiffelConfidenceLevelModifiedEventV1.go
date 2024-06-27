@@ -89,8 +89,11 @@ func (e *ConfidenceLevelModifiedV1) String() string {
 	return string(b)
 }
 
-var _ FieldSetter = &ConfidenceLevelModifiedV1{}
-var _ MetaTeller = &ConfidenceLevelModifiedV1{}
+var (
+	_ CapabilityTeller = &ConfidenceLevelModifiedV1{}
+	_ FieldSetter      = &ConfidenceLevelModifiedV1{}
+	_ MetaTeller       = &ConfidenceLevelModifiedV1{}
+)
 
 // ID returns the value of the meta.id field.
 func (e ConfidenceLevelModifiedV1) ID() string {
@@ -115,6 +118,13 @@ func (e ConfidenceLevelModifiedV1) Time() int64 {
 // DomainID returns the value of the meta.source.domainId field.
 func (e ConfidenceLevelModifiedV1) DomainID() string {
 	return e.Meta.Source.DomainID
+}
+
+// SupportsSigning returns true if the event supports signatures according
+// to V3 of the meta field, i.e. events where the signature is found under
+// meta.security.integrityProtection.
+func (e ConfidenceLevelModifiedV1) SupportsSigning() bool {
+	return false
 }
 
 type ConfidenceLevelModifiedV1 struct {

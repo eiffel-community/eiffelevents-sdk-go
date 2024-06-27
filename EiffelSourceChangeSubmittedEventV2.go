@@ -89,8 +89,11 @@ func (e *SourceChangeSubmittedV2) String() string {
 	return string(b)
 }
 
-var _ FieldSetter = &SourceChangeSubmittedV2{}
-var _ MetaTeller = &SourceChangeSubmittedV2{}
+var (
+	_ CapabilityTeller = &SourceChangeSubmittedV2{}
+	_ FieldSetter      = &SourceChangeSubmittedV2{}
+	_ MetaTeller       = &SourceChangeSubmittedV2{}
+)
 
 // ID returns the value of the meta.id field.
 func (e SourceChangeSubmittedV2) ID() string {
@@ -115,6 +118,13 @@ func (e SourceChangeSubmittedV2) Time() int64 {
 // DomainID returns the value of the meta.source.domainId field.
 func (e SourceChangeSubmittedV2) DomainID() string {
 	return e.Meta.Source.DomainID
+}
+
+// SupportsSigning returns true if the event supports signatures according
+// to V3 of the meta field, i.e. events where the signature is found under
+// meta.security.integrityProtection.
+func (e SourceChangeSubmittedV2) SupportsSigning() bool {
+	return false
 }
 
 type SourceChangeSubmittedV2 struct {

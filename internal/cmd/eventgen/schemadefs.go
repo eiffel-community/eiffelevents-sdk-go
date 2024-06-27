@@ -125,6 +125,7 @@ func (edf *eventDefinitionFile) Render(schema io.Reader, outputFile string) erro
 		subTypeNamePrefix = fmt.Sprintf("%sV%d", eventTypeAbbrev, edf.version.Major())
 	}
 	eventMeta := struct {
+		SupportsSigning   bool            // Does this event type support signing according to V3 of meta.security?
 		EventType         string          // The name of the event type, e.g. EiffelActivityTriggeredEvent.
 		EventTypeAbbrev   string          // The abbreviated event type name, e.g. ActT.
 		StructName        string          // The name of the struct that represents the event type.
@@ -141,6 +142,17 @@ func (edf *eventDefinitionFile) Render(schema io.Reader, outputFile string) erro
 	rootStruct, err := newEventStruct(eventMeta.SubTypeNamePrefix, eventMeta.StructName, s)
 	if err != nil {
 		return err
+	}
+
+	// Populate eventMeta.SupportsSigning by checking which version of
+	// the meta field that introduced the second-generation signing
+	// (via meta.security.integrityProtection rather than meta.security.sdm).
+	firstMetaSecurity := semver.MustParse("3.0.0")
+	for _, member := range rootStruct.Fields {
+		if t, ok := member.Type.(*goPredeclaredType); ok && t.BaseName == "Meta" {
+			eventMeta.SupportsSigning = t.Version.GreaterThan(firstMetaSecurity) || t.Version.Equal(firstMetaSecurity)
+			break
+		}
 	}
 
 	ct := codetemplate.New(outputFile)

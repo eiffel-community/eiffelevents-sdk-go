@@ -89,8 +89,11 @@ func (e *TestCaseFinishedV1) String() string {
 	return string(b)
 }
 
-var _ FieldSetter = &TestCaseFinishedV1{}
-var _ MetaTeller = &TestCaseFinishedV1{}
+var (
+	_ CapabilityTeller = &TestCaseFinishedV1{}
+	_ FieldSetter      = &TestCaseFinishedV1{}
+	_ MetaTeller       = &TestCaseFinishedV1{}
+)
 
 // ID returns the value of the meta.id field.
 func (e TestCaseFinishedV1) ID() string {
@@ -115,6 +118,13 @@ func (e TestCaseFinishedV1) Time() int64 {
 // DomainID returns the value of the meta.source.domainId field.
 func (e TestCaseFinishedV1) DomainID() string {
 	return e.Meta.Source.DomainID
+}
+
+// SupportsSigning returns true if the event supports signatures according
+// to V3 of the meta field, i.e. events where the signature is found under
+// meta.security.integrityProtection.
+func (e TestCaseFinishedV1) SupportsSigning() bool {
+	return false
 }
 
 type TestCaseFinishedV1 struct {

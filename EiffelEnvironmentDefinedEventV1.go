@@ -89,8 +89,11 @@ func (e *EnvironmentDefinedV1) String() string {
 	return string(b)
 }
 
-var _ FieldSetter = &EnvironmentDefinedV1{}
-var _ MetaTeller = &EnvironmentDefinedV1{}
+var (
+	_ CapabilityTeller = &EnvironmentDefinedV1{}
+	_ FieldSetter      = &EnvironmentDefinedV1{}
+	_ MetaTeller       = &EnvironmentDefinedV1{}
+)
 
 // ID returns the value of the meta.id field.
 func (e EnvironmentDefinedV1) ID() string {
@@ -115,6 +118,13 @@ func (e EnvironmentDefinedV1) Time() int64 {
 // DomainID returns the value of the meta.source.domainId field.
 func (e EnvironmentDefinedV1) DomainID() string {
 	return e.Meta.Source.DomainID
+}
+
+// SupportsSigning returns true if the event supports signatures according
+// to V3 of the meta field, i.e. events where the signature is found under
+// meta.security.integrityProtection.
+func (e EnvironmentDefinedV1) SupportsSigning() bool {
+	return false
 }
 
 type EnvironmentDefinedV1 struct {
