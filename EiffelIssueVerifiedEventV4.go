@@ -89,8 +89,11 @@ func (e *IssueVerifiedV4) String() string {
 	return string(b)
 }
 
-var _ FieldSetter = &IssueVerifiedV4{}
-var _ MetaTeller = &IssueVerifiedV4{}
+var (
+	_ CapabilityTeller = &IssueVerifiedV4{}
+	_ FieldSetter      = &IssueVerifiedV4{}
+	_ MetaTeller       = &IssueVerifiedV4{}
+)
 
 // ID returns the value of the meta.id field.
 func (e IssueVerifiedV4) ID() string {
@@ -115,6 +118,13 @@ func (e IssueVerifiedV4) Time() int64 {
 // DomainID returns the value of the meta.source.domainId field.
 func (e IssueVerifiedV4) DomainID() string {
 	return e.Meta.Source.DomainID
+}
+
+// SupportsSigning returns true if the event supports signatures according
+// to V3 of the meta field, i.e. events where the signature is found under
+// meta.security.integrityProtection.
+func (e IssueVerifiedV4) SupportsSigning() bool {
+	return true
 }
 
 type IssueVerifiedV4 struct {

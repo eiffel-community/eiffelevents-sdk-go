@@ -89,8 +89,11 @@ func (e *ActivityStartedV1) String() string {
 	return string(b)
 }
 
-var _ FieldSetter = &ActivityStartedV1{}
-var _ MetaTeller = &ActivityStartedV1{}
+var (
+	_ CapabilityTeller = &ActivityStartedV1{}
+	_ FieldSetter      = &ActivityStartedV1{}
+	_ MetaTeller       = &ActivityStartedV1{}
+)
 
 // ID returns the value of the meta.id field.
 func (e ActivityStartedV1) ID() string {
@@ -115,6 +118,13 @@ func (e ActivityStartedV1) Time() int64 {
 // DomainID returns the value of the meta.source.domainId field.
 func (e ActivityStartedV1) DomainID() string {
 	return e.Meta.Source.DomainID
+}
+
+// SupportsSigning returns true if the event supports signatures according
+// to V3 of the meta field, i.e. events where the signature is found under
+// meta.security.integrityProtection.
+func (e ActivityStartedV1) SupportsSigning() bool {
+	return false
 }
 
 type ActivityStartedV1 struct {

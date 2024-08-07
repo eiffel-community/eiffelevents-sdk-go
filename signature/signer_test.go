@@ -22,7 +22,6 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/rsa"
-	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -55,69 +54,76 @@ func TestSigner(t *testing.T) {
 		name          string
 		alg           Algorithm
 		key           crypto.Signer
-		eventFactory  func() (json.Marshaler, error)
+		eventFactory  func() (SigningSubject, error)
 		expectedError error
 	}{
 		{
 			name:         "Happy path with RS256",
 			alg:          RS256,
 			key:          rsaKey,
-			eventFactory: func() (json.Marshaler, error) { return rooteiffelevents.NewCompositionDefinedV3() },
+			eventFactory: func() (SigningSubject, error) { return rooteiffelevents.NewCompositionDefinedV3() },
 		},
 		{
 			name:         "Happy path with RS384",
 			alg:          RS384,
 			key:          rsaKey,
-			eventFactory: func() (json.Marshaler, error) { return rooteiffelevents.NewCompositionDefinedV3() },
+			eventFactory: func() (SigningSubject, error) { return rooteiffelevents.NewCompositionDefinedV3() },
 		},
 		{
 			name:         "Happy path with RS512",
 			alg:          RS512,
 			key:          rsaKey,
-			eventFactory: func() (json.Marshaler, error) { return rooteiffelevents.NewCompositionDefinedV3() },
+			eventFactory: func() (SigningSubject, error) { return rooteiffelevents.NewCompositionDefinedV3() },
 		},
 		{
 			name:         "Happy path with ES256",
 			alg:          ES256,
 			key:          ecdsa256Key,
-			eventFactory: func() (json.Marshaler, error) { return rooteiffelevents.NewCompositionDefinedV3() },
+			eventFactory: func() (SigningSubject, error) { return rooteiffelevents.NewCompositionDefinedV3() },
 		},
 		{
 			name:         "Happy path with ES384",
 			alg:          ES384,
 			key:          ecdsa384Key,
-			eventFactory: func() (json.Marshaler, error) { return rooteiffelevents.NewCompositionDefinedV3() },
+			eventFactory: func() (SigningSubject, error) { return rooteiffelevents.NewCompositionDefinedV3() },
 		},
 		{
 			name:         "Happy path with ES512",
 			alg:          ES512,
 			key:          ecdsa521Key,
-			eventFactory: func() (json.Marshaler, error) { return rooteiffelevents.NewCompositionDefinedV3() },
+			eventFactory: func() (SigningSubject, error) { return rooteiffelevents.NewCompositionDefinedV3() },
 		},
 		{
 			name:         "Happy path with PS256",
 			alg:          PS256,
 			key:          rsaKey,
-			eventFactory: func() (json.Marshaler, error) { return rooteiffelevents.NewCompositionDefinedV3() },
+			eventFactory: func() (SigningSubject, error) { return rooteiffelevents.NewCompositionDefinedV3() },
 		},
 		{
 			name:         "Happy path with PS384",
 			alg:          PS384,
 			key:          rsaKey,
-			eventFactory: func() (json.Marshaler, error) { return rooteiffelevents.NewCompositionDefinedV3() },
+			eventFactory: func() (SigningSubject, error) { return rooteiffelevents.NewCompositionDefinedV3() },
 		},
 		{
 			name:         "Happy path with PS512",
 			alg:          PS512,
 			key:          rsaKey,
-			eventFactory: func() (json.Marshaler, error) { return rooteiffelevents.NewCompositionDefinedV3() },
+			eventFactory: func() (SigningSubject, error) { return rooteiffelevents.NewCompositionDefinedV3() },
 		},
 		{
 			name:          "Algorithm and key mismatch",
 			alg:           RS256,
 			key:           ecdsa256Key,
-			eventFactory:  func() (json.Marshaler, error) { return rooteiffelevents.NewCompositionDefinedV3() },
+			eventFactory:  func() (SigningSubject, error) { return rooteiffelevents.NewCompositionDefinedV3() },
 			expectedError: ErrSigningFailed,
+		},
+		{
+			name:          "Event is too old to support signing",
+			alg:           PS512,
+			key:           rsaKey,
+			eventFactory:  func() (SigningSubject, error) { return rooteiffelevents.NewCompositionDefinedV2() },
+			expectedError: ErrSigningUnavailable,
 		},
 	}
 	for _, tc := range testcases {
