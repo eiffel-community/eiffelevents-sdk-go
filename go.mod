@@ -15,7 +15,7 @@ require (
 	github.com/gowebpki/jcs v1.0.1
 	github.com/lestrrat-go/jsschema v0.0.0-20181205002244-5c81c58ffcc3
 	github.com/package-url/packageurl-go v0.1.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/tidwall/gjson v1.18.0
 	github.com/tidwall/sjson v1.2.5
 	github.com/xeipuuv/gojsonschema v1.2.0
