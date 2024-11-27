@@ -171,10 +171,10 @@ func (v *Verifier) Verify(ctx context.Context, event []byte) error {
 
 	keys, err := v.keyLocator.Locate(ctx, dn)
 	if err != nil {
-		return fmt.Errorf("%w: %s", ErrPublicKeyLookup, identity)
+		return errors.Join(fmt.Errorf("%w: %s", ErrPublicKeyLookup, identity), err)
 	}
 	if len(keys) == 0 {
-		return fmt.Errorf("%w: %s", ErrPublicKeyNotFound, identity)
+		return errors.Join(fmt.Errorf("%w: %s", ErrPublicKeyNotFound, identity), err)
 	}
 
 	// Collect the error for each public key we try, and start with
