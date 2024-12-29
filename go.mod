@@ -9,7 +9,6 @@ require (
 	github.com/Showmax/go-fqdn v1.0.0
 	github.com/clarketm/json v1.17.1
 	github.com/gertd/go-pluralize v0.2.1
-	github.com/go-ldap/ldap v3.0.3+incompatible
 	github.com/google/renameio v1.0.1
 	github.com/google/uuid v1.6.0
 	github.com/gowebpki/jcs v1.0.1
@@ -37,6 +36,5 @@ require (
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
-	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
