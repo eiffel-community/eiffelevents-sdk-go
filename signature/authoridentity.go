@@ -19,7 +19,7 @@ package signature
 import (
 	"fmt"
 
-	"github.com/go-ldap/ldap"
+	ldap "github.com/go-ldap/ldap/v3"
 )
 
 // AuthorIdentity is a representation of the distinguished name
