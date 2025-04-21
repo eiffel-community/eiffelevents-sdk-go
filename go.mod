@@ -2,7 +2,7 @@ module github.com/eiffel-community/eiffelevents-sdk-go
 
 go 1.21
 
-toolchain go1.21.11
+toolchain go1.24.1
 
 require (
 	github.com/Masterminds/semver v1.5.0
@@ -19,7 +19,7 @@ require (
 	github.com/tidwall/gjson v1.18.0
 	github.com/tidwall/sjson v1.2.5
 	github.com/xeipuuv/gojsonschema v1.2.0
-	golang.org/x/text v0.21.0
+	golang.org/x/text v0.24.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
