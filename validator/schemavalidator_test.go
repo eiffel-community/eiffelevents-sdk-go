@@ -103,7 +103,7 @@ func TestSchemaValidator(t *testing.T) {
 			validator := NewSchemaValidator(tc.schemaLocators...)
 			event, err := os.ReadFile(filepath.Join("testdata", tc.eventFile))
 			require.NoError(t, err)
-			err = validator.Validate(context.Background(), event)
+			err = validator.Validate(t.Context(), event)
 			assert.ErrorIs(t, err, tc.errorIs)
 		})
 	}

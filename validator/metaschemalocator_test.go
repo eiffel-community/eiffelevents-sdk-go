@@ -17,7 +17,6 @@
 package validator
 
 import (
-	"context"
 	"io"
 	"net/http"
 	"strings"
@@ -71,7 +70,7 @@ func TestMetaSchemaLocator(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
 			loc := NewMetaSchemaLocator(tc.httpGetter)
-			body, err := loc.GetSchema(context.Background(), "EiffelCompositionDefinedEvent", "1.0.0", tc.schemaURI)
+			body, err := loc.GetSchema(t.Context(), "EiffelCompositionDefinedEvent", "1.0.0", tc.schemaURI)
 			if tc.errorContains != "" {
 				require.Error(t, err)
 				assert.Contains(t, err.Error(), tc.errorContains)
