@@ -6,12 +6,12 @@ linters:
     - bodyclose
     - canonicalheader
     - contextcheck
+    - copyloopvar
     - dupword
     - durationcheck
     - errcheck
     - errchkjson
     - exhaustive
-    - exportloopref
     - fatcontext
     - forcetypeassert
     - gocyclo
@@ -32,12 +32,12 @@ linters:
     - spancheck
     - staticcheck
     - tagalign
-    - tenv
     - testableexamples
     - testifylint
     - typecheck
     - unconvert
     - unparam
+    - usetesting
     - unused
     - whitespace
 linters-settings:

@@ -17,7 +17,6 @@
 package validator
 
 import (
-	"context"
 	"io"
 	"strings"
 	"testing"
@@ -49,7 +48,7 @@ func TestBundledSchemaLocator(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
 			loc := NewBundledSchemaLocator()
-			body, err := loc.GetSchema(context.Background(), tc.eventType, tc.version, "")
+			body, err := loc.GetSchema(t.Context(), tc.eventType, tc.version, "")
 			if tc.expectSuccess {
 				require.NoError(t, err)
 				require.NotNil(t, body)

@@ -129,7 +129,7 @@ func TestSignAndVerify(t *testing.T) {
 			b, err := signer.Sign(event)
 			require.NoError(t, err)
 
-			err = NewVerifier(&constantPublicKeyLocator{tc.lookupPublicKeys, tc.lookupError}).Verify(context.Background(), b)
+			err = NewVerifier(&constantPublicKeyLocator{tc.lookupPublicKeys, tc.lookupError}).Verify(t.Context(), b)
 			if tc.expectedError == nil {
 				require.NoError(t, err)
 			} else {
