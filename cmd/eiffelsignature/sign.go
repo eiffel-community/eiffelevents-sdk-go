@@ -80,8 +80,9 @@ func signCmd(args []string, in io.Reader, out io.Writer) error {
 	return nil
 }
 
-// loadPrivateKey attempts to read and parse a private key file. It supports
-// PEM-encoded RSA and ECDSA keys, as well as PKCS#8 (un-encrypted) keys.
+// loadPrivateKey attempts to read and parse a private key file encoded
+// as PEM. It supports RSA and ECDSA keys, either in their native
+// encodings (PKCS#1 and SEC1, respectively) or as PKCS#8.
 func loadPrivateKey(path string) (crypto.PrivateKey, error) {
 	pemData, err := os.ReadFile(path)
 	if err != nil {

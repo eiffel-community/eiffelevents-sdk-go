@@ -248,7 +248,7 @@ done according to the standard method, with the signature and metadata under
 the `meta.security` field. See the documentation of the signature subpackage
 for details and code examples, but also the cmd/eiffelsignature
 subpackage from which you can build a standalone CLI executable for
-signing events and verifying such signatures.
+signing events and verifying the signatures of signed events.
 
 ## Code of Conduct and Contributing
 To get involved, please see [Code of Conduct](https://github.com/eiffel-community/.github/blob/master/CODE_OF_CONDUCT.md) and [contribution guidelines](https://github.com/eiffel-community/.github/blob/master/CONTRIBUTING.md).

@@ -6,7 +6,7 @@ more events read from stdin, and `verify` that verifies one or more
 events read from stdin.
 
 Both assume that keys in PEM format, and `verify` supports reading any
-number of public keys from a director of .pem files, trying the keys for
+number of public keys from a directory of .pem files, trying the keys for
 the author identity found in the signed event until it finds one that can
 successfully verify the signature.
 
