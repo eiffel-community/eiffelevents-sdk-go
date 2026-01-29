@@ -34,6 +34,7 @@ export PATH := $(GOBIN):$(PATH)
 .PHONY: all
 all: gen
 	$(GOBUILD) .
+	$(GOBUILD) ./cmd/eiffelsignature
 
 .PHONY: gen
 gen:
