@@ -39,7 +39,7 @@ var ErrUnsupportedEvent error = errors.New("event unsupported")
 // be extracted from it, or some other JSON unmarshaling error occurs an
 // ErrMalformedInput error is returned. If the event type or version isn't
 // supported by this implementation an ErrUnsupportedType error is returned.
-func UnmarshalAny(input []byte) (interface{}, error) {
+func UnmarshalAny(input []byte) (any, error) {
 	if !gjson.ValidBytes(input) {
 		return nil, fmt.Errorf("%w: not valid JSON", ErrMalformedInput)
 	}

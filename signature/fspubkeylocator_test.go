@@ -115,7 +115,7 @@ func mustParseAuthorIdentity(t *testing.T, s string) *AuthorIdentity {
 // one for each line in the input data.
 func mockPublicKeysFromLines(data []byte) ([]crypto.PublicKey, error) {
 	var result []crypto.PublicKey
-	for _, line := range strings.Split(string(data), "\n") {
+	for line := range strings.SplitSeq(string(data), "\n") {
 		result = append(result, mockPublicKey(line))
 	}
 	return result, nil

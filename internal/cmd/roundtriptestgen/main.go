@@ -47,7 +47,7 @@ func generateExampleTable(exampleDir string, output *codetemplate.OutputFile) er
 
 	var table []tableEntry
 	for _, filename := range filenames {
-		eventExample, err := os.ReadFile(filename)
+		eventExample, err := os.ReadFile(filename) // nolint: gosec
 		if err != nil {
 			return err
 		}
@@ -74,7 +74,7 @@ func generateExampleTable(exampleDir string, output *codetemplate.OutputFile) er
 
 func main() {
 	if len(os.Args) < 3 {
-		log.Fatalf("Usage: %s EXAMPLE_DIR OUTPUT_FILE", filepath.Base(os.Args[0]))
+		log.Fatalf("Usage: %s EXAMPLE_DIR OUTPUT_FILE", filepath.Base(os.Args[0])) // nolint: gosec
 	}
 	output := codetemplate.New(os.Args[2])
 	if err := generateExampleTable(os.Args[1], output); err != nil {

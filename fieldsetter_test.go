@@ -39,7 +39,7 @@ func TestSetField(t *testing.T) {
 		name        string
 		input       setFieldLevel1TestStruct
 		field       string
-		value       interface{}
+		value       any
 		expected    setFieldLevel1TestStruct
 		expectedErr string
 	}{

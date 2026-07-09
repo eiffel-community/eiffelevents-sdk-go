@@ -79,7 +79,7 @@ func createEditionDefinitions(packageName string, outputRootDir string, eventVer
 	})
 
 	outputDir := filepath.Join(outputRootDir, packageName)
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
+	if err := os.MkdirAll(outputDir, 0755); err != nil { // nolint: gosec
 		return err
 	}
 	ct := codetemplate.New(filepath.Join(outputDir, "events.go"))
@@ -132,17 +132,17 @@ func getLatestEvents(ctx context.Context, dir string, tagName string) (map[strin
 
 func main() {
 	if len(os.Args) < 3 {
-		log.Fatalf("Usage: %s SCHEMA_REPO ROOT_OUTPUT_DIR", filepath.Base(os.Args[0]))
+		log.Fatalf("Usage: %s SCHEMA_REPO ROOT_OUTPUT_DIR", filepath.Base(os.Args[0])) // nolint: gosec
 	}
 
 	for editionName, editionTag := range editionTags {
 		latestEventVersions, err := getLatestEvents(context.Background(), os.Args[1], editionTag)
 		if err != nil {
-			log.Fatalf("%s: %s", filepath.Base(os.Args[0]), err)
+			log.Fatalf("%s: %s", filepath.Base(os.Args[0]), err) // nolint: gosec
 		}
 
 		if err = createEditionDefinitions(editionName, filepath.Join(os.Args[2], "editions"), latestEventVersions); err != nil {
-			log.Fatalf("%s: %s", filepath.Base(os.Args[0]), err)
+			log.Fatalf("%s: %s", filepath.Base(os.Args[0]), err) // nolint: gosec
 		}
 	}
 }

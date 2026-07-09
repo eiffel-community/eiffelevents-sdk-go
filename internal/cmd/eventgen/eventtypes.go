@@ -73,7 +73,7 @@ func generateTypes(schemaDefs map[string][]schemaDefinitionRenderer, outputDir s
 			defer schemaFile.Close()
 
 			// Convert input YAML to JSON acceptable to github.com/lestrrat-go/jsschema.
-			var def interface{}
+			var def any
 			if err := yaml.NewDecoder(schemaFile).Decode(&def); err != nil {
 				return err
 			}

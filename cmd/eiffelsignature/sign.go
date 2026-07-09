@@ -84,7 +84,7 @@ func signCmd(args []string, in io.Reader, out io.Writer) error {
 // as PEM. It supports RSA and ECDSA keys, either in their native
 // encodings (PKCS#1 and SEC1, respectively) or as PKCS#8.
 func loadPrivateKey(path string) (crypto.PrivateKey, error) {
-	pemData, err := os.ReadFile(path)
+	pemData, err := os.ReadFile(path) // nolint: gosec
 	if err != nil {
 		return nil, err
 	}
