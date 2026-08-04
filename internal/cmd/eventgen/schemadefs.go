@@ -187,6 +187,7 @@ var structFileTemplate string
 // schemaDefinitionRenderer.
 type structDefinitionFile struct {
 	definitionFile
+
 	templateFile string
 }
 

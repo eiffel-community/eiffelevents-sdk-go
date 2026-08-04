@@ -30,7 +30,7 @@ import (
 // the ID of each event in a slice you don't have to do a type assertion on
 // every element.
 type Any struct {
-	event interface{}
+	event any
 }
 
 var (
@@ -41,7 +41,7 @@ var (
 
 // Get obtains the event as an interface pointer. Use a type assertion to
 // convert it to a concrete event struct pointer.
-func (a Any) Get() interface{} {
+func (a Any) Get() any {
 	return a.event
 }
 

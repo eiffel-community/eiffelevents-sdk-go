@@ -35,10 +35,9 @@ var trimmedTypeNameSuffixes = []string{
 func StructName(eventType string, eventVersion *semver.Version) string {
 	s := strings.TrimPrefix(eventType, "Eiffel")
 	for _, suffix := range trimmedTypeNameSuffixes {
-		// We want to break after the first removed suffix so we can't just
-		// call strings.TrimSuffix.
-		if strings.HasSuffix(s, suffix) {
-			return strings.TrimSuffix(s, suffix)
+		// We want to break after the first removed suffix.
+		if prefix, found := strings.CutSuffix(s, suffix); found {
+			return prefix
 		}
 	}
 	return s

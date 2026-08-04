@@ -26,14 +26,14 @@ import (
 // FieldSetter sets struct field by name using the usual toplevelfield.subfield notation.
 // Fields should be expressed with their JSON names, i.e. based on the "json" tag.
 type FieldSetter interface {
-	SetField(fieldName string, value interface{}) error
+	SetField(fieldName string, value any) error
 }
 
 // setField sets the value of a struct field whose path is expressed
 // with dot notation using the field names in the "json" tag. The reflect.Value
 // passed as the target must be a pointer to a struct.
-func setField(target reflect.Value, fieldName string, value interface{}) error {
-	if target.Kind() != reflect.Ptr {
+func setField(target reflect.Value, fieldName string, value any) error {
+	if target.Kind() != reflect.Pointer {
 		return errors.New("target value is not a pointer")
 	}
 	elemVal := target.Elem()

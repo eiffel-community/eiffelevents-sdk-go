@@ -1,6 +1,6 @@
----
+version: "2"
 linters:
-  disable-all: true
+  default: none
   enable:
     - bidichk
     - bodyclose
@@ -9,22 +9,26 @@ linters:
     - copyloopvar
     - dupword
     - durationcheck
+    - embeddedstructfieldcheck
     - errcheck
     - errchkjson
     - exhaustive
+    - exptostd
     - fatcontext
     - forcetypeassert
     - gocyclo
+    - godoclint
     - godot
-    - gofmt
     - gosec
-    - gosimple
     - govet
     - inamedparam
     - ineffassign
+    - iotamixing
     - makezero
     - mirror
     - misspell
+    - modernize
+    - nilnesserr
     - noctx
     - nosprintfhostport
     - predeclared
@@ -34,18 +38,41 @@ linters:
     - tagalign
     - testableexamples
     - testifylint
-    - typecheck
     - unconvert
     - unparam
-    - usetesting
     - unused
+    - usestdlibvars
+    - usetesting
     - whitespace
-linters-settings:
-  misspell:
-    locale: US
-  usestdlibvars:
-    crypto-hash: true
-    http-method: false
-    sql-isolation-level: true
-    time-layout: true
-    tls-signature-scheme: true
+  settings:
+    misspell:
+      locale: US
+    usestdlibvars:
+      http-method: false
+      time-layout: true
+      crypto-hash: true
+      sql-isolation-level: true
+      tls-signature-scheme: true
+    usetesting:
+      os-setenv: true
+      os-temp-dir: true
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gofmt
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

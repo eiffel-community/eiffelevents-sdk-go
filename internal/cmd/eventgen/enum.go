@@ -47,7 +47,7 @@ type goEnum struct {
 	Values []goEnumValue
 }
 
-func newEnum(parent *goStruct, name string, typ goType, values []interface{}) (*goEnum, error) {
+func newEnum(parent *goStruct, name string, typ goType, values []any) (*goEnum, error) {
 	enumTypeName := parent.SubTypeNamePrefix + initialCapital(name)
 
 	var enumValues []goEnumValue
@@ -83,7 +83,7 @@ type goEnumValue struct {
 	Value     string
 }
 
-func newEnumValue(typeName string, value interface{}) (goEnumValue, error) {
+func newEnumValue(typeName string, value any) (goEnumValue, error) {
 	strValue, ok := value.(string)
 	if !ok {
 		return goEnumValue{}, fmt.Errorf("enum value for type %s not a string type: %#v", typeName, value)
@@ -112,12 +112,11 @@ func stringToEnum(s string) string {
 	// Go-style strings (OneTwo).
 	result := s
 	if !isConstAbbrevExpr.MatchString(s) {
-		result = strings.Replace( // One Two -> OneTwo
+		result = strings.ReplaceAll( // One Two -> OneTwo
 			cases.Title(language.English).String( // one two -> One Two
 				strings.ToLower( // ONE TWO -> one two
-					strings.Replace(result, "_", " ", -1)), /// ONE_TWO -> ONE TWO
-			),
-			" ", "", -1)
+					strings.ReplaceAll(result, "_", " "))), /// ONE_TWO -> ONE TWO
+			" ", "")
 	}
 	return goNonIdentifierCharsExpr.ReplaceAllString(result, "_")
 }

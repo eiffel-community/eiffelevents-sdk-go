@@ -29,7 +29,7 @@ func main() {
 	programName := filepath.Base(os.Args[0])
 
 	if len(os.Args) < 3 {
-		log.Fatalf("Usage: %s SRC_DIR DEST_DIR", programName)
+		log.Fatalf("Usage: %s SRC_DIR DEST_DIR", programName) // nolint: gosec
 	}
 
 	src := os.Args[1]
@@ -37,14 +37,14 @@ func main() {
 	// As a safety measure since we're allowing files to be deleted
 	// the destination directory must be relative.
 	if filepath.IsAbs(dest) {
-		log.Fatalf("%s: destination directory path must be relative: %s", programName, dest)
+		log.Fatalf("%s: destination directory path must be relative: %s", programName, dest) // nolint: gosec
 	}
 
 	gitCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	cmd := exec.CommandContext(gitCtx, "rsync", "-a", "--delete", src, dest)
+	cmd := exec.CommandContext(gitCtx, "rsync", "-a", "--delete", src, dest) // nolint: gosec
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
-		log.Fatalf("%s: error running %q to list available schemas: %s", programName, cmd.String(), err)
+		log.Fatalf("%s: error running %q to list available schemas: %s", programName, cmd.String(), err) // nolint: gosec
 	}
 }

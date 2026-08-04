@@ -24,16 +24,16 @@ import (
 
 func main() {
 	if len(os.Args) < 3 {
-		log.Fatalf("Usage: %s SCHEMA_ROOT_DIR OUTPUT_DIR", filepath.Base(os.Args[0]))
+		log.Fatalf("Usage: %s SCHEMA_ROOT_DIR OUTPUT_DIR", filepath.Base(os.Args[0])) // nolint: gosec
 	}
 	schemas, err := findSchemas(os.Args[1])
 	if err != nil {
-		log.Fatalf("%s: %s", filepath.Base(os.Args[0]), err)
+		log.Fatalf("%s: %s", filepath.Base(os.Args[0]), err) // nolint: gosec
 	}
 	if err := generateTypes(schemas, "."); err != nil {
-		log.Fatalf("%s: %s", filepath.Base(os.Args[0]), err)
+		log.Fatalf("%s: %s", filepath.Base(os.Args[0]), err) // nolint: gosec
 	}
 	if err := generateEventTypeTable(schemas, "eventtypetable.go"); err != nil {
-		log.Fatalf("%s: %s", filepath.Base(os.Args[0]), err)
+		log.Fatalf("%s: %s", filepath.Base(os.Args[0]), err) // nolint: gosec
 	}
 }
