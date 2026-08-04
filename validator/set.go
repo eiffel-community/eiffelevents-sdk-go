@@ -69,5 +69,6 @@ func DefaultSet() *ValidatorSet {
 			NewMetaSchemaLocator(http.DefaultClient),
 			NewBundledSchemaLocator(),
 		),
+		NewPackageURLValidator(),
 	)
 }
